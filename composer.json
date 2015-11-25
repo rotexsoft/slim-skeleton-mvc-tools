@@ -15,6 +15,9 @@
     ],
     "require": {
         "php": ">=5.5.0",
+        "slim/slim": "^3.0",
+        "cfs/authenticator": "^1.0",
+        "katzgrau/klogger": "dev-master",
         "rotexsoft/file-renderer": "dev-master"
     },
     "require-dev": {
