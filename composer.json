@@ -1,0 +1,32 @@
+{
+    "name": "rotexsoft/file-renderer",
+    "type": "library",
+    "description": "A support package for the SlimPHP 3 Skeleton MVC App (https://github.com/rotexsoft/slim3-skeleton-mvc-app).",
+    "keywords": [ "mvc", "framework", "tools", "utils"],
+    "homepage": "https://github.com/rotexsoft/slim3-skeleton-mvc-tools",
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "Rotimi Adegbamigbe",
+            "email": "rotexdegba007-github@yahoo.ca",
+            "homepage": "https://github.com/rotexdegba",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "rotexsoft/file-renderer": "dev-master"
+    },
+    "require-dev": {
+        "php": ">=5.5.0",
+        "phpunit/phpunit": "^4.7",
+        "devster/ubench": "^1.1",
+        "digitalnature/php-ref": "^1.0"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    },
+    "autoload-dev": {
+        "classmap": ["src/", "tests/"]
+    }
+}
