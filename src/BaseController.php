@@ -109,16 +109,9 @@ class BaseController
         $this->app = $app;
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
-        
-        $ds = DIRECTORY_SEPARATOR;
-        
-        $path_2_layout_files = __DIR__."{$ds}..{$ds}src{$ds}site-layout-templates";
+                
         $this->layout_renderer = $this->app->getContainer()->get('new_layout_renderer');
-        $this->layout_renderer->appendPath($path_2_layout_files);
-        
-        $path_2_view_files = __DIR__."{$ds}..{$ds}src{$ds}views{$ds}base";
         $this->view_renderer = $this->app->getContainer()->get('new_view_renderer');
-        $this->view_renderer->appendPath($path_2_view_files);
         
         //try to resume the session
         $auth = $this->app->getContainer()->get('aura_auth_object');
