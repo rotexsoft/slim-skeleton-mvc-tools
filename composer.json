@@ -1,5 +1,5 @@
 {
-    "name": "rotexsoft/file-renderer",
+    "name": "rotexsoft/slim3-skeleton-mvc-tools",
     "type": "library",
     "description": "A support package for the SlimPHP 3 Skeleton MVC App (https://github.com/rotexsoft/slim3-skeleton-mvc-app).",
     "keywords": [ "mvc", "framework", "tools", "utils"],
@@ -24,9 +24,11 @@
         "digitalnature/php-ref": "^1.0"
     },
     "autoload": {
-        "classmap": ["src/"]
+        "classmap": ["src/"],
+        "files": ["src/functions/framework-helpers.php", "src/functions/str-helpers.php"]
     },
     "autoload-dev": {
-        "classmap": ["src/", "tests/"]
+        "classmap": ["src/", "tests/"],
+        "files": ["src/functions/framework-helpers.php", "src/functions/str-helpers.php"]
     }
 }
