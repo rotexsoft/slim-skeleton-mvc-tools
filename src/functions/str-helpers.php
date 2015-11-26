@@ -134,6 +134,12 @@ namespace Slim3MvcTools {
     function color_4_console(
         $string, $foreground_color = null, $background_color = null
     ) {
+        if( PHP_OS !== 'Linux') {
+            
+            //just return the string as is
+            return $string;
+        }
+        
         $foreground_colors = array();
         $background_colors = array();
 
