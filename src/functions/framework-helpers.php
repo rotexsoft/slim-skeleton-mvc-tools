@@ -155,7 +155,7 @@ namespace {
      * 
      * @param mixed $v variable or expression to dump
      */
-    function s3MVC_dump_var($v) {
+    function s3MVC_DumpVar($v) {
 
         $v = (!is_string($v)) ? var_export($v, true) : $v;
         echo "<pre>$v</pre>";

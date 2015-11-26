@@ -167,7 +167,7 @@ class BaseController
     }
     
     public function actionIndex() {
-s3MVC_dump_var($this->app->getContainer()->keys());exit;
+s3MVC_DumpVar($this->app->getContainer()->keys());exit;
         //get the contents of the view first
         $view_str = $this->renderView('index.php');
         
