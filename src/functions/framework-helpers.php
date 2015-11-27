@@ -1,12 +1,10 @@
 <?php
 namespace Slim3MvcTools {
     
-    function dumpAuthinfo(\Aura\Auth\Auth $auth) {
+    function dumpAuthinfo(\Vespula\Auth\Auth $auth) {
 
-        return 'Initial Login Time: '. $auth->getFirstActive().PHP_EOL
-             . 'Time Now: ' . $auth->getLastActive().PHP_EOL
-             . 'Login Status: ' . $auth->getStatus().PHP_EOL
-             . 'Logged in Person\'s Username: ' . $auth->getUserName().PHP_EOL
+        return 'Login Status: ' . $auth->getSession()->getStatus() . PHP_EOL
+             . 'Logged in Person\'s Username: ' . $auth->getUsername().PHP_EOL
              . 'Logged in User\'s Data: ' . PHP_EOL . print_r($auth->getUserData(), true);
     }
 }

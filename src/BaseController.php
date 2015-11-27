@@ -112,11 +112,6 @@ class BaseController
                 
         $this->layout_renderer = $this->app->getContainer()->get('new_layout_renderer');
         $this->view_renderer = $this->app->getContainer()->get('new_view_renderer');
-        
-        //try to resume the session
-        $auth = $this->app->getContainer()->get('aura_auth_object');
-        $resume_service = $this->app->getContainer()->get('aura_resume_service');
-        $resume_service->resume($auth);
     }
     
     /**
@@ -203,94 +198,76 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
         }
         
         $data_4_login_view = [
-                            'controller_object'=>$this,
-                            'error_message' => '',
-                            'username' => '',
-                            'password' => '',
-                        ];
+            'controller_object'=>$this, 'error_message' => '', 'username' => '',
+            'password' => '',
+        ];
         
         if( strtoupper($request_obj->getMethod()) === 'GET' ) {
 
             //show login form
+            //get the contents of the view first
             $view_str = $this->renderView('login.php', $data_4_login_view);
+            
             return $this->renderLayout('main-template.php', ['content'=>$view_str]);
             
         } else {
             
             //this is a POST request, process login
-            $username = s3MVC_GetSuperGlobal('post', 'username');//TODO: SANITIZATION: should sanitize this value
-            $password = s3MVC_GetSuperGlobal('post', 'password');//TODO: SANITIZATION: should sanitize this value
+            $auth = $this->app->getContainer()->get('vespula_auth'); //get the 
+                                                                     //auth object
+            $username = s3MVC_GetSuperGlobal('post', 'username');
+            $password = s3MVC_GetSuperGlobal('post', 'password');
             
-            $auth = $this->app->getContainer()->get('aura_auth_object');
-            $login_service = $this->app->getContainer()->get('aura_login_service');
-            $loggedin_successfully = false;
+            $error_msg = '';
             
-            try {
+            if( empty($username) ) {
+                
+                $error_msg .= "The 'username' field is empty.";
+            } 
+            
+            if( empty($password) ) {
+                
+                $error_msg .= (empty($error_msg))? '' : '<br>';
+                $error_msg .= "The 'password' field is empty.";
+            }
+            
+            if( empty($error_msg) ) {
+                
+                $credentials = [
+                    'username'=> filter_var($username, FILTER_SANITIZE_STRING), 
+                    'password'=> $password, //Not sanitizing this. Sanitizing or
+                                            //validating passwords should be app
+                                            //specific. For example an app can be 
+                                            //setup to allow only alphanumeric 
+                                            //passwords with a specific list of 
+                                            //allowed special characters.
+                ];
 
-                $login_service->login(
-                    $auth, [ 'username'=>$username, 'password'=>$password ]
-                );
-                
-                //The call to login above did not throw an Exception, this means
-                //that the login was successful
-                $msg = "You are now logged into a new session.";
-                $loggedin_successfully = true;
-                
-                if( 
-                    !$using_default_redirect 
-                    && session_status() === PHP_SESSION_ACTIVE && isset($_SESSION)
-                    && array_key_exists(static::SESSN_PARAM_LOGIN_REDIRECT, $_SESSION)
-                ) { 
-                    //redirect url must have been read from the session
-                    //remove it from the session, since the login was 
-                    //successful and we have already read the value.
-                    unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
+                $auth->login($credentials); //try to login
+
+                if( $auth->isValid() ) {
+
+                    $msg = "You are now logged into a new session.";
+
+                    if( 
+                        !$using_default_redirect 
+                        && session_status() === PHP_SESSION_ACTIVE && isset($_SESSION)
+                        && array_key_exists(static::SESSN_PARAM_LOGIN_REDIRECT, $_SESSION)
+                    ) { 
+                        //redirect url must have been read from the session
+                        //remove it from the session, since the login was 
+                        //successful and we have already read the value.
+                        unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
+                    }
+
+                } else {
+
+                    $msg = 'Login Failed!<br>' . $auth->getAdapter()->getError();
                 }
-
-            } catch (\Aura\Auth\Exception\UsernameMissing $e) {
-
-                $msg = "The 'username' field is missing or empty.";
-                //throw new \Exception();
-
-            } catch (\Aura\Auth\Exception\PasswordMissing $e) {
-
-                $msg = "The 'password' field is missing or empty.";
-                //throw new \Exception();
-
-            } catch (\Aura\Auth\Exception\UsernameNotFound $e) {
-
-                $msg = "The username you entered was not found.";
-                //throw new \Exception();
-
-            } catch (\Aura\Auth\Exception\MultipleMatches $e) {
-
-                $msg = "There is more than one account with that username.";
-                //throw new \Exception();
-
-            } catch (\Aura\Auth\Exception\PasswordIncorrect $e) {
-
-                $msg = "The password you entered was incorrect.";
-                //throw new \Exception();
-
-            } catch (\Aura\Auth\Exception\ConnectionFailed $e) {
-
-                $msg = "Cound not connect to IMAP or LDAP server.";
-                $msg .= " This could be because the username or password was wrong,";
-                $msg .= " or because the the connect operation itself failed in some way.";
-                //$msg .= $e->getMessage();
-                //throw new \Exception();
-
-            } catch (\Aura\Auth\Exception\BindFailed $e) {
-
-                $msg = "Cound not bind to LDAP server.";
-                $msg .= "This could be because the username or password was wrong,";
-                $msg .= " or because the the bind operation itself failed in some way.";
-                //$msg .= $e->getMessage();
-                //throw new \Exception();
-
-            } catch (\Exception $e) {
-
-                $msg = "Invalid login details. Please try again.";
+                
+            } else {
+                
+                $msg = $error_msg;
             }
             
             if( s3MVC_GetCurrentAppEnvironment() === S3MVC_APP_ENV_DEV ) {
@@ -298,7 +275,7 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
                 $msg .= '<br>'.nl2br(\Slim3MvcTools\dumpAuthinfo($auth));
             }
 
-            if( $loggedin_successfully ) {
+            if( $auth->isValid() ) {
                 
                 if( strpos($success_redirect_path, s3MVC_GetBaseUrlPath()) === false ) {
                     
@@ -318,6 +295,8 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
                 $data_4_login_view['error_message'] = $msg;
                 $data_4_login_view['username'] = $username;
                 $data_4_login_view['password'] = $password;
+                
+                //get the contents of the view first
                 $view_str = $this->renderView('login.php', $data_4_login_view);
                 
                 return $this->renderLayout('main-template.php', ['content'=>$view_str]);
@@ -336,9 +315,7 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
      */
     public function actionLogout($show_status_on_completion = false) {
         
-        $auth = $this->app->getContainer()->get('aura_auth_object');
-        $logout_service = $this->app->getContainer()->get('aura_logout_service');
-        $logout_service->logout($auth);
+        $this->app->getContainer()->get('vespula_auth')->logout(); //logout
                 
         $actn = ($show_status_on_completion) ? 'action-login-status' : 'action-login';
         
@@ -367,19 +344,22 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
         $msg = '';
             
         //Just get the current login status
-        $auth = $this->app->getContainer()->get('aura_auth_object');
+        $auth = $this->app->getContainer()->get('vespula_auth');
 
         switch (true) {
 
             case $auth->isAnon():
+                
                 $msg = "You are not logged in.";
                 break;
             
             case $auth->isIdle():
+                
                 $msg = "Your session was idle for too long. Please log in again.";
                 break;
             
             case $auth->isExpired():
+                
                 $msg = "Your session has expired. Please log in again.";
                 break;
             
@@ -397,7 +377,9 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
             $msg .= '<br>'.nl2br(\Slim3MvcTools\dumpAuthinfo($auth));
         }
 
+        //get the contents of the view first
         $view_str = $this->renderView('login-status.php', ['message'=>$msg, 'is_logged_in'=>$this->isLoggedIn(), 'controller_object'=>$this]);
+        
         return $this->renderLayout('main-template.php', ['content'=>$view_str]);
     }
 
@@ -435,7 +417,7 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
     
     public function isLoggedIn() {
         
-        return ($this->app->getContainer()->get('aura_auth_object')->isValid() === true);
+        return ($this->app->getContainer()->get('vespula_auth')->isValid() === true);
     }
     
     /**
@@ -452,19 +434,20 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
      * @return boolean|\Psr\Http\Message\ResponseInterface
      * 
      */
-    protected function getResponseObjForLoginRedirection() {
+    protected function getResponseObjForLoginRedirectionIfNotLoggedIn() {
         
         if( !$this->isLoggedIn() ) {
             
             $uri = $this->app->request->getUri();
             $base_path = s3MVC_GetBaseUrlPath();
-            $path = $uri->getPath();
+            $fragment = $uri->getFragment();
             $query = $uri->getQuery();
-            $frag = $uri->getFragment();
+            $path = $uri->getPath();
+            
             $path = $base_path . '/' . ltrim($path, '/');
             
-            $current_url = 
-                    $path . ($query ? '?'.$query :'') . ($frag ? '#'.$frag :'');
+            $curr_url = $path. ( $query ? '?' . $query : '' )
+                             . ( $fragment ? '#' . $fragment : '' );
             
             $controller = $this->controller_name_from_uri;
 
@@ -482,7 +465,7 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
             }
 
             //store current url in session
-            $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $current_url;
+            $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
 
             return $this->app->getContainer()
                              ->get('response')
