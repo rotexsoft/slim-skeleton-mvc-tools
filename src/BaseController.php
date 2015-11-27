@@ -1,5 +1,5 @@
 <?php
-namespace Slim3MvcTools;
+namespace Slim3MvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
     \Psr\Http\Message\ResponseInterface;
@@ -109,9 +109,9 @@ class BaseController
         $this->app = $app;
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
-                
-        $this->layout_renderer = $this->app->getContainer()->get('new_layout_renderer');
+
         $this->view_renderer = $this->app->getContainer()->get('new_view_renderer');
+        $this->layout_renderer = $this->app->getContainer()->get('new_layout_renderer');
     }
     
     /**
@@ -162,7 +162,7 @@ class BaseController
     }
     
     public function actionIndex() {
-s3MVC_DumpVar($this->app->getContainer()->keys());exit;
+        
         //get the contents of the view first
         $view_str = $this->renderView('index.php');
         
@@ -176,8 +176,9 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
         $request_obj = $this->app->getContainer()->get('request');
         
         if(
-            session_status() === PHP_SESSION_ACTIVE && isset($_SESSION)
-            && array_key_exists(static::SESSN_PARAM_LOGIN_REDIRECT, $_SESSION)
+            session_status() === PHP_SESSION_ACTIVE 
+            && isset($_SESSION)
+            && isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT])
         ) {
             //there is an active session with a redirect url stored in it
             $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
@@ -198,8 +199,8 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
         }
         
         $data_4_login_view = [
-            'controller_object'=>$this, 'error_message' => '', 'username' => '',
-            'password' => '',
+            'controller_object' => $this, 'error_message' => '', 
+            'username' => '', 'password' => '',
         ];
         
         if( strtoupper($request_obj->getMethod()) === 'GET' ) {
@@ -208,13 +209,12 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
             //get the contents of the view first
             $view_str = $this->renderView('login.php', $data_4_login_view);
             
-            return $this->renderLayout('main-template.php', ['content'=>$view_str]);
+            return $this->renderLayout('main-template.php', ['content' => $view_str]);
             
         } else {
             
             //this is a POST request, process login
-            $auth = $this->app->getContainer()->get('vespula_auth'); //get the 
-                                                                     //auth object
+            $auth = $this->app->getContainer()->get('vespula_auth'); //get the auth object
             $username = s3MVC_GetSuperGlobal('post', 'username');
             $password = s3MVC_GetSuperGlobal('post', 'password');
             
@@ -251,9 +251,10 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
 
                     if( 
                         !$using_default_redirect 
-                        && session_status() === PHP_SESSION_ACTIVE && isset($_SESSION)
-                        && array_key_exists(static::SESSN_PARAM_LOGIN_REDIRECT, $_SESSION)
-                    ) { 
+                        && session_status() === PHP_SESSION_ACTIVE 
+                        && isset($_SESSION)
+                        && isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT])
+                    ) {
                         //redirect url must have been read from the session
                         //remove it from the session, since the login was 
                         //successful and we have already read the value.
@@ -272,7 +273,7 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
             
             if( s3MVC_GetCurrentAppEnvironment() === S3MVC_APP_ENV_DEV ) {
                 
-                $msg .= '<br>'.nl2br(\Slim3MvcTools\dumpAuthinfo($auth));
+                $msg .= '<br>'.nl2br(s3MVC_DumpAuthinfo($auth));
             }
 
             if( $auth->isValid() ) {
@@ -374,7 +375,7 @@ s3MVC_DumpVar($this->app->getContainer()->keys());exit;
 
         if( s3MVC_GetCurrentAppEnvironment() === S3MVC_APP_ENV_DEV ) {
 
-            $msg .= '<br>'.nl2br(\Slim3MvcTools\dumpAuthinfo($auth));
+            $msg .= '<br>'.nl2br(s3MVC_DumpAuthinfo($auth));
         }
 
         //get the contents of the view first

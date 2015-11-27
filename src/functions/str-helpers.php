@@ -1,5 +1,5 @@
 <?php
-namespace Slim3MvcTools {
+namespace Slim3MvcTools\Functions\Str {
 
     /**
      * 
@@ -189,4 +189,4 @@ namespace Slim3MvcTools {
         return $colored_string;
     }
     
-} //namespace Slim3MvcTools
+} //namespace Slim3MvcTools\Functions\Str
