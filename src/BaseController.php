@@ -195,7 +195,9 @@ class BaseController
                 $controller = 'base-controller';
             }
             
-            $success_redirect_path = "{$controller}/action-login-status";
+            $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+            $action = ($prepend_action) ? 'action-' : '';
+            $success_redirect_path = "{$controller}/{$action}login-status";
         }
         
         $data_4_login_view = [
@@ -318,7 +320,9 @@ class BaseController
         
         $this->app->getContainer()->get('vespula_auth')->logout(); //logout
                 
-        $actn = ($show_status_on_completion) ? 'action-login-status' : 'action-login';
+        $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+        $action = ($prepend_action) ? 'action-' : '';
+        $actn = ($show_status_on_completion) ? $action.'login-status' : $action.'login';
         
         $controller = $this->controller_name_from_uri;
 
@@ -457,7 +461,9 @@ class BaseController
                 $controller = 'base-controller';
             }
             
-            $redr_path = s3MVC_GetBaseUrlPath() . "/{$controller}/action-login";
+            $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+            $action = ($prepend_action) ? 'action-login' : 'login';
+            $redr_path = s3MVC_GetBaseUrlPath() . "/{$controller}/$action";
                     
             if( session_status() !== PHP_SESSION_ACTIVE ) {
                 
