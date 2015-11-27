@@ -20,7 +20,7 @@
         "slim/slim": "^3.0",
         "rotexsoft/file-renderer": "dev-master",
         "vespula/log": "^0.2.1",
-        "vespula/auth": "dev-master"
+        "vespula/auth": "^0.1.2"
     },
     "require-dev": {
         "php": ">=5.5.0",
