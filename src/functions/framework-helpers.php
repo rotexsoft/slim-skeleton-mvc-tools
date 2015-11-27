@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- * Creates a controller object.
+ * Creates a controller object or returns a Respond object containing a not found page.
  *  
  * The controller class must be \Slim3MvcTools\Controllers\BaseController or one of its sub-classes
  * 
@@ -11,7 +11,10 @@
  * @param \Psr\Http\Message\ServerRequestInterface $request
  * @param \Psr\Http\Message\ResponseInterface $response
  * 
- * @return \Slim3MvcTools\Controllers\BaseController or an instance of its sub-class
+ * @return \Slim3MvcTools\Controllers\BaseController|\Psr\Http\Message\ResponseInterface 
+ *          an instance of \Slim3MvcTools\Controllers\BaseController or its sub-class or
+ *          an instance \Psr\Http\Message\ResponseInterface containing the not found 
+ *          page.
  */
 function s3MVC_CreateController(
     \Slim\App $app, 
