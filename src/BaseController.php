@@ -175,15 +175,18 @@ class BaseController
         $using_default_redirect = false;
         $request_obj = $this->app->getContainer()->get('request');
         
-        if(
-            session_status() === PHP_SESSION_ACTIVE 
-            && isset($_SESSION)
-            && isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT])
-        ) {
+        //resume session if any
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            
+            session_start(); 
+        }
+        
+        if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
+            
             //there is an active session with a redirect url stored in it
             $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
         }
-        
+
         if( empty($success_redirect_path) ) {
             
             $using_default_redirect = true;
@@ -199,7 +202,7 @@ class BaseController
             $action = ($prepend_action) ? 'action-' : '';
             $success_redirect_path = "{$controller}/{$action}login-status";
         }
-        
+
         $data_4_login_view = [
             'controller_object' => $this, 'error_message' => '', 
             'username' => '', 'password' => '',
@@ -210,16 +213,16 @@ class BaseController
             //show login form
             //get the contents of the view first
             $view_str = $this->renderView('login.php', $data_4_login_view);
-            
+
             return $this->renderLayout('main-template.php', ['content' => $view_str]);
             
         } else {
-            
+
             //this is a POST request, process login
             $auth = $this->app->getContainer()->get('vespula_auth'); //get the auth object
             $username = s3MVC_GetSuperGlobal('post', 'username');
             $password = s3MVC_GetSuperGlobal('post', 'password');
-            
+
             $error_msg = '';
             
             if( empty($username) ) {
@@ -252,9 +255,7 @@ class BaseController
                     $msg = "You are now logged into a new session.";
 
                     if( 
-                        !$using_default_redirect 
-                        && session_status() === PHP_SESSION_ACTIVE 
-                        && isset($_SESSION)
+                        !$using_default_redirect
                         && isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT])
                     ) {
                         //redirect url must have been read from the session
