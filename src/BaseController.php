@@ -443,7 +443,7 @@ class BaseController
         
         if( !$this->isLoggedIn() ) {
             
-            $uri = $this->app->request->getUri();
+            $uri = $this->app->getContainer()->get('request')->getUri();
             $base_path = s3MVC_GetBaseUrlPath();
             $fragment = $uri->getFragment();
             $query = $uri->getQuery();
