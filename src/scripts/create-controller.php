@@ -218,9 +218,19 @@ function printInfo($str, $append_new_line = true) {
     }
 }
 
-function normalizeFolderPath($path){
+function normalizeFolderPath($path) {
     
-    return rtrim(rtrim($path, '/'), '\\').DIRECTORY_SEPARATOR;
+    //trim right-most linux style path separator if any
+    $trimed_path = rtrim($path, '/');
+    
+    if( strlen($trimed_path) === strlen($path) ) {
+        
+        //there was no right-most linux path separator
+        //try to trim right-most windows style path separator if any
+        $trimed_path = rtrim($trimed_path, '\\');
+    }
+    
+    return $trimed_path . DIRECTORY_SEPARATOR;
 }
 
 /**
