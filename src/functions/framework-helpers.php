@@ -120,7 +120,7 @@ function s3MVC_GetBaseUrlPath() {
         $requestScriptDir = dirname($requestScriptName);
         $requestUri = parse_url($server['REQUEST_URI'], PHP_URL_PATH);
 
-        if (stripos($requestUri, $requestScriptName) === 0) {
+        if (strcasecmp($requestUri, $requestScriptName) === 0) {
 
             $base_path = $requestScriptName;
 
