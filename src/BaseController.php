@@ -319,8 +319,15 @@ class BaseController
      */
     public function actionLogout($show_status_on_completion = false) {
         
-        $this->app->getContainer()->get('vespula_auth')->logout(); //logout
+        $auth = $this->app->getContainer()->get('vespula_auth');
+        $auth->logout(); //logout
                 
+        if( !$auth->isAnon() ) {
+            
+            //logout failed. Definitely redirect to actionLoginStatus
+            $show_status_on_completion = true;
+        }
+        
         $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
         $action = ($prepend_action) ? 'action-' : '';
         $actn = ($show_status_on_completion) ? $action.'login-status' : $action.'login';
