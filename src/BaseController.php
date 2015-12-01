@@ -171,38 +171,8 @@ class BaseController
     
     public function actionLogin() {
 
-        $success_redirect_path = '';
-        $using_default_redirect = false;
         $request_obj = $this->app->getContainer()->get('request');
         
-        //resume session if any
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            
-            session_start(); 
-        }
-        
-        if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
-            
-            //there is an active session with a redirect url stored in it
-            $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
-        }
-
-        if( empty($success_redirect_path) ) {
-            
-            $using_default_redirect = true;
-            
-            $controller = $this->controller_name_from_uri;
-            
-            if( empty($controller) ) {
-                
-                $controller = 'base-controller';
-            }
-            
-            $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
-            $action = ($prepend_action) ? 'action-' : '';
-            $success_redirect_path = "{$controller}/{$action}login-status";
-        }
-
         $data_4_login_view = [
             'controller_object' => $this, 'error_message' => '', 
             'username' => '', 'password' => '',
@@ -219,6 +189,12 @@ class BaseController
         } else {
 
             //this is a POST request, process login
+            $controller = $this->controller_name_from_uri ?: 'base-controller';
+            
+            $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+            $action = ($prepend_action) ? 'action-' : '';
+            $success_redirect_path = "{$controller}/{$action}login-status";
+
             $auth = $this->app->getContainer()->get('vespula_auth'); //get the auth object
             $username = s3MVC_GetSuperGlobal('post', 'username');
             $password = s3MVC_GetSuperGlobal('post', 'password');
@@ -253,14 +229,17 @@ class BaseController
                 if( $auth->isValid() ) {
 
                     $msg = "You are now logged into a new session.";
+                    
+                    //since we are successfully logged in, resume session if any
+                    if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
-                    if( 
-                        !$using_default_redirect
-                        && isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT])
-                    ) {
-                        //redirect url must have been read from the session
-                        //remove it from the session, since the login was 
-                        //successful and we have already read the value.
+                    if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
+
+                        //there is an active session with a redirect url stored in it
+                        $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
+
+                        //since login is successful remove stored redirect url, 
+                        //it has served its purpose & we'll be redirecting now.
                         unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
                     }
 
