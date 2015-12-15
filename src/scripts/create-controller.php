@@ -4,11 +4,6 @@
 $ds = DIRECTORY_SEPARATOR;
 include_once __DIR__."{$ds}..{$ds}functions{$ds}str-helpers.php";
 
-//print_r(getOptVal('-c', $argv));
-//echo PHP_EOL;
-//print_r($argv);
-//echo PHP_EOL;
-
 if ( 
     $argc <= 1
     || in_array('--help', $argv)
@@ -71,52 +66,6 @@ if (
         exit;
     }
 
-    //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
-    //substitute {{TEMPLTATE_CONTROLLER_VIEW_FOLDER}} with the view folder name \Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
-    //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
-    
-    //make the dir S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
-    //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
-    //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
-
-    $template_controller_file = $templates_dir.'controller-class-template.php';
-    $dest_controller_class_file_folder = $src_folder_path.'controllers'.$ds;
-    $dest_controller_class_file = $dest_controller_class_file_folder."{$studly_controller_name}.php";
-    
-    if( 
-        !file_exists($dest_controller_class_file_folder)
-        && !mkdir($dest_controller_class_file_folder, 0775, true)
-    ) {
-        printError("Failed to create `$dest_controller_class_file_folder`; the folder supposed to contain the controller named `$studly_controller_name`. Goodbye!!");
-        exit;
-    }
-    
-    $template_view_file = $templates_dir.'index-view-template.php';
-    $dest_view_file_folder = $src_folder_path.'views'.$ds."{$dashed_controller_name}{$ds}";
-    $dest_view_file = "{$dest_view_file_folder}index.php";
-    
-    if( 
-        !file_exists($dest_view_file_folder)
-        && !mkdir($dest_view_file_folder, 0775, true) 
-    ) {    
-        printError("Failed to create `$dest_view_file_folder`; the folder supposed to contain views for the controller named `$studly_controller_name`. Goodbye!!");
-        exit;
-    }
-    
-    if( file_exists($dest_controller_class_file) ) {
-        
-        printError("Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!");
-        exit;
-    }
-    
-    if( file_exists($dest_view_file) ) {
-        
-        printError("View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!");
-        exit;
-    }
-    
-    printInfo("Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....");
-    
     ////////////////////////////////////////////////////////////////////////////
     $default_controller_2_extend = '\\Slim3MvcTools\\Controllers\\BaseController';
     
@@ -182,6 +131,52 @@ if (
         $namepace_declaration = "namespace {$namepace_4_controller};";
     }
     
+    //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
+    //substitute {{TEMPLTATE_CONTROLLER_VIEW_FOLDER}} with the view folder name \Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
+    //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
+    
+    //make the dir S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
+    //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
+    //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
+
+    $template_controller_file = $templates_dir.'controller-class-template.php';
+    $dest_controller_class_file_folder = $src_folder_path.'controllers'.$ds;
+    $dest_controller_class_file = $dest_controller_class_file_folder."{$studly_controller_name}.php";
+    
+    if( 
+        !file_exists($dest_controller_class_file_folder)
+        && !mkdir($dest_controller_class_file_folder, 0775, true)
+    ) {
+        printError("Failed to create `$dest_controller_class_file_folder`; the folder supposed to contain the controller named `$studly_controller_name`. Goodbye!!");
+        exit;
+    }
+    
+    $template_view_file = $templates_dir.'index-view-template.php';
+    $dest_view_file_folder = $src_folder_path.'views'.$ds."{$dashed_controller_name}{$ds}";
+    $dest_view_file = "{$dest_view_file_folder}index.php";
+    
+    if( 
+        !file_exists($dest_view_file_folder)
+        && !mkdir($dest_view_file_folder, 0775, true) 
+    ) {    
+        printError("Failed to create `$dest_view_file_folder`; the folder supposed to contain views for the controller named `$studly_controller_name`. Goodbye!!");
+        exit;
+    }
+    
+    if( file_exists($dest_controller_class_file) ) {
+        
+        printError("Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!");
+        exit;
+    }
+    
+    if( file_exists($dest_view_file) ) {
+        
+        printError("View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!");
+        exit;
+    }
+    
+    printInfo("Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....");
+
     ////////////////////////////////////////////////////////////////////////////
     $replaces = [
         '__CONTROLLER_2_EXTEND__' => $controller_2_extend,
