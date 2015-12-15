@@ -188,6 +188,7 @@ if (
         '__TEMPLTATE_CONTROLLER__' => $studly_controller_name,
         'namespace __NAMESPACE_2_REPLACE__;' => $namepace_declaration,
         '{{TEMPLTATE_CONTROLLER_VIEW_FOLDER}}' => $dashed_controller_name,
+        "'__login_success_redirect_controller__'" => "'{$dashed_controller_name}'",
     ];
     
     if( processTemplateFile($template_controller_file, $dest_controller_class_file, $replaces) === false ) {

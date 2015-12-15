@@ -17,7 +17,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
      * 
      * @var string
      */
-    protected $login_success_redirect_action = 'login-status';
+    protected $login_success_redirect_action = 'index';
     
     /**
      * 
@@ -26,7 +26,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
      * 
      * @var string
      */
-    protected $login_success_redirect_controller = 'base-controller';
+    protected $login_success_redirect_controller = '__login_success_redirect_controller__';
     
     /**
      * 
