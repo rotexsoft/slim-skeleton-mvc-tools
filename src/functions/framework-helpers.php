@@ -28,7 +28,7 @@ function s3MVC_CreateController(
     $controller_class_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
 
-    if( !preg_match($regex_4_valid_class_name, $controller_class_name) ) {
+    if( !preg_match( $regex_4_valid_class_name, preg_quote($controller_class_name, '/') ) ) {
 
         //A valid php class name starts with a letter or underscore, followed by 
         //any number of letters, numbers, or underscores.
