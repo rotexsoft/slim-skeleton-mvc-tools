@@ -19,9 +19,18 @@ if (
     displayHelp();
 
 } else if ( 
-    $argc >= 5
-    && ( in_array('--controller-name', $argv) || in_array('-c', $argv) )
-    && ( in_array('--path-to-src-folder', $argv) || in_array('-p', $argv) )
+   (
+        $argc === 5
+        && ( in_array('--controller-name', $argv) || in_array('-c', $argv) )
+        && ( in_array('--path-to-src-folder', $argv) || in_array('-p', $argv) )  
+    )     
+    ||
+   (
+        $argc >= 7
+        && ( in_array('--controller-name', $argv) || in_array('-c', $argv) )
+        && ( in_array('--path-to-src-folder', $argv) || in_array('-p', $argv) )
+        && ( in_array('--extends-controller', $argv) || in_array('-e', $argv) )
+    )  
 ) {
     $templates_dir = dirname(__DIR__).$ds.'templates'.$ds;
     $controller_name = getOptVal('--controller-name', $argv);
@@ -30,7 +39,7 @@ if (
         
         $controller_name = getOptVal('-c', $argv);
     }
-    
+
     $studly_controller_name = \Slim3MvcTools\Functions\Str\dashesToStudly(
                                     \Slim3MvcTools\Functions\Str\underToStudly(
                                         $controller_name
@@ -62,12 +71,12 @@ if (
         exit;
     }
 
-    //read template controller and substitute TEMPLTATE_CONTROLLER with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
+    //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
     //substitute {{TEMPLTATE_CONTROLLER_VIEW_FOLDER}} with the view folder name \Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
     //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
     
     //make the dir S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
-    //read template controller index view and substitute TEMPLTATE_CONTROLLER with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
+    //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
     //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
 
     $template_controller_file = $templates_dir.'controller-class-template.php';
@@ -108,9 +117,77 @@ if (
     
     printInfo("Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....");
     
+    ////////////////////////////////////////////////////////////////////////////
+    $default_controller_2_extend = '\\Slim3MvcTools\\Controllers\\BaseController';
+    
+    $controller_2_extend = getOptVal('--extends-controller', $argv);
+
+    if($controller_2_extend === false) {
+
+        $controller_2_extend = getOptVal('-e', $argv);
+
+        if($controller_2_extend !== false) {
+
+            if( !isValidExtendsClassName($controller_2_extend) ) {
+
+                printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
+                exit;
+            }
+            
+        } else {
+
+            //use default controller class to be extended
+            $controller_2_extend = $default_controller_2_extend;
+        }
+    } else {
+
+        if( !isValidExtendsClassName($controller_2_extend) ) {
+
+            printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
+            exit;
+        }
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    $namepace_declaration = '';//omit namespace declaration by default
+    $namepace_4_controller = getOptVal('--namespace-4-controller', $argv);
+
+    if($namepace_4_controller === false) {
+
+        $namepace_4_controller = getOptVal('-n', $argv);
+
+        if($namepace_4_controller !== false) {
+            
+            if( !isValidNamespaceName($namepace_4_controller) ) {
+
+                printError("Invalid namespace `$namepace_4_controller` supplied. Goodbye!!");
+                exit;
+            }
+            
+            //validation passed
+            $namepace_declaration = "namespace {$namepace_4_controller};";
+            
+        } else {
+            $namepace_4_controller = '';
+        }
+    } else {
+        
+        if( !isValidNamespaceName($namepace_4_controller) ) {
+
+            printError("Invalid namespace `$namepace_4_controller` supplied. Goodbye!!");
+            exit;
+        }
+
+        //validation passed
+        $namepace_declaration = "namespace {$namepace_4_controller};";
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
     $replaces = [
-        'TEMPLTATE_CONTROLLER' => $studly_controller_name,
-        '{{TEMPLTATE_CONTROLLER_VIEW_FOLDER}}' => $dashed_controller_name
+        '__CONTROLLER_2_EXTEND__' => $controller_2_extend,
+        '__TEMPLTATE_CONTROLLER__' => $studly_controller_name,
+        'namespace __NAMESPACE_2_REPLACE__;' => $namepace_declaration,
+        '{{TEMPLTATE_CONTROLLER_VIEW_FOLDER}}' => $dashed_controller_name,
     ];
     
     if( processTemplateFile($template_controller_file, $dest_controller_class_file, $replaces) === false ) {
@@ -123,7 +200,9 @@ if (
     }
     
     printInfo("Creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}` ....");
-        
+    
+    $replaces['__TEMPLTATE_CONTROLLER__'] = rtrim($namepace_4_controller, '\\').'\\'.$studly_controller_name;
+    
     if( processTemplateFile($template_view_file, $dest_view_file, $replaces) === false ) {
         
         printError("Failed creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}`.");
@@ -165,14 +244,28 @@ Usage:
   php {$cur_script} [options]
 
 Example:
-# either of the commands below will create a controller with the class named FooBar in `src/controllers/FooBar.php` and a default view in `src/views/foo-bar/index.php`  
-  php {$cur_script} -c foo-bar -p "/var/www/html/my-app/src"
-  php {$cur_script} --controller-name foo-bar
+# either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which by default extends `\Slim3MvcTools\Controllers\BaseController`)  and a default view in `src/views/foo-bar/index.php`
+    
+    php {$cur_script} -c foo-bar -p "/var/www/html/my-app/src"
+    
+    php {$cur_script} --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src"
+  
+# either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which extends `\SomeNameSpace\Controller2Extend`) and a default view in `src/views/foo-bar/index.php`
+  
+    php {$cur_script} -c foo-bar -p "/var/www/html/my-app/src" -e "\\SomeNameSpace\\Controller2Extend"
+    
+    php {$cur_script} --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src" --extends-controller "\\SomeNameSpace\\Controller2Extend"
 
 Options:
-  -h, -?, -help, --help     Display this help message
-  -c, --controller-name     The name of the controller class you want to create. The name will be converted to Studly case eg. foo-bar will be changed to FooBar.
-  -p, --path-to-src-folder  The absolute path to the `src` folder. Eg. /var/www/html/my-app/src
+  -h, -?, -help, --help         Display this help message
+    
+  -c, --controller-name         The name of the controller class you want to create. The name will be converted to Studly case eg. foo-bar will be changed to FooBar.
+  
+  -e, --extends-controller      The name of the controller class (optionally including the name-space prefix) that you want your created controller to extend. `\\Slim3MvcTools\\Controllers\\BaseController` is the default value if this option is not specified. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is the correct full class name).
+    
+  -n, --namespace-4-controller  The name of the namespace the new controller will belong to. If omitted the namespace declaration will not be present in the new controller class. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is a valid name for a php namespace).
+    
+  -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. /var/www/html/my-app/src
  
 HELP;
 
@@ -194,8 +287,52 @@ function getOptVal($opt, array $args) {
 function isValidClassName($class_name) {
     
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
+
+    return preg_match( $regex_4_valid_class_name, preg_quote($class_name, '/') );
+}
+
+function isValidExtendsClassName($controller_2_extend) {
     
-    return preg_match($regex_4_valid_class_name, $class_name);
+    $extend_class_parts = explode('\\', $controller_2_extend);
+
+    if( strlen($extend_class_parts[0]) <= 0 ) {
+
+        //the extend class name started with a leading \
+        //eg. \SomeNameSpace\ControllerClass
+        unset($extend_class_parts[0]);
+    }
+
+    foreach($extend_class_parts as $class_part) {
+
+        if( !isValidClassName($class_part) ) {
+
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function isValidNamespaceName($namepace_4_controller) {
+    
+    $namespace_parts = explode('\\', $namepace_4_controller);
+
+    if( strlen($namespace_parts[0]) <= 0 ) {
+
+        //the namespace started with a leading \
+        //eg. \SomeNameSpace\SubNameSpace
+        unset($namespace_parts[0]);
+    }
+
+    foreach($namespace_parts as $namespace_part) {
+
+        if( !isValidClassName($namespace_part) ) {
+
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 function printError($str, $append_new_line = true) {

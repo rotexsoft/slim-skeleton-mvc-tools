@@ -41,6 +41,24 @@ class BaseController
      *  
      */
     protected $view_renderer;
+    
+    /**
+     * 
+     * Will be used in actionLogin() to construct the url to redirect to upon successful login,
+     * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
+     * 
+     * @var string
+     */
+    protected $login_success_redirect_action = 'login-status';
+    
+    /**
+     * 
+     * Will be used in actionLogin() to construct the url to redirect to upon successful login,
+     * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
+     * 
+     * @var string
+     */
+    protected $login_success_redirect_controller = 'base-controller';
         
     /**
      *
@@ -174,8 +192,8 @@ class BaseController
         $request_obj = $this->app->getContainer()->get('request');
         
         $data_4_login_view = [
-            'controller_object' => $this, 'error_message' => '', 
-            'username' => '', 'password' => '',
+            'controller_object' => $this, 'error_message' => '', 'username' => '', 
+            'password' => ''
         ];
         
         if( strtoupper($request_obj->getMethod()) === 'GET' ) {
@@ -189,11 +207,12 @@ class BaseController
         } else {
 
             //this is a POST request, process login
-            $controller = $this->controller_name_from_uri ?: 'base-controller';
+            $controller = $this->login_success_redirect_controller ?: 'base-controller';
             
             $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = ($prepend_action) ? 'action-' : '';
-            $success_redirect_path = "{$controller}/{$action}login-status";
+            $success_redirect_path =
+                "{$controller}/{$action}{$this->login_success_redirect_action}";
 
             $auth = $this->app->getContainer()->get('vespula_auth'); //get the auth object
             $username = s3MVC_GetSuperGlobal('post', 'username');

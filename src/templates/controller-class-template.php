@@ -1,13 +1,33 @@
 <?php
-
+namespace __NAMESPACE_2_REPLACE__;
 /**
  * 
  * Description of TEMPLTATE_CONTROLLER goes here
  *
  * 
  */
-class TEMPLTATE_CONTROLLER extends \Slim3MvcTools\Controllers\BaseController
+class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
 {   
+    
+    
+    /**
+     * 
+     * Will be used in actionLogin() to construct the url to redirect to upon successful login,
+     * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
+     * 
+     * @var string
+     */
+    protected $login_success_redirect_action = 'login-status';
+    
+    /**
+     * 
+     * Will be used in actionLogin() to construct the url to redirect to upon successful login,
+     * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
+     * 
+     * @var string
+     */
+    protected $login_success_redirect_controller = 'base-controller';
+    
     /**
      * 
      * 
