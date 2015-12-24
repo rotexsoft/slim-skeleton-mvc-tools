@@ -2,7 +2,7 @@
 namespace __NAMESPACE_2_REPLACE__;
 /**
  * 
- * Description of TEMPLTATE_CONTROLLER goes here
+ * Description of __TEMPLTATE_CONTROLLER__ goes here
  *
  * 
  */
