@@ -135,6 +135,21 @@ function s3MVC_GetBaseUrlPath() {
 
 /**
  * 
+ * Generates a link prepended with s3MVC_GetBaseUrlPath().
+ * Can be used for generating values for the href attribute of an a or link tag, or the src 
+ * atrribute of a script tag, etc.
+ * 
+ * @param string $path
+ * @return string
+ */
+function s3MVC_MakeLink($path){
+    
+    return s3MVC_GetBaseUrlPath(). '/'.ltrim($path, '/');
+}
+
+
+/**
+ * 
  * This function stores a snapshot of the following super globals $_SERVER, $_GET,
  * $_POST, $_FILES, $_COOKIE, $_SESSION & $_ENV and then returns the stored values
  * on subsequent calls. (In the case of $_SESSION, a reference to it is kept so 
