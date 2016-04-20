@@ -28,7 +28,7 @@ class BaseController
      * 
      * View object for rendering layout files. 
      *
-     * @var \Rotexsoft\Renderer
+     * @var \Rotexsoft\FileRenderer\Renderer
      *  
      */
     protected $layout_renderer;
@@ -37,7 +37,7 @@ class BaseController
      * 
      * View object for rendering view files associated with controller actions. 
      *
-     * @var \Rotexsoft\Renderer
+     * @var \Rotexsoft\FileRenderer\Renderer
      *  
      */
     protected $view_renderer;
