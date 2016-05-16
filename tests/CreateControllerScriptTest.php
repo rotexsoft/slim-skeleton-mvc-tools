@@ -24,7 +24,6 @@ class CreateControllerScriptTest extends \PHPUnit_Framework_TestCase
         // Capture the output
         ob_start();
 
-        
         displayHelp('create-controller.php');
 
         // Get the captured output and close the buffer
