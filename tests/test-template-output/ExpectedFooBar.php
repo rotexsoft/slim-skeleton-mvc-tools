@@ -1,12 +1,12 @@
 <?php
-namespace __NAMESPACE_2_REPLACE__;
+namespace Test\Space;
 /**
  * 
- * Description of __TEMPLTATE_CONTROLLER__ goes here
+ * Description of FooBar goes here
  *
  * 
  */
-class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
+class FooBar extends SomeNameSpace\Controller2Extend
 {   
     
     
@@ -26,7 +26,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
      * 
      * @var string
      */
-    protected $login_success_redirect_controller = '__login_success_redirect_controller__';
+    protected $login_success_redirect_controller = 'foo-bar';
     
     /**
      * 
@@ -44,7 +44,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
         //Prepend view folder for this controller. 
         //It takes precedence over the view folder for the base controller.
         $ds = DIRECTORY_SEPARATOR;
-        $path_2_view_files = __DIR__.$ds.'..'.$ds.'views'.$ds.'{{TEMPLTATE_CONTROLLER_VIEW_FOLDER}}';
+        $path_2_view_files = __DIR__.$ds.'..'.$ds.'views'.$ds.'foo-bar';
         $this->view_renderer->prependPath($path_2_view_files);
     }
     
