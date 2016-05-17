@@ -25,7 +25,7 @@ try {
  * 
  * @return void
  * 
- * @throws \InvalidArgumentException
+ * @throws \InvalidArgumentException not directly but some of the functions called throw this Exception.
  */
 function create_controller($argc, array $argv) {
     
