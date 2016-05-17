@@ -19,17 +19,9 @@ class CreateControllerScriptTest extends \PHPUnit_Framework_TestCase
         $this->script_2_test = __DIR__."{$ds}..{$ds}src{$ds}scripts{$ds}create-controller.php";
     }
 
-    public function testScriptWithHelpArgs() {
+    public function testThatCreateControllerScriptWorksAsExpectedWithValidArgsAndValidArgVals() {
         
-        // Capture the output
-        ob_start();
-
-        displayHelp('create-controller.php');
-
-        // Get the captured output and close the buffer
-        $output = ob_get_clean();
-        
-        $expected_substr = <<<INPUT
+        $expected_output_showing_help_page = <<<INPUT
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim3-skeleton-mvc-app derived projects.
 
 Usage:
@@ -51,15 +43,97 @@ Example:
 Options:
   -h, -?, -help, --help         Display this help message
     
-  -c, --controller-name         The name of the controller class you want to create. The name will be converted to Studly case eg. foo-bar will be changed to FooBar.
+  -c, --controller-name         The name of the controller class you want to create. The name will be converted to Studly case eg. foo-bar will be changed to FooBar. This option REQUIRES at least the `-p` or `--path-to-src-folder` option to work.
   
-  -e, --extends-controller      The name of the controller class (optionally including the name-space prefix) that you want your created controller to extend. `\Slim3MvcTools\Controllers\BaseController` is the default value if this option is not specified. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is the correct full class name).
+  -e, --extends-controller      The name of the controller class (optionally including the name-space prefix) that you want your created controller to extend. `\\Slim3MvcTools\\Controllers\\BaseController` is the default value if this option is not specified. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is the correct full class name). This option REQUIRES at least the `-c` (or `--controller-name`) and the `-p` (or `--path-to-src-folder`) options to work.
     
-  -n, --namespace-4-controller  The name of the namespace the new controller will belong to. If omitted the namespace declaration will not be present in the new controller class. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is a valid name for a php namespace).
+  -n, --namespace-4-controller  The name of the namespace the new controller will belong to. If omitted the namespace declaration will not be present in the new controller class. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is a valid name for a php namespace). This option REQUIRES at least the `-c` (or `--controller-name`) and the `-p` (or `--path-to-src-folder`) options to work.
     
-  -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. /var/www/html/my-app/src
+  -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 INPUT;
-        $this->assertContains($expected_substr, $output);
+        //run script with no args
+        $captured_script_output = `php {$this->script_2_test}`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -? arg
+        $captured_script_output = `php {$this->script_2_test} -?`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -h arg
+        $captured_script_output = `php {$this->script_2_test} -h`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -help arg
+        $captured_script_output = `php {$this->script_2_test} -help`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --help arg
+        $captured_script_output = `php {$this->script_2_test} --help`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -c arg
+        $captured_script_output = `php {$this->script_2_test} -c`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -c arg with value
+        $captured_script_output = `php {$this->script_2_test} -c SomeController`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --controller-name arg
+        $captured_script_output = `php {$this->script_2_test} --controller-name`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --controller-name arg with value
+        $captured_script_output = `php {$this->script_2_test} --controller-name SomeController`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -p arg
+        $captured_script_output = `php {$this->script_2_test} -p`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -p arg with value
+        $captured_script_output = `php {$this->script_2_test} -p /path/to/your/apps/source-files`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --path-to-src-folder arg
+        $captured_script_output = `php {$this->script_2_test} --path-to-src-folder`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --path-to-src-folder arg with value
+        $captured_script_output = `php {$this->script_2_test} --path-to-src-folder /path/to/your/apps/source-files`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+                
+        //run script with -e arg
+        $captured_script_output = `php {$this->script_2_test} -e`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -e arg with value
+        $captured_script_output = `php {$this->script_2_test} -e SomeController2Extend`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --extends-controller arg
+        $captured_script_output = `php {$this->script_2_test} --extends-controller`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --extends-controller arg with value
+        $captured_script_output = `php {$this->script_2_test} --extends-controller SomeController2Extend`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+                
+        //run script with -n arg
+        $captured_script_output = `php {$this->script_2_test} -n`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with -n arg with value
+        $captured_script_output = `php {$this->script_2_test} -n SomeNameSpace\ForNewController`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --namespace-4-controller arg
+        $captured_script_output = `php {$this->script_2_test} --namespace-4-controller`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        
+        //run script with --namespace-4-controller arg with value
+        $captured_script_output = `php {$this->script_2_test} --namespace-4-controller SomeNameSpace\ForNewController`;
+        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
     }
 
 
