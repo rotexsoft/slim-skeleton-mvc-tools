@@ -541,6 +541,9 @@ INPUT;
         $this->assertEquals(false, @processTemplateFile('bad file', $dest_view_file, $replaces));
         $this->assertEquals(false, @processTemplateFile('bad file3', 'bad file4', $replaces));
         
+        //false when there is no perm to write destination file (Works in Linux)
+        $this->assertEquals(false, @processTemplateFile($template_view_file, '/root/bad-perm-file.txt', $replaces));
+        
         ////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////
         //Ensure the processed controller file template contains the expected output
