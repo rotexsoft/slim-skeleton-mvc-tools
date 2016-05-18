@@ -20,7 +20,7 @@ class CreateControllerScriptTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testThatCreateControllerScriptWorksAsExpectedWithValidArgsAndValidArgVals() {
-        
+/*        
         $expected_output_showing_help_page = <<<INPUT
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim3-skeleton-mvc-app derived projects.
 
@@ -134,6 +134,8 @@ INPUT;
         //run script with --namespace-4-controller arg with value
         $captured_script_output = `php {$this->script_2_test} --namespace-4-controller SomeNameSpace\ForNewController`;
         $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+ *
+ */
     }
 
 
