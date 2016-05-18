@@ -456,7 +456,7 @@ function createController($argc, array $argv) {
         if( !isValidClassName($studly_controller_name) ) {
 
             printError("Invalid controller class name `$controller_name` supplied. Goodbye!!");
-            exit;
+            return;
         }
 
         $src_folder_path = getOptVal('--path-to-src-folder', $argv);
@@ -471,7 +471,7 @@ function createController($argc, array $argv) {
         if( !file_exists($src_folder_path) || !is_dir($src_folder_path) ) {
 
             printError("The src folder path `$src_folder_path` supplied is a non-existent directory. Goodbye!!");
-            exit;
+            return;
         }
 
         ////////////////////////////////////////////////////////////////////////////
@@ -488,7 +488,7 @@ function createController($argc, array $argv) {
                 if( !isValidExtendsClassName($controller_2_extend) ) {
 
                     printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
-                    exit;
+                    return;
                 }
 
             } else {
@@ -501,7 +501,7 @@ function createController($argc, array $argv) {
             if( !isValidExtendsClassName($controller_2_extend) ) {
 
                 printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
-                exit;
+                return;
             }
         }
 
@@ -518,7 +518,7 @@ function createController($argc, array $argv) {
                 if( !isValidNamespaceName($namepace_4_controller) ) {
 
                     printError("Invalid namespace `$namepace_4_controller` supplied. Goodbye!!");
-                    exit;
+                    return;
                 }
 
                 //validation passed
@@ -532,7 +532,7 @@ function createController($argc, array $argv) {
             if( !isValidNamespaceName($namepace_4_controller) ) {
 
                 printError("Invalid namespace `$namepace_4_controller` supplied. Goodbye!!");
-                exit;
+                return;
             }
 
             //validation passed
@@ -556,7 +556,7 @@ function createController($argc, array $argv) {
             && !mkdir($dest_controller_class_file_folder, 0775, true)
         ) {
             printError("Failed to create `$dest_controller_class_file_folder`; the folder supposed to contain the controller named `$studly_controller_name`. Goodbye!!");
-            exit;
+            return;
         }
 
         $template_view_file = $templates_dir.'index-view-template.php';
@@ -568,19 +568,19 @@ function createController($argc, array $argv) {
             && !mkdir($dest_view_file_folder, 0775, true) 
         ) {    
             printError("Failed to create `$dest_view_file_folder`; the folder supposed to contain views for the controller named `$studly_controller_name`. Goodbye!!");
-            exit;
+            return;
         }
 
         if( file_exists($dest_controller_class_file) ) {
 
             printError("Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!");
-            exit;
+            return;
         }
 
         if( file_exists($dest_view_file) ) {
 
             printError("View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!");
-            exit;
+            return;
         }
 
         printInfo("Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....");
@@ -621,7 +621,7 @@ function createController($argc, array $argv) {
                 printInfo("Goodbye!!");
             }
 
-            exit;
+            return;
 
         } else {
 
