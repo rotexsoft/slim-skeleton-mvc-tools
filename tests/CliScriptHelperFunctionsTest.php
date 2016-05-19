@@ -637,13 +637,12 @@ Options:
     
   -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 INPUT;
-        //createController(1, []);
+        //createController(1, ['create-controller.php']);
         $argc = 1;
         $argv = ['create-controller.php']; //script name is always at index 0
         $captured_script_output = $this->execFuncAndReturnBufferedOutput('createController', [$argc, $argv], true);
 
         $this->assertContains($expected_output_showing_help_page, $captured_script_output);
-        
 /*
         //run script with -? arg
         $captured_script_output = `php {$this->script_2_test} -?`;
