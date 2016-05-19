@@ -726,7 +726,6 @@ INPUT;
 */
     }
     
-    
     protected function execFuncAndReturnBufferedOutput($func_name, array $args=[], $strip_bin_markers=false) {
         
         // Capture the output

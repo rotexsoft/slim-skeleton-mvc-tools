@@ -374,7 +374,7 @@ function createController($argc, array $argv) {
     //////////////////////////////////////////
     // START: Environment and Args Validation
     //////////////////////////////////////////
-    if( php_sapi_name() !== 'cli' ) {
+    if( !isPhpRunningInCliMode() ) {
         
         $err_msg = '`' . __FUNCTION__ . '($argc, array $argv)` should only be called from within'
                    . ' php scripts that should be run via the command line!!!'.PHP_EOL;
@@ -639,4 +639,9 @@ function createController($argc, array $argv) {
     //////////////////////////////////
     ///END: COMMAND PROCESSING
     //////////////////////////////////
+}
+
+function isPhpRunningInCliMode() 
+{
+    return php_sapi_name() === 'cli';
 }

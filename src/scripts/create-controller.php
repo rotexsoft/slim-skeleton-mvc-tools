@@ -2,7 +2,7 @@
 <?php
 include_once __DIR__.DIRECTORY_SEPARATOR."cli-script-helper-functions.php";
 
-if( php_sapi_name() !== 'cli' ) {
+if( !isPhpRunningInCliMode() ) {
 
     echo 'Error: This script should only be run via the command line!!';
     
