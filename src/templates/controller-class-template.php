@@ -44,13 +44,6 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
         callable $not_found_handler        
     ) {
         parent::__construct($app, $controller_name_from_uri, $action_name_from_uri, $req, $res, $not_found_handler);
-        
-        //Prepend view folder for this controller. 
-        //It takes precedence over the view folder 
-        //for the base controller.
-        $ds = DIRECTORY_SEPARATOR;
-        $path_2_view_files = __DIR__.$ds.'..'.$ds.'views'.$ds.'{{TEMPLTATE_CONTROLLER_VIEW_FOLDER}}';
-        $this->view_renderer->prependPath($path_2_view_files);
     }
     
     public function actionIndex() {

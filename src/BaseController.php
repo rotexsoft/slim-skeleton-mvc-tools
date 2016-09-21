@@ -324,6 +324,17 @@ class BaseController
 
             throw new MissingPropertyException($msg);
         }
+          
+        //Try to prepend view folder for this controller. 
+        //It takes precedence over the view folder 
+        //for the base controller.
+        $ds = DIRECTORY_SEPARATOR;
+        $path_2_view_files = __DIR__.$ds.'..'.$ds.'views'.$ds.$this->controller_name_from_uri;
+            
+        if( !$this->view_renderer->hasPath($path_2_view_files) ) {
+
+            $this->view_renderer->prependPath($path_2_view_files);
+        }
         
         return $this->view_renderer->renderToString($file_name, $data);
     }
