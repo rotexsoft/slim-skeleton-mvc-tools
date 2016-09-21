@@ -2,7 +2,8 @@
 namespace Slim3MvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
-    \Psr\Http\Message\ResponseInterface;
+    \Psr\Http\Message\ResponseInterface,
+    \Slim3MvcTools\Controllers\Exceptions\MissingPropertyException;
 
 /**
  * 
@@ -170,13 +171,30 @@ class BaseController
         $this->app = $app;
         $this->request = $req;
         $this->response = $res;
-        $this->current_uri = $req->getUri();
+        $this->current_uri = s3MVC_UriToString($req->getUri());
         $this->not_found_handler = $not_found_handler;
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
+    }
+    
+    /**
+     * 
+     * @param \Rotexsoft\FileRenderer\Renderer $renderer
+     * 
+     */
+    public function setLayoutRenderer(\Rotexsoft\FileRenderer\Renderer $renderer) {
         
-        $this->view_renderer = $this->app->getContainer()->get('new_view_renderer');
-        $this->layout_renderer = $this->app->getContainer()->get('new_layout_renderer');
+        $this->layout_renderer = $renderer;
+    }
+    
+    /**
+     * 
+     * @param \Rotexsoft\FileRenderer\Renderer $renderer
+     * 
+     */
+    public function setViewRenderer(\Rotexsoft\FileRenderer\Renderer $renderer) {
+        
+        $this->view_renderer = $renderer;
     }
     
     /**
@@ -198,6 +216,16 @@ class BaseController
      * 
      */
     public function renderLayout( $file_name, array $data = ['content'=>'Content should be placed here!'] ) {
+        
+        if( !($this->layout_renderer instanceof \Rotexsoft\FileRenderer\Renderer) ) {
+            
+            $msg = "ERROR: The `layout_renderer` property of `" . get_class($this) . "`"
+                 . " must be set via a call to `" . get_class($this) . '::setLayoutRenderer(...)` '
+                 . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
+                 . PHP_EOL;
+
+            throw new MissingPropertyException($msg);
+        }
         
         return $this->layout_renderer->renderToString($file_name, $data);
     }
@@ -223,6 +251,16 @@ class BaseController
      */
     public function renderView( $file_name, array $data = [] ) {
 
+        if( !($this->view_renderer instanceof \Rotexsoft\FileRenderer\Renderer) ) {
+            
+            $msg = "ERROR: The `view_renderer` property of `" . get_class($this) . "`"
+                 . " must be set via a call to `" . get_class($this) . '::setViewRenderer(...)` '
+                 . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
+                 . PHP_EOL;
+
+            throw new MissingPropertyException($msg);
+        }
+        
         return $this->view_renderer->renderToString($file_name, $data);
     }
     
