@@ -37,12 +37,16 @@ class FooBar extends SomeNameSpace\Controller2Extend
      * @param string $action_name_from_uri
      * 
      */
-    public function __construct(\Slim\App $app, $controller_name_from_uri, $action_name_from_uri) {
-        
-        parent::__construct($app, $controller_name_from_uri, $action_name_from_uri);
+    public function __construct(
+        \Slim\App $app, $controller_name_from_uri, $action_name_from_uri, 
+        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res,
+        callable $not_found_handler        
+    ) {
+        parent::__construct($app, $controller_name_from_uri, $action_name_from_uri, $req, $res, $not_found_handler);
         
         //Prepend view folder for this controller. 
-        //It takes precedence over the view folder for the base controller.
+        //It takes precedence over the view folder 
+        //for the base controller.
         $ds = DIRECTORY_SEPARATOR;
         $path_2_view_files = __DIR__.$ds.'..'.$ds.'views'.$ds.'foo-bar';
         $this->view_renderer->prependPath($path_2_view_files);
