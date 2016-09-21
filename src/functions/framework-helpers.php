@@ -150,7 +150,6 @@ function s3MVC_MakeLink($path){
     return s3MVC_GetBaseUrlPath(). '/'.ltrim($path, '/');
 }
 
-
 /**
  * 
  * This function stores a snapshot of the following super globals $_SERVER, $_GET,
@@ -245,4 +244,57 @@ function s3MVC_GetSuperGlobal($global_name='', $key='', $default_val='') {
     return array_key_exists($key, $super_globals[$global_name])
                                 ? $super_globals[$global_name][$key] : $default_val;
 
+}
+
+/**
+ * 
+ * Converts a uri object to a string in the format <scheme>://<server_address>/<path>?<query_string>#<fragment>
+ * 
+ * @param \Psr\Http\Message\UriInterface $uri uri object to be converted to a string
+ * 
+ * @return string the string represntation of the uri object. 
+ *                Eg. http://someserver.com/controller/action
+ */
+function s3MVC_UriToString(\Psr\Http\Message\UriInterface $uri) {
+    
+    $scheme = $uri->getScheme();
+    $authority = $uri->getAuthority();
+    $basePath = s3MVC_GetBaseUrlPath();
+    $path = $uri->getPath();
+    $query = $uri->getQuery();
+    $fragment = $uri->getFragment();
+
+    $path = $basePath . '/' . ltrim($path, '/');
+
+    return ($scheme ? $scheme . ':' : '')
+        . ($authority ? '//' . $authority : '')
+        . $path
+        . ($query ? '?' . $query : '')
+        . ($fragment ? '#' . $fragment : '');
+}
+
+/**
+ * 
+ * Adds a query string parameter key/value pair to a uri object.
+ * 
+ * Given a uri object $uri1 representing http://someserver.com/controller/action?param1=val1 
+ * s3MVC_addQueryStrParamToUri($uri1, 'param2', 'val2') will return a new uri object representing
+ * http://someserver.com/controller/action?param1=val1&param2=val2
+ * 
+ * @param \Psr\Http\Message\UriInterface $uri
+ * @param string $param_name
+ * @param string $param_value
+ * 
+ * @return \Psr\Http\Message\UriInterface
+ */
+function s3MVC_addQueryStrParamToUri(
+    \Psr\Http\Message\UriInterface $uri, $param_name, $param_value
+) {
+    $query_params = [];
+    
+    parse_str($uri->getQuery(), $query_params); // Extract existing query string params to an array
+    
+    $query_params[$param_name] = $param_value; // Add new param the query string params array
+    
+    return $uri->withQuery(http_build_query($query_params)); // return a uri object with updated query params
 }

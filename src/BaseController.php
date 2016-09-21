@@ -124,6 +124,15 @@ class BaseController
      * 
      */
     public $controller_name_from_uri;
+    
+    /**
+     *
+     * The full url of the current request e.g. http://someserver.com/controller/action
+     * 
+     * @var string 
+     * 
+     */
+    public $current_uri;
 
     //////////////////////////////////
     // Session Parameter keys
@@ -161,6 +170,7 @@ class BaseController
         $this->app = $app;
         $this->request = $req;
         $this->response = $res;
+        $this->current_uri = $req->getUri();
         $this->not_found_handler = $not_found_handler;
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
