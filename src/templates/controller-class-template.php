@@ -30,11 +30,12 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
     
     /**
      * 
-     * 
-     * 
      * @param \Slim\App $app
      * @param string $controller_name_from_uri
      * @param string $action_name_from_uri
+     * @param \Psr\Http\Message\ServerRequestInterface $req
+     * @param \Psr\Http\Message\ResponseInterface $res
+     * @param \Slim3MvcTools\Controllers\callable $not_found_handler
      * 
      */
     public function __construct(
