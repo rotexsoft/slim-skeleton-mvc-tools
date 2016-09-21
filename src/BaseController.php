@@ -44,6 +44,23 @@ class BaseController
     protected $view_renderer;
     
     /**
+     *
+     * An auth object used by the following methods of this class:
+     *  - isLoggedIn
+     *  - actionLogin
+     *  - actionLogout
+     *  - actionLoginStatus
+     * 
+     * These methods will throw a \Slim3MvcTools\Controllers\Exceptions\MissingPropertyException 
+     * if this object was not set before the method call.
+     * 
+     * @var \Vespula\Auth\Auth
+     * 
+     */
+    protected $vespula_auth;
+
+
+    /**
      * 
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
      * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
@@ -179,6 +196,46 @@ class BaseController
     
     /**
      * 
+     * @throws \Slim3MvcTools\Controllers\Exceptions\MissingPropertyException
+     * 
+     */
+    public function ensureVespulaAuthObjectIsSet() {
+        
+        if( !($this->vespula_auth instanceof \Vespula\Auth\Auth) ) {
+            
+            $msg = "ERROR: The `vespula_auth` property of `" . get_class($this) . "`"
+                 . " must be set via a call to `" . get_class($this) . '::setVespulaAuthObject(...)` '
+                 . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
+                 . PHP_EOL;
+
+            throw new MissingPropertyException($msg);
+        }
+    }
+    
+    /**
+     * 
+     * 
+     * 
+     * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
+     * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS 
+     * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
+     * 
+     * @param \Vespula\Auth\Auth $vespula_auth
+     * 
+     */
+    public function setVespulaAuthObject(\Vespula\Auth\Auth $vespula_auth) {
+        
+        $this->vespula_auth = $vespula_auth;
+    }
+    
+    /**
+     * 
+     * 
+     * 
+     * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
+     * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS 
+     * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
+     * 
      * @param \Rotexsoft\FileRenderer\Renderer $renderer
      * 
      */
@@ -188,6 +245,12 @@ class BaseController
     }
     
     /**
+     * 
+     * 
+     * 
+     * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
+     * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS 
+     * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
      * 
      * @param \Rotexsoft\FileRenderer\Renderer $renderer
      * 
@@ -298,7 +361,8 @@ class BaseController
             $action = ($prepend_action) ? 'action-' : '';
             $success_redirect_path =
                 "{$controller}/{$action}{$this->login_success_redirect_action}";
-
+                
+            $this->ensureVespulaAuthObjectIsSet();
             $auth = $this->app->getContainer()->get('vespula_auth'); //get the auth object
             $username = s3MVC_GetSuperGlobal('post', 'username');
             $password = s3MVC_GetSuperGlobal('post', 'password');
@@ -399,6 +463,7 @@ class BaseController
      */
     public function actionLogout($show_status_on_completion = false) {
         
+        $this->ensureVespulaAuthObjectIsSet();
         $auth = $this->app->getContainer()->get('vespula_auth');
         $auth->logout(); //logout
                 
@@ -433,7 +498,9 @@ class BaseController
     public function actionLoginStatus() {
 
         $msg = '';
-            
+        
+        $this->ensureVespulaAuthObjectIsSet(); 
+        
         //Just get the current login status
         $auth = $this->app->getContainer()->get('vespula_auth');
 
@@ -508,6 +575,7 @@ class BaseController
     
     public function isLoggedIn() {
         
+        $this->ensureVespulaAuthObjectIsSet();
         return ($this->app->getContainer()->get('vespula_auth')->isValid() === true);
     }
     
