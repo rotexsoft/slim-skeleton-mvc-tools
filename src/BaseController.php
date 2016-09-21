@@ -61,6 +61,37 @@ class BaseController
     protected $login_success_redirect_controller = 'base-controller';
         
     /**
+     * 
+     * Request Object
+     * 
+     * @var \Psr\Http\Message\ServerRequestInterface
+     */
+    protected $request;
+        
+    /**
+     * 
+     * Response Object
+     * 
+     * @var \Psr\Http\Message\ResponseInterface
+     */
+    protected $response;
+        
+    /**
+     * 
+     * 404 Not Found Callable Handler with the signature below 
+     * (
+     *   \Psr\Http\Message\ServerRequestInterface $request, 
+     *   \Psr\Http\Message\ResponseInterface $response
+     * ) : \Psr\Http\Message\ResponseInterface
+     * 
+     * This calllable accepts a PSR7 Request and a PSR7 Response Object 
+     * and returns a PSR7 Response Object
+     * 
+     * @var callable
+     */
+    protected $not_found_handler;
+
+    /**
      *
      * The action section of the url. 
      * 
@@ -122,12 +153,18 @@ class BaseController
      * @param string $action_name_from_uri
      * 
      */
-    public function __construct(\Slim\App $app, $controller_name_from_uri, $action_name_from_uri) {
-        
+    public function __construct(
+        \Slim\App $app, $controller_name_from_uri, $action_name_from_uri, 
+        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res,
+        callable $not_found_handler
+    ) {
         $this->app = $app;
+        $this->request = $req;
+        $this->response = $res;
+        $this->not_found_handler = $not_found_handler;
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
-
+        
         $this->view_renderer = $this->app->getContainer()->get('new_view_renderer');
         $this->layout_renderer = $this->app->getContainer()->get('new_layout_renderer');
     }
@@ -189,7 +226,7 @@ class BaseController
     
     public function actionLogin() {
 
-        $request_obj = $this->app->getContainer()->get('request');
+        $request_obj = $this->request;
         
         $data_4_login_view = [
             'controller_object' => $this, 'error_message' => '', 'username' => '', 
@@ -287,10 +324,7 @@ class BaseController
                 }
 
                 //re-direct
-                return $this->app
-                            ->getContainer()
-                            ->get('response')
-                            ->withHeader('Location', $success_redirect_path);
+                return $this->response->withHeader('Location', $success_redirect_path);
             } else {
                 
                 //re-display login form with error messages
@@ -340,9 +374,7 @@ class BaseController
         $redirect_path = s3MVC_GetBaseUrlPath() . "/{$controller}/{$actn}";
  
         //re-direct
-        return $this->app->getContainer()
-                         ->get('response')
-                         ->withHeader('Location', $redirect_path);
+        return $this->response->withHeader('Location', $redirect_path);
     }
     
     /**
@@ -411,7 +443,7 @@ class BaseController
      */
     protected function notFound(ServerRequestInterface $req, ResponseInterface $res, $_404_page_content='Page Not Found') {
         
-        $not_found_handler = $this->app->getContainer()->get('notFoundHandler');
+        $not_found_handler = $this->not_found_handler;
         
         if( is_callable($not_found_handler) && $_404_page_content === 'Page Not Found') {
             
@@ -449,7 +481,7 @@ class BaseController
         
         if( !$this->isLoggedIn() ) {
             
-            $uri = $this->app->getContainer()->get('request')->getUri();
+            $uri = $this->request->getUri();
             $base_path = s3MVC_GetBaseUrlPath();
             $fragment = $uri->getFragment();
             $query = $uri->getQuery();
@@ -480,9 +512,7 @@ class BaseController
             //store current url in session
             $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
 
-            return $this->app->getContainer()
-                             ->get('response')
-                             ->withHeader('Location', $redr_path);
+            return $this->response->withHeader('Location', $redr_path);
         }
         
         return false;

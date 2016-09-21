@@ -66,7 +66,7 @@ function s3MVC_CreateController(
     }
 
     //Create the controller object
-    return new $controller_class_name($app, $controller_name_from_url, $action_name_from_url);
+    return new $controller_class_name($app, $controller_name_from_url, $action_name_from_url, $request, $response, $container->get('notFoundHandler'));
 }
 
 /**
