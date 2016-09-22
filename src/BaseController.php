@@ -329,7 +329,7 @@ class BaseController
         //It takes precedence over the view folder 
         //for the base controller.
         $ds = DIRECTORY_SEPARATOR;
-        $path_2_view_files = __DIR__.$ds.'..'.$ds.'views'.$ds.$this->controller_name_from_uri;
+        $path_2_view_files = S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.$this->controller_name_from_uri;
             
         if( !$this->view_renderer->hasPath($path_2_view_files) ) {
 
