@@ -645,4 +645,18 @@ class BaseController
         
         return false;
     }
+    
+    public function preAction() {
+        
+        $container = $this->app->getContainer();
+        
+        //Inject some dependencies into the controller
+        $this->setLayoutRenderer($container->get('new_layout_renderer'));
+        $this->setViewRenderer($container->get('new_view_renderer'));
+        $this->setVespulaAuthObject($container->get('vespula_auth'));
+    }
+    
+    public function postAction() {
+        
+    }
 }
