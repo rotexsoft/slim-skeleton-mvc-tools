@@ -347,15 +347,19 @@ class BaseController
             
             $parent_class_folder = \Slim3MvcTools\Functions\Str\toDashes($parent_class);
             
-            if( !$this->view_renderer->hasPath($path_2_view_files . $parent_class_folder) ) {
-
+            if( 
+                !$this->view_renderer->hasPath($path_2_view_files . $parent_class_folder) 
+                && file_exists($path_2_view_files . $parent_class_folder)
+            ) {
                 $this->view_renderer->prependPath($path_2_view_files . $parent_class_folder);
             }
         }
         
         //finally add my view folder
-        if( !$this->view_renderer->hasPath($path_2_view_files . $this->controller_name_from_uri) ) {
-
+        if( 
+            !$this->view_renderer->hasPath($path_2_view_files . $this->controller_name_from_uri)
+            && file_exists($path_2_view_files . $this->controller_name_from_uri)
+        ) {
             $this->view_renderer->prependPath($path_2_view_files . $this->controller_name_from_uri);
         }
         
