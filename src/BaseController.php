@@ -325,15 +325,38 @@ class BaseController
             throw new MissingPropertyException($msg);
         }
           
+        
+        $parent_classes = [];
+        $parent_class = get_parent_class($this);
+        
+        while( $parent_class !== __CLASS__ && !empty($parent_class) ) {
+            
+            $parent_classes[] = 
+                (new \ReflectionClass($parent_class))->getShortName();
+            
+            $parent_class = get_parent_class($parent_class);
+        }
+        
         //Try to prepend view folder for this controller. 
         //It takes precedence over the view folder 
         //for the base controller.
         $ds = DIRECTORY_SEPARATOR;
-        $path_2_view_files = S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.$this->controller_name_from_uri;
+        $path_2_view_files = S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds;
+        
+        while ( $parent_class = array_pop($parent_classes) ) {
             
-        if( !$this->view_renderer->hasPath($path_2_view_files) ) {
+            $parent_class_folder = \Slim3MvcTools\Functions\Str\toDashes($parent_class);
+            
+            if( !$this->view_renderer->hasPath($path_2_view_files . $parent_class_folder) ) {
 
-            $this->view_renderer->prependPath($path_2_view_files);
+                $this->view_renderer->prependPath($path_2_view_files . $parent_class_folder);
+            }
+        }
+        
+        //finally add my view folder
+        if( !$this->view_renderer->hasPath($path_2_view_files . $this->controller_name_from_uri) ) {
+
+            $this->view_renderer->prependPath($path_2_view_files . $this->controller_name_from_uri);
         }
         
         return $this->view_renderer->renderToString($file_name, $data);
