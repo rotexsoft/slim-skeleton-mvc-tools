@@ -668,7 +668,6 @@ function isCommandAvailableOnOs($command) {
     
     $output = [];
 
-    //type foo >/dev/null 2>&1 || { echo >&2 "NOT FOUND"; }
     exec( 'type '.$command.' >/dev/null 2>&1 || { echo >&2 "NOT FOUND"; }', $output );
 
     if ( array_key_exists(0, $output) && $output[0] === "NOT FOUND" ) {
