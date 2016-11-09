@@ -8,8 +8,6 @@ namespace __NAMESPACE_2_REPLACE__;
  */
 class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
 {   
-    
-    
     /**
      * 
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
@@ -54,5 +52,19 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
         
         //uncomment and edit the line below to incorporate the view above into your app's template
         //return $this->renderLayout( 'main-template.php', ['content'=>$view_str] );
+    }
+    
+    public function preAction() {
+        
+        parent::preAction();
+        
+        // add code that you need to be executed before each controller action method is executed
+    }
+    
+    public function postAction() {
+        
+        parent::postAction();
+        
+        // add code that you need to be executed after each controller action method is executed
     }
 }
