@@ -668,7 +668,7 @@ function isCommandAvailableOnOs($command) {
     
     $output = [];
 
-    exec( 'command -v '.$command.' >& /dev/null && echo "Found" || echo "Not Found"', $output );
+    exec( 'type '.$command.' >& /dev/null && echo "Found" || echo "Not Found"', $output );
 
     if ( $output[0] === "Found" ) {
         // command is available
