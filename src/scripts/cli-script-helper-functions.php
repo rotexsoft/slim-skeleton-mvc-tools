@@ -633,12 +633,8 @@ function createController($argc, array $argv) {
         if ( strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
         
             //test if composer is avaliable only if server OS on which this script is being run
-            //is not windows
-            $ret_val = shell_exec("which composer");
-
-            $is_composer_available = ( empty($ret_val) ? false : true );
-            
-            if( $is_composer_available) {
+            //is not windows            
+            if( isCommandAvailableOnOs('composer') ) {
                 
                 passthru('composer dumpautoload');
                 
@@ -666,4 +662,19 @@ function createController($argc, array $argv) {
 function isPhpRunningInCliMode() 
 {
     return php_sapi_name() === 'cli';
+}
+
+function isCommandAvailableOnOs($command) {
+    
+    $output = [];
+
+    exec( 'command -v '.$command.' >& /dev/null && echo "Found" || echo "Not Found"', $output );
+
+    if ( $output[0] === "Found" ) {
+        // command is available
+        return TRUE;
+    } else {
+        // command is unavailable
+        return FALSE;
+    }
 }
