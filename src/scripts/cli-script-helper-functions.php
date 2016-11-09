@@ -627,8 +627,30 @@ function createController($argc, array $argv) {
 
             printInfo("Successfully created `{$dest_view_file}` ....".PHP_EOL);
         }
+        
+        printInfo("All done!!");
+        
+        if ( strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        
+            //test if composer is avaliable only if server OS on which this script is being run
+            //is not windows
+            $ret_val = shell_exec("which composer");
 
-        printInfo("All done!! Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
+            $is_composer_available = ( empty($ret_val) ? false : true );
+            
+            if( $is_composer_available) {
+                
+                passthru('composer dumpautoload');
+                
+            } else {
+                
+                printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
+            }
+        } else {
+            printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
+        }
+
+        
 
         //we are done
 
