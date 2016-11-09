@@ -668,13 +668,13 @@ function isCommandAvailableOnOs($command) {
     
     $output = [];
 
-    exec( 'type '.$command.' >/dev/null 2>&1 || { echo >&2 "NOT FOUND"; }', $output );
+    exec( 'command -v '.$command.' >& /dev/null && echo "Found" || echo "Not Found"', $output );
 
-    if ( array_key_exists(0, $output) && $output[0] === "NOT FOUND" ) {
-        // command is unavailable
-        return FALSE;
-    } else {
+    if ( $output[0] === "Found" ) {
         // command is available
         return TRUE;
+    } else {
+        // command is unavailable
+        return FALSE;
     }
 }
