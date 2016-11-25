@@ -193,6 +193,8 @@ class BaseController
         $this->not_found_handler = $not_found_handler;
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
+        
+        $this->storeCurrentUrlForLoginRedirection();
     }
     
     /**
@@ -524,6 +526,14 @@ class BaseController
         }
         
         $redirect_path = s3MVC_GetBaseUrlPath() . "/{$controller}/{$actn}";
+        
+        if( 
+            session_status() === PHP_SESSION_ACTIVE
+            && isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT])
+        ) {
+            //there is an active session with a redirect url stored in it
+            $redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
+        }
  
         //re-direct
         return $this->response->withHeader('Location', $redirect_path);
@@ -636,16 +646,7 @@ class BaseController
         
         if( !$this->isLoggedIn() ) {
             
-            $uri = $this->request->getUri();
-            $base_path = s3MVC_GetBaseUrlPath();
-            $fragment = $uri->getFragment();
-            $query = $uri->getQuery();
-            $path = $uri->getPath();
-            
-            $path = $base_path . '/' . ltrim($path, '/');
-            
-            $curr_url = $path. ( $query ? '?' . $query : '' )
-                             . ( $fragment ? '#' . $fragment : '' );
+            $this->storeCurrentUrlForLoginRedirection();
             
             $controller = $this->controller_name_from_uri;
 
@@ -657,15 +658,6 @@ class BaseController
             $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = ($prepend_action) ? 'action-login' : 'login';
             $redr_path = s3MVC_GetBaseUrlPath() . "/{$controller}/$action";
-                    
-            if( session_status() !== PHP_SESSION_ACTIVE ) {
-                
-                //start a new session
-                session_start();
-            }
-
-            //store current url in session
-            $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
 
             return $this->response->withHeader('Location', $redr_path);
         }
@@ -685,5 +677,34 @@ class BaseController
     
     public function postAction() {
         
+    }
+    
+    protected function storeCurrentUrlForLoginRedirection() {
+        
+        if(
+            in_array(
+                strtolower($this->action_name_from_uri), 
+                [
+                    'login', 'action-login', 'actionlogin', 'action_login',
+                    'logout', 'action-logout', 'actionlogout', 'action_logout'
+                ] 
+            )
+        ) { return; }
+          
+        $uri = $this->request->getUri();
+        $base_path = s3MVC_GetBaseUrlPath();
+        $fragment = $uri->getFragment();
+        $query = $uri->getQuery();
+        $path = $uri->getPath();
+
+        $path = $base_path . '/' . ltrim($path, '/');
+        $curr_url = $path. ( $query ? '?' . $query : '' )
+                         . ( $fragment ? '#' . $fragment : '' );
+        
+        //start a new session if none exists
+        (session_status() !== PHP_SESSION_ACTIVE) && session_start();
+        
+        //store current url in session
+        $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
     }
 }
