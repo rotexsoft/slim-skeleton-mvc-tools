@@ -26,6 +26,10 @@ function s3MVC_CreateController(
     $has_logger = $container->has('logger') 
                     && ( $container->get('logger') instanceof \Psr\Log\LoggerInterface );
     
+    $notFoundHandlerClass = '\\Slim3MvcTools\\Controllers\\HttpNotFoundController'; // default handler
+    
+    $container->has('notFoundHandlerClass') && $notFoundHandlerClass = $container->get('notFoundHandlerClass');
+    
     $has_logger && $logger = $container->get('logger');
     $controller_class_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
@@ -40,7 +44,7 @@ function s3MVC_CreateController(
         //trigger 404 not found
         $has_logger && $logger->notice("`".__FILE__."` on line ".__LINE__.": Bad controller name `{$controller_class_name}`");
         
-        $notFoundHandler = new \Slim3MvcTools\Controllers\HttpNotFoundController(
+        $notFoundHandler = new $notFoundHandlerClass(
                                 $container, $controller_name_from_url, 
                                 $action_name_from_url, $request, $response
                             );
@@ -77,7 +81,7 @@ function s3MVC_CreateController(
             //404 Not Found: Controller class not found.
             $has_logger && $logger->notice("`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.");
 
-            $notFoundHandler = new \Slim3MvcTools\Controllers\HttpNotFoundController(
+            $notFoundHandler = new $notFoundHandlerClass(
                 $container, $controller_name_from_url, $action_name_from_url, $request, $response
             );
             
