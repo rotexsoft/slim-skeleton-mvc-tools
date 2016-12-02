@@ -3,7 +3,8 @@ namespace Slim3MvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
     \Psr\Http\Message\ResponseInterface,
-    \Slim3MvcTools\Controllers\Exceptions\MissingPropertyException;
+    \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException,
+    \Slim3MvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException;
 
 /**
  * 
@@ -16,14 +17,12 @@ class BaseController
 {
     /**
      *
-     * A Slim App object containing, Request, Response and other Environment
-     * information for each request sent to this controller or any of its
-     * sub-classes.
+     * A container object containing dependencies needed by the controller.
      * 
-     * @var \Slim\Slim
+     * @var \Interop\Container\ContainerInterface
      * 
      */
-    protected $app;
+    protected $container;
 
     /**
      * 
@@ -51,7 +50,7 @@ class BaseController
      *  - actionLogout
      *  - actionLoginStatus
      * 
-     * These methods will throw a \Slim3MvcTools\Controllers\Exceptions\MissingPropertyException 
+     * These methods will throw a \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException 
      * if this object was not set before the method call.
      * 
      * @var \Vespula\Auth\Auth
@@ -93,21 +92,6 @@ class BaseController
      * @var \Psr\Http\Message\ResponseInterface
      */
     protected $response;
-        
-    /**
-     * 
-     * 404 Not Found Callable Handler with the signature below 
-     * (
-     *   \Psr\Http\Message\ServerRequestInterface $request, 
-     *   \Psr\Http\Message\ResponseInterface $response
-     * ) : \Psr\Http\Message\ResponseInterface
-     * 
-     * This calllable accepts a PSR7 Request and a PSR7 Response Object 
-     * and returns a PSR7 Response Object
-     * 
-     * @var callable
-     */
-    protected $not_found_handler;
 
     /**
      *
@@ -151,6 +135,29 @@ class BaseController
      * 
      */
     public $current_uri;
+    
+    /**
+     *
+     * The name of the layout file that will be rendered by $this->layout_renderer inside 
+     * $this->renderLayout(..)
+     * 
+     * @var string 
+     * 
+     */
+    public $layout_template_file_name = 'main-template.php';
+    
+    /**
+     * Known handled content types
+     * Lifted from SlimPHP 3
+     *
+     * @var array
+     */
+    protected $knownContentTypes = [
+        'application/json',
+        'application/xml',
+        'text/xml',
+        'text/html',
+    ];   
 
     //////////////////////////////////
     // Session Parameter keys
@@ -173,24 +180,21 @@ class BaseController
     
     /**
      * 
-     * @param \Slim\App $app
+     * @param \Interop\Container\ContainerInterface $container
      * @param string $controller_name_from_uri
      * @param string $action_name_from_uri
      * @param \Psr\Http\Message\ServerRequestInterface $req
      * @param \Psr\Http\Message\ResponseInterface $res
-     * @param \Slim3MvcTools\Controllers\callable $not_found_handler
      * 
      */
     public function __construct(
-        \Slim\App $app, $controller_name_from_uri, $action_name_from_uri, 
-        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res,
-        callable $not_found_handler
+        \Interop\Container\ContainerInterface $container, $controller_name_from_uri, $action_name_from_uri, 
+        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res
     ) {
-        $this->app = $app;
+        $this->container = $container;
         $this->request = $req;
         $this->response = $res;
         $this->current_uri = s3MVC_UriToString($req->getUri());
-        $this->not_found_handler = $not_found_handler;
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
         
@@ -199,19 +203,26 @@ class BaseController
     
     /**
      * 
-     * @throws \Slim3MvcTools\Controllers\Exceptions\MissingPropertyException
+     * @throws \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
      * 
      */
     public function ensureVespulaAuthObjectIsSet() {
         
         if( !($this->vespula_auth instanceof \Vespula\Auth\Auth) ) {
             
-            $msg = "ERROR: The `vespula_auth` property of `" . get_class($this) . "`"
-                 . " must be set via a call to `" . get_class($this) . '::setVespulaAuthObject(...)` '
-                 . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
-                 . PHP_EOL;
+            try {
+                
+                $this->vespula_auth = $this->getContainerItem('vespula_auth');
+                
+            } catch (ExpectedContainerItemMissingException $ex) {
 
-            throw new MissingPropertyException($msg);
+                $msg = "ERROR: The `vespula_auth` property of `" . get_class($this) . "`"
+                     . " must be set via a call to `" . get_class($this) . '::setVespulaAuthObject(...)` '
+                     . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
+                     . PHP_EOL;
+
+                throw new IncorrectlySetPropertyException($msg);
+            }
         }
     }
     
@@ -280,17 +291,25 @@ class BaseController
      *                    file (i.e. the file named $file_name).
      * @return string
      * 
+     * @throws \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * 
      */
     public function renderLayout( $file_name, array $data = ['content'=>'Content should be placed here!'] ) {
         
         if( !($this->layout_renderer instanceof \Rotexsoft\FileRenderer\Renderer) ) {
             
-            $msg = "ERROR: The `layout_renderer` property of `" . get_class($this) . "`"
-                 . " must be set via a call to `" . get_class($this) . '::setLayoutRenderer(...)` '
-                 . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
-                 . PHP_EOL;
+            try {
+                $this->layout_renderer = $this->getContainerItem('new_layout_renderer');
+                
+            } catch (ExpectedContainerItemMissingException $ex) {
 
-            throw new MissingPropertyException($msg);
+                $msg = "ERROR: The `layout_renderer` property of `" . get_class($this) . "`"
+                     . " must be set via a call to `" . get_class($this) . '::setLayoutRenderer(...)` '
+                     . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
+                     . PHP_EOL;
+
+                throw new IncorrectlySetPropertyException($msg);
+            }
         }
         
         return $this->layout_renderer->renderToString($file_name, $data);
@@ -314,20 +333,27 @@ class BaseController
      *                    file (i.e. the file named $file_name).
      * @return string
      * 
+     * @throws \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * 
      */
     public function renderView( $file_name, array $data = [] ) {
-
+        
         if( !($this->view_renderer instanceof \Rotexsoft\FileRenderer\Renderer) ) {
             
-            $msg = "ERROR: The `view_renderer` property of `" . get_class($this) . "`"
-                 . " must be set via a call to `" . get_class($this) . '::setViewRenderer(...)` '
-                 . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
-                 . PHP_EOL;
+            try {
+                $this->view_renderer = $this->getContainerItem('new_view_renderer');
+                
+            } catch (ExpectedContainerItemMissingException $ex) {
 
-            throw new MissingPropertyException($msg);
+                $msg = "ERROR: The `view_renderer` property of `" . get_class($this) . "`"
+                     . " must be set via a call to `" . get_class($this) . '::setViewRenderer(...)` '
+                     . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.' 
+                     . PHP_EOL;
+
+                throw new IncorrectlySetPropertyException($msg);
+            }
         }
-          
-        
+
         $parent_classes = [];
         $parent_class = get_parent_class($this);
         
@@ -373,7 +399,7 @@ class BaseController
         //get the contents of the view first
         $view_str = $this->renderView('index.php');
         
-        return $this->renderLayout( 'main-template.php', ['content'=>$view_str] );
+        return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
     public function actionLogin() {
@@ -391,7 +417,7 @@ class BaseController
             //get the contents of the view first
             $view_str = $this->renderView('login.php', $data_4_login_view);
 
-            return $this->renderLayout('main-template.php', ['content' => $view_str]);
+            return $this->renderLayout( $this->layout_template_file_name, ['content' => $view_str]);
             
         } else {
 
@@ -404,7 +430,7 @@ class BaseController
                 "{$controller}/{$action}{$this->login_success_redirect_action}";
                 
             $this->ensureVespulaAuthObjectIsSet();
-            $auth = $this->app->getContainer()->get('vespula_auth'); //get the auth object
+            $auth = $this->vespula_auth; //get the auth object
             $username = s3MVC_GetSuperGlobal('post', 'username');
             $password = s3MVC_GetSuperGlobal('post', 'password');
 
@@ -488,7 +514,7 @@ class BaseController
                 //get the contents of the view first
                 $view_str = $this->renderView('login.php', $data_4_login_view);
                 
-                return $this->renderLayout('main-template.php', ['content'=>$view_str]);
+                return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
             }
         }
     }
@@ -505,7 +531,7 @@ class BaseController
     public function actionLogout($show_status_on_completion = false) {
         
         $this->ensureVespulaAuthObjectIsSet();
-        $auth = $this->app->getContainer()->get('vespula_auth');
+        $auth = $this->vespula_auth;
         $auth->logout(); //logout
                 
         if( !$auth->isAnon() ) {
@@ -547,12 +573,10 @@ class BaseController
     public function actionLoginStatus() {
 
         $msg = '';
-        
         $this->ensureVespulaAuthObjectIsSet(); 
+        $auth = $this->vespula_auth;
         
         //Just get the current login status
-        $auth = $this->app->getContainer()->get('vespula_auth');
-
         switch (true) {
 
             case $auth->isAnon():
@@ -585,11 +609,48 @@ class BaseController
         }
 
         //get the contents of the view first
-        $view_str = $this->renderView('login-status.php', ['message'=>$msg, 'is_logged_in'=>$this->isLoggedIn(), 'controller_object'=>$this]);
+        $view_str = $this->renderView( 'login-status.php', ['message'=>$msg, 'is_logged_in'=>$this->isLoggedIn(), 'controller_object'=>$this] );
         
-        return $this->renderLayout('main-template.php', ['content'=>$view_str]);
+        return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
+    
+    public function actionHttpNotFound() {
+        
+        return $this->generateNotFoundResponse($this->request, $this->response);
+    }
+    
 
+    /**
+     * Determine which content type we know about is wanted using Accept header
+     * Lifted from SlimPHP 3
+     * 
+     * Note: This method is a bare-bones implementation designed specifically for
+     * Slim's error handling requirements. Consider a fully-feature solution such
+     * as willdurand/negotiation for any other situation.
+     *
+     * @param ServerRequestInterface $request
+     * @return string
+     */
+    protected function determineContentType(ServerRequestInterface $request)
+    {
+        $acceptHeader = $request->getHeaderLine('Accept');
+        $selectedContentTypes = array_intersect(explode(',', $acceptHeader), $this->knownContentTypes);
+
+        if (count($selectedContentTypes)) {
+            return current($selectedContentTypes);
+        }
+
+        // handle +json and +xml specially
+        if (preg_match('/\+(json|xml)/', $acceptHeader, $matches)) {
+            $mediaType = 'application/' . $matches[1];
+            if (in_array($mediaType, $this->knownContentTypes)) {
+                return $mediaType;
+            }
+        }
+
+        return 'text/html';
+    }
+    
     /**
      * 
      * Force 404 notFound from within action methods in your controller.
@@ -598,34 +659,252 @@ class BaseController
      * 
      * @param ServerRequestInterface $req a request object
      * @param ResponseInterface $res a response object
-     * @param string $_404_page_content a string containing the html to display as the 404 page.
-     *                                  If this string contains a value other than the default value,
-     *                                  render it as the 404 page
+     * @param ResponseInterface|string $_404_page_content a string or Response object containing the 
+     *                                                    html to display as the 404 page.
      * 
-     * @return ResponseInterface a response object with the 404 status and 
-     *                           appropriate body (eg the html showing the 404 message)
+     *                                                    If it's null, or not a string or not a 
+     *                                                    Response object, then this method will
+     *                                                    generate a default 404 page.
+     * 
+     *                                                    If it's a string it will be written as 
+     *                                                    an html document into a response object.
+     * 
+     *                                                    If it's a response object, it will be 
+     *                                                    returned with a status code of 404 and
+     *                                                    Content-Type of `text/html`.
+     * 
+     * @return ResponseInterface a response object with an http 404 status code, Content-Type 
+     *                           of `text/html` and appropriate body (eg the html showing the 
+     *                           404 message)
      */
-    protected function notFound(ServerRequestInterface $req, ResponseInterface $res, $_404_page_content='Page Not Found') {
+    protected function generateNotFoundResponse(ServerRequestInterface $req=null, ResponseInterface $res=null, $_404_page_content=null) {
         
-        $not_found_handler = $this->not_found_handler;
+        is_null($req) && $req = $this->request;
+        is_null($res) && $res = $this->response;
         
-        if( is_callable($not_found_handler) && $_404_page_content === 'Page Not Found') {
+        $new_response_body = new \Slim\Http\Body( fopen( 'php://temp', 'r+' ) );
+        $new_response = $res->withBody( $new_response_body );
+        
+        if(
+            $_404_page_content !== null 
+            && ( is_string($_404_page_content) || ($_404_page_content instanceof ResponseInterface) ) 
+        ) {
+            if( is_string($_404_page_content) ) {
+                
+                if( preg_match ( '%(<html.*>)%i' , $_404_page_content ) === 1 ) {
+                    
+                    // $_404_page_content contains an html tag so assume it's a fully valid
+                    // html document and write it into the response body
+                    $new_response->getBody()->write( $_404_page_content );
+                    
+                } else {
+                    
+                    //if renderLayout throws an exception it will be handled by 
+                    //$this->container['errorHandler'] (Slim functionality)
+                    
+                    // inject $_404_page_content into the default layout
+                    // and write it into the response body
+                    $new_response->getBody()->write( $this->renderLayout( $this->layout_template_file_name, ['content'=>$_404_page_content] ) ) ;
+                }
+                
+            } else if ( $_404_page_content instanceof ResponseInterface ) {
+                
+                // $_404_page_content is already a Response object generated elsewhere,
+                // just return it with the correct status code and header
+                
+                $new_response = $_404_page_content;
+            } // no need for else since we already know that $_404_page_content is either
+              // a string or a Response object based on the parent `if` test
             
-            return $not_found_handler($req, $res);    
-        } 
+        } else {
+            
+            //generate default 404 page content using the layout and write it into the response body
+            $error_str = '';
+            $_404_page_content = '';
+            $layout_content = "Page not found: " . $this->current_uri;
+
+            try {
+                //log the not found message
+                $this->container->has('logger')
+                    && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+                    && $this->container->get('logger')->notice("HTTP 404: $layout_content");
+
+            } catch (\Exception $e) {
+
+                if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+                    
+                    // for non production environments, capture the exception string and display
+                    // it in the browser
+                    $error_str .= '<br><br>'.$e->getTraceAsString();
+                }
+            }
+            
+            $layout_data = [];
+            $layout_data['content'] = $layout_content.'<br><br>'.$error_str;
+            
+            //if renderLayout throws an exception it will be handled by 
+            //$this->container['errorHandler'] (Slim functionality)
+            $_404_page_content .= $this->renderLayout( $this->layout_template_file_name, $layout_data );
+
+            $new_response->getBody()->write( $_404_page_content );
+        }
         
-        //404 handler could not be retrieved from the container
-        //manually set the 404
-        $not_found_response = $res->withStatus(404);
-        $not_found_response->getBody()->write($_404_page_content);
+        return $new_response->withStatus(404)->withHeader('Content-Type', 'text/html');
+    }
+    
+    /**
+     * 
+     * 405 notAllowed handler.
+     * 
+     * @param ServerRequestInterface $req a request object
+     * @param ResponseInterface $res a response object
+     * 
+     * @return ResponseInterface a response object with an http 405 status code, Content-Type 
+     *                           of `text/html` and appropriate body (eg the html showing the 
+     *                           405 message)
+     */
+    public function generateNotAllowedResponse(array $methods, ServerRequestInterface $req=null, ResponseInterface $res=null) {
         
-        return $not_found_response;
+        is_null($req) && $req = $this->request;
+        is_null($res) && $res = $this->response;
+        
+        $new_response_body = new \Slim\Http\Body( fopen( 'php://temp', 'r+' ) );
+        $new_response = $res->withBody( $new_response_body );
+        
+        $_405_message1 = 'Http method `'. strtoupper($req->getMethod())
+                     . '` not allowed on the url `'.$this->current_uri 
+                     . '` ';
+        $_405_message2 = 'HTTP Method must be one of: ' 
+                         . implode( ' or ', array_map(function($val){ return "`$val`";}, $methods) );
+                    
+        //generate default 405 page content using the layout and write it into the response body
+        $error_str = '';
+        $_405_page_content = '';
+        $layout_content =  "$_405_message1<br>$_405_message2";
+
+        try {
+            $log_message = "$_405_message1. $_405_message2";
+            
+            //log the not allowed message
+            $this->container->has('logger')
+                && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+                && $this->container->get('logger')->notice("HTTP 405: $log_message");
+
+        } catch (\Exception $e) {
+
+            if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+
+                // for non production environments, capture the exception string and display
+                // it in the browser
+                $error_str .= '<br><br>'.$e->getTraceAsString();
+            }
+        }
+
+        $layout_data = [];
+        $layout_data['content'] = $layout_content.'<br><br>'.$error_str;
+        
+        //if renderLayout throws an exception it will be handled by 
+        //$this->container['errorHandler'] (Slim functionality)
+        $_405_page_content .= $this->renderLayout( $this->layout_template_file_name, $layout_data );
+
+        $new_response->getBody()->write( $_405_page_content );
+        
+        return $new_response->withStatus(405)
+                            ->withHeader('Allow', implode(', ', $methods))
+                            ->withHeader('Content-Type', 'text/html');
+    }
+    
+    /**
+     * 
+     * Handler for Http 500 Server Errors. Returns a response object containing the server error page.
+     * 
+     * @param \Exception $exception exception that was raised (it contains info about the server error) 
+     * @param ServerRequestInterface $req a request object
+     * @param ResponseInterface $res a response object
+     * 
+     * @return ResponseInterface a response object with an http 500 status code, Content-Type 
+     *                           of `text/html` and appropriate body (eg the html showing the 
+     *                           500 message)
+     */
+    public function generateServerErrorResponse(\Exception $exception, ServerRequestInterface $req=null, ResponseInterface $res=null) {
+        
+        is_null($req) && $req = $this->request;
+        is_null($res) && $res = $this->response;
+        
+        $new_response_body = new \Slim\Http\Body( fopen( 'php://temp', 'r+' ) );
+        $new_response = $res->withBody( $new_response_body );
+
+        //generate default 500 page content using the layout and write it into the response body
+        $error_str = '';
+        $_500_page_content = '';
+        $layout_content = 'Something went wrong!';
+        
+        $exception_info = $exception->getMessage()
+                        . ' on line '.$exception->getLine()
+                        . ' in `'.$exception->getFile().'`'
+                        . '<br><br>'.$exception->getTraceAsString();
+
+        if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+            
+            //Append exception message if we are not in production.
+            $layout_content .= '<br>'.nl2br($exception_info);
+        }
+        
+        try {
+            //log the server error message
+            $this->container->has('logger')
+                && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+                && $this->container->get('logger')->error( str_replace('<br>', PHP_EOL, "HTTP 500: $exception_info") );
+
+        } catch (\Exception $e) {
+
+            if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+
+                // for non production environments, capture the exception string and display
+                // it in the browser
+                $error_str .= '<br><br>Error while logging 500 Server Error: '.$e->getTraceAsString();
+            }
+        }
+
+        try {
+            $layout_data = [];
+            $layout_data['content'] = $layout_content.'<br><br>'.$error_str;
+            $_500_page_content .= $this->renderLayout( $this->layout_template_file_name, $layout_data );
+            
+        } catch ( \Exception $e) {
+            
+            // could not inject the error page info into the layout
+            $error_str .= "<br><br>Error while rendering layout `{$this->layout_template_file_name}` 500 Server Error: ".$e->getTraceAsString();
+            
+            // inject error page info into a bare bones layout below
+            $_500_page_content = <<<EOT
+<!doctype html>
+<html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>Server Error</title>
+    </head>
+
+    <body>
+        <div>
+            <p>$layout_content</p>
+            <br><br>
+            <p>$error_str</p>
+        </div>
+    </body>
+</html>
+EOT;
+        }
+
+        $new_response->getBody()->write( $_500_page_content );
+        
+        return $new_response->withStatus(500)->withHeader('Content-Type', 'text/html');
     }
     
     public function isLoggedIn() {
         
         $this->ensureVespulaAuthObjectIsSet();
-        return ($this->app->getContainer()->get('vespula_auth')->isValid() === true);
+        return ($this->vespula_auth->isValid() === true);
     }
     
     /**
@@ -666,13 +945,11 @@ class BaseController
     }
     
     public function preAction() {
-        
-        $container = $this->app->getContainer();
-        
+                
         //Inject some dependencies into the controller
-        $this->setLayoutRenderer($container->get('new_layout_renderer'));
-        $this->setViewRenderer($container->get('new_view_renderer'));
-        $this->setVespulaAuthObject($container->get('vespula_auth'));
+        $this->setLayoutRenderer($this->getContainerItem('new_layout_renderer'));
+        $this->setViewRenderer($this->getContainerItem('new_view_renderer'));
+        $this->setVespulaAuthObject($this->getContainerItem('vespula_auth'));
     }
     
     public function postAction() {
@@ -706,5 +983,33 @@ class BaseController
         
         //store current url in session
         $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
+    }
+    
+    /**
+     * 
+     * @param string $item_key_in_container
+     * @return mixed
+     * 
+     * @throws \Slim3MvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException
+     */
+    protected function getContainerItem($item_key_in_container) {
+        
+        if( $this->container->has($item_key_in_container) ) {
+            
+            return $this->container->get($item_key_in_container);
+            
+        } else {
+            
+            $msg = "ERROR: The item with the key named `$item_key_in_container` does not exist in"
+                 . " the container associated with `" . get_class($this) . "` ."
+                 . PHP_EOL;
+
+            throw new ExpectedContainerItemMissingException($msg);
+        }
+    }
+    
+    public function getContainer() {
+        
+        return $this->container;
     }
 }

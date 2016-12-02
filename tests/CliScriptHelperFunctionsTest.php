@@ -494,7 +494,7 @@ INPUT;
         ];
         
         //Make sure processTemplateFile does not return false when the file is valid
-        $template_controller_file = dirname(__DIR__).  $this->ds .'src'.  $this->ds . 'templates' . $this->ds .'controller-class-template.php';
+        $template_controller_file = dirname(__DIR__).  $this->ds .'src'.  $this->ds . 'templates' . $this->ds .'controller-class-template.php.tpl';
         $dest_controller_class_file = __DIR__.  $this->ds . 'test-template-output' . $this->ds .'FooBar.php';
         $this->assertNotEquals(false, processTemplateFile($template_controller_file, $dest_controller_class_file, $replaces));
         

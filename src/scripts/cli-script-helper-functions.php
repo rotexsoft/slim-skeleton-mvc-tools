@@ -547,7 +547,7 @@ function createController($argc, array $argv) {
         //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
         //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
 
-        $template_controller_file = $templates_dir.'controller-class-template.php';
+        $template_controller_file = $templates_dir.'controller-class-template.php.tpl';
         $dest_controller_class_file_folder = $src_folder_path.'controllers'.$ds;
         $dest_controller_class_file = $dest_controller_class_file_folder."{$studly_controller_name}.php";
 

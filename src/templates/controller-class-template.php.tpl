@@ -28,20 +28,18 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
     
     /**
      * 
-     * @param \Slim\App $app
+     * @param \Interop\Container\ContainerInterface $container
      * @param string $controller_name_from_uri
      * @param string $action_name_from_uri
      * @param \Psr\Http\Message\ServerRequestInterface $req
      * @param \Psr\Http\Message\ResponseInterface $res
-     * @param \Slim3MvcTools\Controllers\callable $not_found_handler
      * 
      */
     public function __construct(
-        \Slim\App $app, $controller_name_from_uri, $action_name_from_uri, 
-        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res,
-        callable $not_found_handler        
+        \Interop\Container\ContainerInterface $container, $controller_name_from_uri, $action_name_from_uri, 
+        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res
     ) {
-        parent::__construct($app, $controller_name_from_uri, $action_name_from_uri, $req, $res, $not_found_handler);
+        parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
     }
     
     public function actionIndex() {
@@ -51,7 +49,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
         return $view_str;
         
         //uncomment and edit the line below to incorporate the view above into your app's template
-        //return $this->renderLayout( 'main-template.php', ['content'=>$view_str] );
+        //return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
     public function preAction() {

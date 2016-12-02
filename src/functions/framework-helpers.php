@@ -5,7 +5,7 @@
  *  
  * The controller class must be \Slim3MvcTools\Controllers\BaseController or one of its sub-classes
  * 
- * @param \Slim\App $app
+ * @param \Interop\Container\ContainerInterface $container
  * @param string $controller_name_from_url
  * @param string $action_name_from_url
  * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -17,14 +17,16 @@
  *          page.
  */
 function s3MVC_CreateController(
-    \Slim\App $app, 
+    \Interop\Container\ContainerInterface $container, 
     $controller_name_from_url, 
     $action_name_from_url,
     \Psr\Http\Message\ServerRequestInterface $request, 
     \Psr\Http\Message\ResponseInterface $response
 ) {
-    $container = $app->getContainer();
-    $logger = $container->get('logger');
+    $has_logger = $container->has('logger') 
+                    && ( $container->get('logger') instanceof \Psr\Log\LoggerInterface );
+    
+    $has_logger && $logger = $container->get('logger');
     $controller_class_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
 
@@ -36,37 +38,61 @@ function s3MVC_CreateController(
         //Make sure the controller name is a valid string usable as a class name
         //in php as defined in http://php.net/manual/en/language.oop5.basic.php
         //trigger 404 not found
-        $logger->notice("`".__FILE__."` on line ".__LINE__.": Bad controller name `{$controller_class_name}`");
-        $notFoundHandler = $container->get('notFoundHandler');
-        return $notFoundHandler($request, $response);//invoke the not found handler
+        $has_logger && $logger->notice("`".__FILE__."` on line ".__LINE__.": Bad controller name `{$controller_class_name}`");
+        
+        $notFoundHandler = new \Slim3MvcTools\Controllers\HttpNotFoundController(
+                                $container, $controller_name_from_url, 
+                                $action_name_from_url, $request, $response
+                            );
+        
+        $notFoundHandler->preAction();
+
+        $action_result = $notFoundHandler->actionHttpNotFound(); //invoke the not found handler 
+
+        $notFoundHandler->postAction();
+        
+        return $action_result;
     }
 
     if( !class_exists($controller_class_name) ) {
+        
+        if( $container->has('namespaces_for_controllers') ) {
+            
+            $namespaces_4_controllers = $container->get('namespaces_for_controllers');
 
-        $namespaces_4_controllers = $container->get('namespaces_for_controllers');
+            //try to prepend name space
+            foreach($namespaces_4_controllers as $namespace_4_controllers) {
 
-        //try to prepend name space
-        foreach($namespaces_4_controllers as $namespace_4_controllers) {
+                if( class_exists($namespace_4_controllers.$controller_class_name) ) {
 
-            if( class_exists($namespace_4_controllers.$controller_class_name) ) {
-
-                $controller_class_name = $namespace_4_controllers.$controller_class_name;
-                break;
+                    $controller_class_name = $namespace_4_controllers.$controller_class_name;
+                    break;
+                }
             }
         }
-
+        
         //class still doesn't exist
         if( !class_exists($controller_class_name) ) {
 
             //404 Not Found: Controller class not found.
-            $logger->notice("`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.");
-            $notFoundHandler = $container->get('notFoundHandler');
-            return $notFoundHandler($request, $response);
+            $has_logger && $logger->notice("`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.");
+
+            $notFoundHandler = new \Slim3MvcTools\Controllers\HttpNotFoundController(
+                $container, $controller_name_from_url, $action_name_from_url, $request, $response
+            );
+            
+            $notFoundHandler->preAction();
+
+            $action_result = $notFoundHandler->actionHttpNotFound(); //invoke the not found handler 
+
+            $notFoundHandler->postAction();
+
+            return $action_result;
         }
     }
 
     //Create the controller object
-    return new $controller_class_name($app, $controller_name_from_url, $action_name_from_url, $request, $response, $container->get('notFoundHandler'));
+    return new $controller_class_name($container, $controller_name_from_url, $action_name_from_url, $request, $response);
 }
 
 /**

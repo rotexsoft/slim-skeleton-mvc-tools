@@ -6,4 +6,4 @@ namespace Slim3MvcTools\Controllers\Exceptions;
  *
  * @author Rotimi Ade
  */
-class MissingPropertyException extends \Exception { }
+class IncorrectlySetPropertyException extends \Exception { }
