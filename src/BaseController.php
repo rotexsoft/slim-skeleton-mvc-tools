@@ -204,7 +204,7 @@ class BaseController
             // $this->action_name_from_uri if necessary
             
             $uri_path = ($req->getUri() instanceof \Psr\Http\Message\UriInterface)
-                                                        ? '' : $req->getUri()->getPath();
+                                                        ? $req->getUri()->getPath() : '';
             
             if( !empty($uri_path) && $uri_path !== '/' && strpos($uri_path, '/') !== false ) {
                 
