@@ -198,6 +198,35 @@ class BaseController
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
         
+        if( empty($controller_name_from_uri) || empty($action_name_from_uri) ) {
+            
+            // calculate $this->controller_name_from_uri and / or
+            // $this->action_name_from_uri if necessary
+            
+            $uri_path = $req->getUri()->getPath();
+            
+            if( !empty($uri_path) && $uri_path !== '/' && strpos($uri_path, '/') !== false ) {
+                                
+                if( $uri_path[0] === '/' ) {
+                    
+                    // remove leading slash /
+                    $uri_path = substr($uri_path, 1);
+                }
+                
+                $uri_path_parts = explode('/', $uri_path);
+                
+                if( count($uri_path_parts) >= 1 && empty($controller_name_from_uri) ) {
+                    
+                    $this->controller_name_from_uri = $uri_path_parts[0];
+                }
+                
+                if( count($uri_path_parts) >= 2 && empty($action_name_from_uri) ) {
+                    
+                    $this->action_name_from_uri = $uri_path_parts[1];
+                }
+            }
+        }
+        
         $this->storeCurrentUrlForLoginRedirection();
     }
     
