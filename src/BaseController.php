@@ -203,10 +203,11 @@ class BaseController
             // calculate $this->controller_name_from_uri and / or
             // $this->action_name_from_uri if necessary
             
-            $uri_path = $req->getUri()->getPath();
+            $uri_path = ($req->getUri() instanceof \Psr\Http\Message\UriInterface)
+                                                        ? '' : $req->getUri()->getPath();
             
             if( !empty($uri_path) && $uri_path !== '/' && strpos($uri_path, '/') !== false ) {
-                                
+                
                 if( $uri_path[0] === '/' ) {
                     
                     // remove leading slash /
