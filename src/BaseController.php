@@ -996,6 +996,8 @@ EOT;
                     'logout', 'action-logout', 'actionlogout', 'action_logout'
                 ] 
             )
+            || strtolower($this->request->getHeaderLine('X-Requested-With')) === strtolower('XMLHttpRequest') //ajax request
+            || ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ) //ajax request
         ) { return; }
           
         $uri = $this->request->getUri();
