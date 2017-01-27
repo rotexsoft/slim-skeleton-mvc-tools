@@ -869,7 +869,7 @@ class BaseController
         $_500_page_content = '';
         $layout_content = 'Something went wrong!';
         
-        $exception_info = $exception->getMessage()
+        $exception_info = $exception->getMessage() . PHP_EOL
                         . ' on line '.$exception->getLine()
                         . ' in `'.$exception->getFile().'`'
                         . '<br><br>'.$exception->getTraceAsString();
