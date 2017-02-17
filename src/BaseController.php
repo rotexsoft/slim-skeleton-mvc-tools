@@ -715,6 +715,46 @@ class BaseController
         $new_response_body = new \Slim\Http\Body( fopen( 'php://temp', 'r+' ) );
         $new_response = $res->withBody( $new_response_body );
         
+        $error_str = '';
+
+        try {
+            $req_as_str = 
+                s3MVC_psr7RequestObjToString(
+                    $req,
+                    ['route','routeInfo'],
+                    false, //$skip_req_attribs
+                    true,  //$skip_req_body cos posted password might be there
+                    false, //$skip_req_cookie_params
+                    false, //$skip_req_headers
+                    false, //$skip_req_method
+                    false, //$skip_req_proto_ver
+                    true,  //$skip_req_query_params would be visible in the url / uri
+                    true,  //$skip_req_target would be visible in the url / uri
+                    false, //$skip_req_server_params
+                    false, //$skip_req_uploaded_files
+                    false  //$skip_req_uri
+                );
+
+            //log the not found message
+            $log_msg = "HTTP 404: Page not found: {$this->current_uri}"
+                    . ((empty($_404_additional_log_message))? '' : PHP_EOL."HTTP 404 More Details: $_404_additional_log_message" )
+                    . PHP_EOL . PHP_EOL. "Request Details:"
+                    . PHP_EOL . str_replace(PHP_EOL, PHP_EOL. "\t\t\t", "\t\t\t".$req_as_str);
+
+            $this->container->has('logger')
+                && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+                && $this->container->get('logger')->notice($log_msg);
+
+        } catch (\Exception $e) {
+
+            if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+
+                // for non production environments, capture the exception string and display
+                // it in the browser
+                $error_str .= '<br><br>'.$e->getTraceAsString();
+            }
+        }
+        
         if(
             $_404_page_content !== null 
             && ( is_string($_404_page_content) || ($_404_page_content instanceof ResponseInterface) ) 
@@ -749,47 +789,8 @@ class BaseController
         } else {
             
             //generate default 404 page content using the layout and write it into the response body
-            $error_str = '';
             $_404_page_content = '';
             $layout_content = "Page not found: " . $this->current_uri;
-
-            try {
-                $req_as_str = 
-                    s3MVC_psr7RequestObjToString(
-                        $req,
-                        ['route','routeInfo'],
-                        false, //$skip_req_attribs
-                        true,  //$skip_req_body cos posted password might be there
-                        false, //$skip_req_cookie_params
-                        false, //$skip_req_headers
-                        false, //$skip_req_method
-                        false, //$skip_req_proto_ver
-                        true,  //$skip_req_query_params would be visible in the url / uri
-                        true,  //$skip_req_target would be visible in the url / uri
-                        false, //$skip_req_server_params
-                        false, //$skip_req_uploaded_files
-                        false  //$skip_req_uri
-                    );
-                
-                //log the not found message
-                $log_msg = "HTTP 404: $layout_content"
-                        . ((empty($_404_additional_log_message))? '' : PHP_EOL."HTTP 404 More Details: $_404_additional_log_message" )
-                        . PHP_EOL . PHP_EOL. "Request Details:"
-                        . PHP_EOL . str_replace(PHP_EOL, PHP_EOL. "\t\t\t", "\t\t\t".$req_as_str);
-                
-                $this->container->has('logger')
-                    && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
-                    && $this->container->get('logger')->notice($log_msg);
-
-            } catch (\Exception $e) {
-
-                if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
-                    
-                    // for non production environments, capture the exception string and display
-                    // it in the browser
-                    $error_str .= '<br><br>'.$e->getTraceAsString();
-                }
-            }
             
             $layout_data = [];
             $layout_data['content'] = $layout_content.'<br><br>'.$error_str;
