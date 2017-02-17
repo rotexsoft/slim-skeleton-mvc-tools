@@ -22,15 +22,11 @@ function s3MVC_CreateController(
     $action_name_from_url,
     \Psr\Http\Message\ServerRequestInterface $request, 
     \Psr\Http\Message\ResponseInterface $response
-) {
-    $has_logger = $container->has('logger') 
-                    && ( $container->get('logger') instanceof \Psr\Log\LoggerInterface );
-    
-    $notFoundHandlerClass = '\\Slim3MvcTools\\Controllers\\HttpNotFoundController'; // default handler
-    
-    $container->has('notFoundHandlerClass') && $notFoundHandlerClass = $container->get('notFoundHandlerClass');
-    
-    $has_logger && $logger = $container->get('logger');
+) {    
+    $notFoundHandlerClass = $container->has('notFoundHandlerClass') 
+                                ? $container->get('notFoundHandlerClass') 
+                                : '\\Slim3MvcTools\\Controllers\\HttpNotFoundController';
+        
     $controller_class_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
 
@@ -42,7 +38,7 @@ function s3MVC_CreateController(
         //Make sure the controller name is a valid string usable as a class name
         //in php as defined in http://php.net/manual/en/language.oop5.basic.php
         //trigger 404 not found
-        $has_logger && $logger->notice("`".__FILE__."` on line ".__LINE__.": Bad controller name `{$controller_class_name}`");
+        $extra_log_message = "`".__FILE__."` on line ".__LINE__.": Bad controller name `{$controller_class_name}`";
         
         $notFoundHandler = new $notFoundHandlerClass(
                                 $container, $controller_name_from_url, 
@@ -51,7 +47,7 @@ function s3MVC_CreateController(
         
         $notFoundHandler->preAction();
 
-        $action_result = $notFoundHandler->actionHttpNotFound(); //invoke the not found handler 
+        $action_result = $notFoundHandler->actionHttpNotFound(null, $extra_log_message); //invoke the not found handler 
 
         $notFoundHandler->postAction();
         
@@ -79,7 +75,7 @@ function s3MVC_CreateController(
         if( !class_exists($controller_class_name) ) {
 
             //404 Not Found: Controller class not found.
-            $has_logger && $logger->notice("`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.");
+            $extra_log_message = "`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.";
 
             $notFoundHandler = new $notFoundHandlerClass(
                 $container, $controller_name_from_url, $action_name_from_url, $request, $response
@@ -87,7 +83,7 @@ function s3MVC_CreateController(
             
             $notFoundHandler->preAction();
 
-            $action_result = $notFoundHandler->actionHttpNotFound(); //invoke the not found handler 
+            $action_result = $notFoundHandler->actionHttpNotFound(null, $extra_log_message); //invoke the not found handler 
 
             $notFoundHandler->postAction();
 
@@ -328,3 +324,191 @@ function s3MVC_addQueryStrParamToUri(
     
     return $uri->withQuery(http_build_query($query_params)); // return a uri object with updated query params
 }
+
+/**
+ * 
+ * @param \Psr\Http\Message\ServerRequestInterface $req
+ * @param array $request_attribute_keys_to_skip
+ * @param bool $skip_req_attribs
+ * @param bool $skip_req_body
+ * @param bool $skip_req_cookie_params
+ * @param bool $skip_req_headers
+ * @param bool $skip_req_method
+ * @param bool $skip_req_proto_ver
+ * @param bool $skip_req_query_params
+ * @param bool $skip_req_target
+ * @param bool $skip_req_server_params
+ * @param bool $skip_req_uploaded_files
+ * @param bool $skip_req_uri
+ * 
+ * @return string
+ */
+function s3MVC_psr7RequestObjToString(
+    \Psr\Http\Message\ServerRequestInterface $req, 
+    array $request_attribute_keys_to_skip=['route','routeInfo'],
+    $skip_req_attribs=false,
+    $skip_req_body=false,
+    $skip_req_cookie_params=false,
+    $skip_req_headers=false,
+    $skip_req_method=false,
+    $skip_req_proto_ver=false,
+    $skip_req_query_params=false,
+    $skip_req_target=false,
+    $skip_req_server_params=false,
+    $skip_req_uploaded_files=false,
+    $skip_req_uri=false
+) { 
+    $uploaded_files_as_str = 
+        empty($req->getUploadedFiles()) ? 
+            null : 
+            array_reduce( 
+                $req->getUploadedFiles(),
+                function($prev, $curr) {  return $prev .= s3MVC_psr7UploadedFileToString($curr) . PHP_EOL; }, 
+                ''
+            )
+        ;
+
+    $request_attributes = empty($req->getAttributes())? [] : $req->getAttributes();
+
+    $attribs_filterer = function ($val, $key) use (&$request_attributes) {
+        if( array_key_exists($val, $request_attributes) ) { unset($request_attributes[$val]); }
+    };
+
+    array_walk($request_attribute_keys_to_skip, $attribs_filterer);
+
+    return (
+                (!$skip_req_attribs)
+                ?
+                    "[[Request Attributes]]:" . PHP_EOL
+                   . print_r( $request_attributes, true )
+                   . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_body)
+                ?
+                    PHP_EOL . "[[Request Body]]:" . PHP_EOL
+                    . $req->getBody()->__toString()
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_cookie_params)
+                ?
+                    PHP_EOL . "[[Request Cookie Params]]:" . PHP_EOL
+                    . var_export( $req->getCookieParams(), true )
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_headers)
+                ?
+                    PHP_EOL . "[[Request Headers]]:" . PHP_EOL
+                    . var_export( $req->getHeaders(), true )
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_method)
+                ?
+                    PHP_EOL . "[[Request Method]]: "
+                    . $req->getMethod()
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_proto_ver)
+                ?
+                    PHP_EOL . "[[Request Protocol Version]]: "
+                    . $req->getProtocolVersion()
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_query_params)
+                ?
+                    PHP_EOL . "[[Request Query Params]]:" . PHP_EOL
+                    . var_export( $req->getQueryParams(), true )
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_target)
+                ?
+                    PHP_EOL . "[[Request Target]]: "
+                    . $req->getRequestTarget()
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_server_params)
+                ?
+                    PHP_EOL . "[[Request Server Params]]:" . PHP_EOL
+                    . var_export( $req->getServerParams(), true )
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_uploaded_files)
+                ?
+                    PHP_EOL . "[[Request Uploaded Files]]:" . PHP_EOL
+                    . var_export( $uploaded_files_as_str, true )
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+            .
+            (
+                (!$skip_req_uri)
+                ?
+                    PHP_EOL . "[[Request Uri]]:" . PHP_EOL
+                    . var_export( s3MVC_UriToString($req->getUri()), true )
+                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
+                :
+                    ''
+            )
+        ;
+}
+    
+function s3MVC_psr7UploadedFileToString(\Psr\Http\Message\UploadedFileInterface $file) {
+        
+    return "[[Uploaded File Client Filename]]: "
+           . $file->getClientFilename()
+
+           . PHP_EOL . PHP_EOL . "<<=================================================>>"
+           . PHP_EOL . "[[Uploaded Client Media Type]]: "
+           . $file->getClientMediaType()
+
+           . PHP_EOL . PHP_EOL . "<<=================================================>>"
+           . PHP_EOL . "[[Uploaded File Size in Bytes]]: "
+           . $file->getSize()
+
+           . PHP_EOL . PHP_EOL . "<<=================================================>>"
+           . PHP_EOL . "[[Uploaded File Contents]]:" . PHP_EOL
+           . var_export($file->getStream()->__toString(), true)
+
+           . PHP_EOL . PHP_EOL . "<<=================================================>>"
+           . PHP_EOL . "[[Uploaded File Error(s) If Any]]: "
+           . $file->getError()                
+        ;
+}
+
+

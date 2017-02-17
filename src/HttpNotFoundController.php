@@ -10,8 +10,8 @@ namespace Slim3MvcTools\Controllers;
  */
 class HttpNotFoundController extends BaseController
 {
-    public function actionHttpNotFound() {
+    public function actionHttpNotFound($_404_page_content=null, $_404_additional_log_message=null) {
         
-        return parent::actionHttpNotFound();
+        return parent::actionHttpNotFound($_404_page_content, $_404_additional_log_message);
     }
 }

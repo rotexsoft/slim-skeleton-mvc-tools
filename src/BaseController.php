@@ -644,9 +644,9 @@ class BaseController
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
-    public function actionHttpNotFound() {
+    public function actionHttpNotFound( $_404_page_content=null, $_404_additional_log_message=null) {
         
-        return $this->generateNotFoundResponse($this->request, $this->response);
+        return $this->generateNotFoundResponse($this->request, $this->response, $_404_page_content, $_404_additional_log_message);
     }
     
 
@@ -707,7 +707,7 @@ class BaseController
      *                           of `text/html` and appropriate body (eg the html showing the 
      *                           404 message)
      */
-    protected function generateNotFoundResponse(ServerRequestInterface $req=null, ResponseInterface $res=null, $_404_page_content=null) {
+    protected function generateNotFoundResponse(ServerRequestInterface $req=null, ResponseInterface $res=null, $_404_page_content=null, $_404_additional_log_message=null) {
         
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
@@ -754,10 +754,32 @@ class BaseController
             $layout_content = "Page not found: " . $this->current_uri;
 
             try {
+                $req_as_str = 
+                    s3MVC_psr7RequestObjToString(
+                        $req,
+                        ['route','routeInfo'],
+                        false, //$skip_req_attribs
+                        true,  //$skip_req_body cos posted password might be there
+                        false, //$skip_req_cookie_params
+                        false, //$skip_req_headers
+                        false, //$skip_req_method
+                        false, //$skip_req_proto_ver
+                        true,  //$skip_req_query_params would be visible in the url / uri
+                        true,  //$skip_req_target would be visible in the url / uri
+                        false, //$skip_req_server_params
+                        false, //$skip_req_uploaded_files
+                        false  //$skip_req_uri
+                    );
+                
                 //log the not found message
+                $log_msg = "HTTP 404: $layout_content"
+                        . ((empty($_404_additional_log_message))? '' : PHP_EOL."HTTP 404 More Details: $_404_additional_log_message" )
+                        . PHP_EOL . PHP_EOL. "Request Details:"
+                        . PHP_EOL . str_replace(PHP_EOL, PHP_EOL. "\t\t\t", "\t\t\t".$req_as_str);
+                
                 $this->container->has('logger')
                     && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
-                    && $this->container->get('logger')->notice("HTTP 404: $layout_content");
+                    && $this->container->get('logger')->notice($log_msg);
 
             } catch (\Exception $e) {
 
@@ -813,7 +835,25 @@ class BaseController
         $layout_content =  "$_405_message1<br>$_405_message2";
 
         try {
-            $log_message = "$_405_message1. $_405_message2";
+            $req_as_str = 
+                s3MVC_psr7RequestObjToString(
+                    $req,
+                    ['route','routeInfo'],
+                    false, //$skip_req_attribs
+                    true,  //$skip_req_body cos posted password might be there
+                    false, //$skip_req_cookie_params
+                    false, //$skip_req_headers
+                    false, //$skip_req_method
+                    false, //$skip_req_proto_ver
+                    true,  //$skip_req_query_params would be visible in the url / uri
+                    true,  //$skip_req_target would be visible in the url / uri
+                    false, //$skip_req_server_params
+                    false, //$skip_req_uploaded_files
+                    false  //$skip_req_uri
+                );
+            $log_message = "$_405_message1. $_405_message2" 
+                        . PHP_EOL . PHP_EOL. "Request Details:"
+                        . PHP_EOL . str_replace(PHP_EOL, PHP_EOL. "\t\t\t", "\t\t\t".$req_as_str);
             
             //log the not allowed message
             $this->container->has('logger')
@@ -881,10 +921,29 @@ class BaseController
         }
         
         try {
+            $req_as_str = 
+                s3MVC_psr7RequestObjToString(
+                    $req,
+                    ['route','routeInfo'],
+                    false, //$skip_req_attribs
+                    true,  //$skip_req_body cos posted password might be there
+                    false, //$skip_req_cookie_params
+                    false, //$skip_req_headers
+                    false, //$skip_req_method
+                    false, //$skip_req_proto_ver
+                    true,  //$skip_req_query_params would be visible in the url / uri
+                    true,  //$skip_req_target would be visible in the url / uri
+                    false, //$skip_req_server_params
+                    false, //$skip_req_uploaded_files
+                    false  //$skip_req_uri
+                );
+            $log_message = str_replace('<br>', PHP_EOL, "HTTP 500: $exception_info") 
+                        . PHP_EOL . PHP_EOL. "Request Details:"
+                        . PHP_EOL . str_replace(PHP_EOL, PHP_EOL. "\t\t\t", "\t\t\t".$req_as_str);
             //log the server error message
             $this->container->has('logger')
                 && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
-                && $this->container->get('logger')->error( str_replace('<br>', PHP_EOL, "HTTP 500: $exception_info") );
+                && $this->container->get('logger')->error( $log_message );
 
         } catch (\Exception $e) {
 
