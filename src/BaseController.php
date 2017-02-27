@@ -735,10 +735,18 @@ class BaseController
                     false  //$skip_req_uri
                 );
 
+            $logged_in_user = 
+                (
+                    ($this->container->get('vespula_auth') instanceof \Vespula\Auth\Auth)
+                    && $this->container->get('vespula_auth')->isValid()
+                )
+                ? $this->container->get('vespula_auth')->getUsername() : '';
+            
             //log the not found message
             $log_msg = "HTTP 404: Page not found: {$this->current_uri}"
                     . ((empty($_404_additional_log_message))? '' : PHP_EOL."HTTP 404 More Details: $_404_additional_log_message" )
                     . PHP_EOL . PHP_EOL. "Request Details:"
+                    . ( empty($logged_in_user) ? '' : PHP_EOL . PHP_EOL. "Logged in user: `$logged_in_user`" )
                     . PHP_EOL . str_replace(PHP_EOL, PHP_EOL. "\t\t\t", "\t\t\t".$req_as_str);
 
             $this->container->has('logger')
@@ -834,6 +842,12 @@ class BaseController
         $error_str = '';
         $_405_page_content = '';
         $layout_content =  "$_405_message1<br>$_405_message2";
+        $logged_in_user = 
+            (
+                ($this->container->get('vespula_auth') instanceof \Vespula\Auth\Auth)
+                && $this->container->get('vespula_auth')->isValid()
+            )
+            ? $this->container->get('vespula_auth')->getUsername() : '';
 
         try {
             $req_as_str = 
@@ -854,6 +868,7 @@ class BaseController
                 );
             $log_message = "$_405_message1. $_405_message2" 
                         . PHP_EOL . PHP_EOL. "Request Details:"
+                        . ( empty($logged_in_user) ? '' : PHP_EOL . PHP_EOL. "Logged in user: `$logged_in_user`" )
                         . PHP_EOL . str_replace(PHP_EOL, PHP_EOL. "\t\t\t", "\t\t\t".$req_as_str);
             
             //log the not allowed message
@@ -938,8 +953,17 @@ class BaseController
                     false, //$skip_req_uploaded_files
                     false  //$skip_req_uri
                 );
+            
+            $logged_in_user = 
+                (
+                    ($this->container->get('vespula_auth') instanceof \Vespula\Auth\Auth)
+                    && $this->container->get('vespula_auth')->isValid()
+                )
+                ? $this->container->get('vespula_auth')->getUsername() : '';
+            
             $log_message = str_replace('<br>', PHP_EOL, "HTTP 500: $exception_info") 
                         . PHP_EOL . PHP_EOL. "Request Details:"
+                        . ( empty($logged_in_user) ? '' : PHP_EOL . PHP_EOL. "Logged in user: `$logged_in_user`" )
                         . PHP_EOL . str_replace(PHP_EOL, PHP_EOL. "\t\t\t", "\t\t\t".$req_as_str);
             //log the server error message
             $this->container->has('logger')
