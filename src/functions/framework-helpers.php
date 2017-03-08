@@ -23,36 +23,33 @@ function s3MVC_CreateController(
     \Psr\Http\Message\ServerRequestInterface $request, 
     \Psr\Http\Message\ResponseInterface $response
 ) {    
-    $notFoundHandlerClass = $container->has('notFoundHandlerClass') 
-                                ? $container->get('notFoundHandlerClass') 
-                                : '\\Slim3MvcTools\\Controllers\\HttpNotFoundController';
+    $notFoundHandler = $container->has('notFoundHandler') 
+                                ? $container->get('notFoundHandler') 
+                                : null;
         
     $controller_class_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
 
-    if( !preg_match( $regex_4_valid_class_name, preg_quote($controller_class_name, '/') ) ) {
-
+    if( 
+        !preg_match( $regex_4_valid_class_name, preg_quote($controller_class_name, '/') )
+    ) {
         //A valid php class name starts with a letter or underscore, followed by 
         //any number of letters, numbers, or underscores.
 
-        //Make sure the controller name is a valid string usable as a class name
-        //in php as defined in http://php.net/manual/en/language.oop5.basic.php
-        //trigger 404 not found
-        $extra_log_message = "`".__FILE__."` on line ".__LINE__.": Bad controller name `{$controller_class_name}`";
+        $extra_log_message = "`" . __FILE__ . "` on line " . __LINE__ . ": Bad controller name `{$controller_class_name}`";
         
-        $notFoundHandler = new $notFoundHandlerClass(
-                                $container, $controller_name_from_url, 
-                                $action_name_from_url, $request, $response
-                            );
-        
-        $notFoundHandler->preAction();
-
-        $action_result = $notFoundHandler->actionHttpNotFound(null, $extra_log_message); //invoke the not found handler 
-
-        $notFoundHandler->postAction();
-        
-        return $action_result;
-    }
+        if ( !is_null($notFoundHandler) ) {
+            
+            //Make sure the controller name is a valid string usable as a class name
+            //in php as defined in http://php.net/manual/en/language.oop5.basic.php
+            //trigger 404 not found
+            return $notFoundHandler($request, $response, null, $extra_log_message);
+            
+        } else {
+            
+            throw new \Exception($extra_log_message);
+        }
+    } 
 
     if( !class_exists($controller_class_name) ) {
         
@@ -76,18 +73,18 @@ function s3MVC_CreateController(
 
             //404 Not Found: Controller class not found.
             $extra_log_message = "`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.";
-
-            $notFoundHandler = new $notFoundHandlerClass(
-                $container, $controller_name_from_url, $action_name_from_url, $request, $response
-            );
             
-            $notFoundHandler->preAction();
+            if ( !is_null($notFoundHandler) ) {
 
-            $action_result = $notFoundHandler->actionHttpNotFound(null, $extra_log_message); //invoke the not found handler 
+                //Make sure the controller name is a valid string usable as a class name
+                //in php as defined in http://php.net/manual/en/language.oop5.basic.php
+                //trigger 404 not found
+                return $notFoundHandler($request, $response, null, $extra_log_message);
 
-            $notFoundHandler->postAction();
+            } else {
 
-            return $action_result;
+                throw new \Exception($extra_log_message);
+            }
         }
     }
 
@@ -510,5 +507,3 @@ function s3MVC_psr7UploadedFileToString(\Psr\Http\Message\UploadedFileInterface 
            . $file->getError()                
         ;
 }
-
-
