@@ -14,10 +14,7 @@ for html, json and xml requests. Right now only html responses are being returne
 
 \Slim\Handlers::$knownContentTypes and
 \Slim\Handlers::determineContentType(ServerRequestInterface $request) are of huge interest
-
-Add setResponse(\Psr\Http\Message\ResponseInterface $response) & 
-setRequest(\Psr\Http\Message\ServerRequestInterface $request) to BaseController
  
 Change BaseController::preAction() & BaseController::postAction() to 
-preAction(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response):\Psr\Http\Message\ResponseInterface $response
-& postAction(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response):\Psr\Http\Message\ResponseInterface $response
+preAction():\Psr\Http\Message\ResponseInterface $response
+& postAction(\Psr\Http\Message\ResponseInterface $response):\Psr\Http\Message\ResponseInterface $response

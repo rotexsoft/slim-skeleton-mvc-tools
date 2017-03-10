@@ -54,14 +54,14 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
     
     public function preAction() {
         
-        parent::preAction();
+        return parent::preAction();
         
         // add code that you need to be executed before each controller action method is executed
     }
     
-    public function postAction() {
+    public function postAction(\Psr\Http\Message\ResponseInterface $response) {
         
-        parent::postAction();
+        return parent::postAction($response);
         
         // add code that you need to be executed after each controller action method is executed
     }

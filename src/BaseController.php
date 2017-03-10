@@ -304,6 +304,16 @@ class BaseController
         $this->view_renderer = $renderer;
     }
     
+    public function setRequest(\Psr\Http\Message\ServerRequestInterface $request) {
+        
+        $this->request = $request;
+    }
+    
+    public function setResponse(\Psr\Http\Message\ResponseInterface $response) {
+        
+        $this->response = $response;
+    }
+    
     /**
      * 
      * Executes a PHP file and returns its output as a string. This file is 
@@ -1064,10 +1074,13 @@ EOT;
         $this->setLayoutRenderer($this->getContainerItem('new_layout_renderer'));
         $this->setViewRenderer($this->getContainerItem('new_view_renderer'));
         $this->setVespulaAuthObject($this->getContainerItem('vespula_auth'));
+        
+        return $this->response;
     }
     
-    public function postAction() {
+    public function postAction(\Psr\Http\Message\ResponseInterface $response) {
         
+        return $response;
     }
     
     protected function storeCurrentUrlForLoginRedirection() {
