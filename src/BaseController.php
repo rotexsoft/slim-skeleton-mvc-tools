@@ -535,7 +535,7 @@ class BaseController
 
             if( $auth->isValid() ) {
                 
-                if( strpos($success_redirect_path, s3MVC_GetBaseUrlPath()) === false ) {
+                if( s3MVC_GetBaseUrlPath().'' === '' || strpos($success_redirect_path, s3MVC_GetBaseUrlPath()) === false ) {
                     
                     //prepend base path
                     $success_redirect_path = 
