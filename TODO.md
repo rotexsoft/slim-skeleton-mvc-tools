@@ -1,3 +1,4 @@
+* For a next major version, look into breaking actions apart e.g. actionShowLogin for GET requests to show login form and actionDoLogin for POST requests to do the login rather than have actionLogin handle both GET and POST requests.
 * Strive for 100% Unit Test Coverage
 * Create custom email for project's composer.json
 * Update travis link in README.md
@@ -14,7 +15,3 @@ for html, json and xml requests. Right now only html responses are being returne
 
 \Slim\Handlers::$knownContentTypes and
 \Slim\Handlers::determineContentType(ServerRequestInterface $request) are of huge interest
- 
-Change BaseController::preAction() & BaseController::postAction() to 
-preAction():\Psr\Http\Message\ResponseInterface $response
-& postAction(\Psr\Http\Message\ResponseInterface $response):\Psr\Http\Message\ResponseInterface $response
