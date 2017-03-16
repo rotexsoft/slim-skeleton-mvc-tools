@@ -19,26 +19,26 @@ class CliScriptHelperFunctionsTest extends \PHPUnit_Framework_TestCase
 
     public function testThatDisplayHelpWorksAsExpected() {
         
-        $output = $this->execFuncAndReturnBufferedOutput('displayHelp', ['create-controller.php']);
+        $output = $this->execFuncAndReturnBufferedOutput('displayHelp', ['s3mvc-create-controller.php']);
         
         $expected_substr = <<<INPUT
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim3-skeleton-mvc-app derived projects.
 
 Usage:
-  php create-controller.php [options]
+  php s3mvc-create-controller.php [options]
 
 Example:
 # either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which by default extends `\Slim3MvcTools\Controllers\BaseController`)  and a default view in `src/views/foo-bar/index.php`
     
-    php create-controller.php -c foo-bar -p "/var/www/html/my-app/src"
+    php s3mvc-create-controller.php -c foo-bar -p "/var/www/html/my-app/src"
     
-    php create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src"
+    php s3mvc-create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src"
   
 # either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which extends `\SomeNameSpace\Controller2Extend`) and a default view in `src/views/foo-bar/index.php`
   
-    php create-controller.php -c foo-bar -p "/var/www/html/my-app/src" -e "\SomeNameSpace\Controller2Extend"
+    php s3mvc-create-controller.php -c foo-bar -p "/var/www/html/my-app/src" -e "\SomeNameSpace\Controller2Extend"
     
-    php create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src" --extends-controller "\SomeNameSpace\Controller2Extend"
+    php s3mvc-create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src" --extends-controller "\SomeNameSpace\Controller2Extend"
 
 Options:
   -h, -?, -help, --help         Display this help message
@@ -611,20 +611,20 @@ INPUT;
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim3-skeleton-mvc-app derived projects.
 
 Usage:
-  php create-controller.php [options]
+  php s3mvc-create-controller.php [options]
 
 Example:
 # either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which by default extends `\Slim3MvcTools\Controllers\BaseController`)  and a default view in `src/views/foo-bar/index.php`
     
-    php create-controller.php -c foo-bar -p "/var/www/html/my-app/src"
+    php s3mvc-create-controller.php -c foo-bar -p "/var/www/html/my-app/src"
     
-    php create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src"
+    php s3mvc-create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src"
   
 # either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which extends `\SomeNameSpace\Controller2Extend`) and a default view in `src/views/foo-bar/index.php`
   
-    php create-controller.php -c foo-bar -p "/var/www/html/my-app/src" -e "\SomeNameSpace\Controller2Extend"
+    php s3mvc-create-controller.php -c foo-bar -p "/var/www/html/my-app/src" -e "\SomeNameSpace\Controller2Extend"
     
-    php create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src" --extends-controller "\SomeNameSpace\Controller2Extend"
+    php s3mvc-create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src" --extends-controller "\SomeNameSpace\Controller2Extend"
 
 Options:
   -h, -?, -help, --help         Display this help message
@@ -637,9 +637,9 @@ Options:
     
   -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 INPUT;
-        //createController(1, ['create-controller.php']);
+        //createController(1, ['s3mvc-create-controller.php']);
         $argc = 1;
-        $argv = ['create-controller.php']; //script name is always at index 0
+        $argv = ['s3mvc-create-controller.php']; //script name is always at index 0
         $captured_script_output = $this->execFuncAndReturnBufferedOutput('createController', [$argc, $argv], true);
 
         $this->assertContains($expected_output_showing_help_page, $captured_script_output);

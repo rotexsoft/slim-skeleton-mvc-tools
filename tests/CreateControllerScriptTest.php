@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class tests \slim3-skeleton-mvc-tools\src\scripts\create-controller.php
+ * This class tests \slim3-skeleton-mvc-tools\src\scripts\s3mvc-create-controller.php
  *
  * @author Rotimi Adegbamigbe
  */
@@ -16,7 +16,7 @@ class CreateControllerScriptTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
         $ds = DIRECTORY_SEPARATOR;
         $this->ds = DIRECTORY_SEPARATOR;
-        $this->script_2_test = __DIR__."{$ds}..{$ds}src{$ds}scripts{$ds}create-controller.php";
+        $this->script_2_test = __DIR__."{$ds}..{$ds}src{$ds}scripts{$ds}s3mvc-create-controller.php";
     }
 
     public function testThatCreateControllerScriptWorksAsExpectedWithValidArgsAndValidArgVals() {
@@ -25,20 +25,20 @@ class CreateControllerScriptTest extends \PHPUnit_Framework_TestCase
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim3-skeleton-mvc-app derived projects.
 
 Usage:
-  php create-controller.php [options]
+  php s3mvc-create-controller.php [options]
 
 Example:
 # either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which by default extends `\Slim3MvcTools\Controllers\BaseController`)  and a default view in `src/views/foo-bar/index.php`
     
-    php create-controller.php -c foo-bar -p "/var/www/html/my-app/src"
+    php s3mvc-create-controller.php -c foo-bar -p "/var/www/html/my-app/src"
     
-    php create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src"
+    php s3mvc-create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src"
   
 # either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which extends `\SomeNameSpace\Controller2Extend`) and a default view in `src/views/foo-bar/index.php`
   
-    php create-controller.php -c foo-bar -p "/var/www/html/my-app/src" -e "\SomeNameSpace\Controller2Extend"
+    php s3mvc-create-controller.php -c foo-bar -p "/var/www/html/my-app/src" -e "\SomeNameSpace\Controller2Extend"
     
-    php create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src" --extends-controller "\SomeNameSpace\Controller2Extend"
+    php s3mvc-create-controller.php --controller-name foo-bar --path-to-src-folder "/var/www/html/my-app/src" --extends-controller "\SomeNameSpace\Controller2Extend"
 
 Options:
   -h, -?, -help, --help         Display this help message
