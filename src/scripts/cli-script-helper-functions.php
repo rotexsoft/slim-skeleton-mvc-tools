@@ -634,14 +634,14 @@ function createController($argc, array $argv) {
         
             //test if composer is avaliable only if server OS on which this script is being run
             //is not windows            
-            if( @isCommandAvailableOnOs('composer') ) {
-                
-                passthru('composer dumpautoload');
-                
-            } else {
+//            if( @isCommandAvailableOnOs('composer') ) {
+//                
+//                passthru('composer dumpautoload');
+//                
+//            } else {
                 
                 printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
-            }
+//            }
         } else {
             printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
         }
