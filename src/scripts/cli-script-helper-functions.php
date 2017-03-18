@@ -634,7 +634,7 @@ function createController($argc, array $argv) {
         
             //test if composer is avaliable only if server OS on which this script is being run
             //is not windows            
-            if( isCommandAvailableOnOs('composer') ) {
+            if( @isCommandAvailableOnOs('composer') ) {
                 
                 passthru('composer dumpautoload');
                 
