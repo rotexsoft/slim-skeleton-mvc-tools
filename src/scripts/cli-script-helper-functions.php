@@ -443,15 +443,9 @@ function createController($argc, array $argv) {
             $controller_name = getOptVal('-c', $argv);
         }
 
-        $studly_controller_name = \Slim3MvcTools\Functions\Str\dashesToStudly(
-                                        \Slim3MvcTools\Functions\Str\underToStudly(
-                                            $controller_name
-                                        )
-                                  );
+        $studly_controller_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name);
 
-        $dashed_controller_name = \Slim3MvcTools\Functions\Str\toDashes(
-                                        $controller_name
-                                  );
+        $dashed_controller_name = \Slim3MvcTools\Functions\Str\toDashes($controller_name);
 
         if( !isValidClassName($studly_controller_name) ) {
 
@@ -539,12 +533,12 @@ function createController($argc, array $argv) {
             $namepace_declaration = "namespace {$namepace_4_controller};";
         }
 
-        //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
+        //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
         //substitute {{TEMPLTATE_CONTROLLER_VIEW_FOLDER}} with the view folder name \Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
         //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
 
         //make the dir S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
-        //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\underToStudly(dashesToStudly($controller_name_from_cli))
+        //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
         //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
 
         $template_controller_file = $templates_dir.'controller-class-template.php.tpl';
