@@ -18,8 +18,14 @@ if( !isPhpRunningInCliMode() ) {
         
         
         $prompt_4_controller_name = 'Please enter the controller name (all lower case with words'
-                                  . ' separated with dashes). ' . PHP_EOL . 'For example, to create a controller'
-                                  . ' class named `ExpiredBlogPosts` enter `expired-blog-posts`:';
+                                  . ' separated with dashes).' 
+                                  . PHP_EOL . 'For example, to create a controller'
+                                  . ' class named `ExpiredBlogPosts` enter `expired-blog-posts`.'
+                                  . PHP_EOL. 'If you want an underscore followed by an uppercase'
+                                  . ' letter in the resulting controller name, e.g Expired_BlogPosts'
+                                  . ' you should enter `expired_-blog-posts` (the view files for this'
+                                  . ' controller would be located in ./views/expired_blog-posts and'
+                                  . ' the url would look like localhost/expired_-blog-posts/):';
         $controller_name = readFromLine(printInfo($prompt_4_controller_name,false));
         //var_dump($controller_name);
         
