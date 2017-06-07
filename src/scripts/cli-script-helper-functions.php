@@ -445,8 +445,8 @@ function createController($argc, array $argv) {
 
         $studly_controller_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name);
 
-        $dashed_controller_name = \Slim3MvcTools\Functions\Str\toDashes($controller_name);
-
+        $dashed_controller_name = mb_strtolower($controller_name, 'UTF-8');
+        
         if( !isValidClassName($studly_controller_name) ) {
 
             printError("Invalid controller class name `$controller_name` supplied. Goodbye!!");
@@ -534,7 +534,6 @@ function createController($argc, array $argv) {
         }
 
         //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
-        //substitute {{TEMPLTATE_CONTROLLER_VIEW_FOLDER}} with the view folder name \Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
         //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
 
         //make the dir S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
@@ -584,7 +583,6 @@ function createController($argc, array $argv) {
             '__CONTROLLER_2_EXTEND__' => $controller_2_extend,
             '__TEMPLTATE_CONTROLLER__' => $studly_controller_name,
             'namespace __NAMESPACE_2_REPLACE__;' => $namepace_declaration,
-            '{{TEMPLTATE_CONTROLLER_VIEW_FOLDER}}' => $dashed_controller_name,
             "'__login_success_redirect_controller__'" => "'{$dashed_controller_name}'",
         ];
 

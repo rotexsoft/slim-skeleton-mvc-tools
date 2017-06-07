@@ -489,7 +489,6 @@ INPUT;
             '__CONTROLLER_2_EXTEND__' => "SomeNameSpace\\Controller2Extend",
             '__TEMPLTATE_CONTROLLER__' => "FooBar",
             'namespace __NAMESPACE_2_REPLACE__;' => "namespace Test\\Space;",
-            '{{TEMPLTATE_CONTROLLER_VIEW_FOLDER}}' => "foo-bar",
             "'__login_success_redirect_controller__'" => "'foo-bar'",
         ];
         
