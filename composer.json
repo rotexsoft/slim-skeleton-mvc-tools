@@ -37,5 +37,5 @@
         "classmap": ["src/", "tests/"],
         "files": ["src/functions/framework-helpers.php", "src/functions/str-helpers.php"]
     },
-    "bin": ["src/scripts/s3mvc-create-controller"]
+    "bin": ["src/scripts/s3mvc-create-controller1"]
 }
