@@ -1,9 +1,9 @@
 * For a next major version, look into breaking actions apart e.g. actionShowLogin for GET requests to show login form and actionDoLogin for POST requests to do the login rather than have actionLogin handle both GET and POST requests.
 * Strive for 100% Unit Test Coverage
-* Create custom email for project's composer.json
 * Update travis link in README.md
 * Look into using example in https://akrabat.com/testing-slim-framework-actions/ for writing unit tests for actions in the mvc-app package.
 
+```
 Look at \Slim\Handlers\Error, \Slim\Handlers\NotAllowed and \Slim\Handlers\NotFound and see how 
 \Slim3MvcTools\Controllers\BaseController::generateNotAllowedResponse(..) ,
 \Slim3MvcTools\Controllers\BaseController::generateNotFoundResponse(..) and 
@@ -15,3 +15,4 @@ for html, json and xml requests. Right now only html responses are being returne
 
 \Slim\Handlers::$knownContentTypes and
 \Slim\Handlers::determineContentType(ServerRequestInterface $request) are of huge interest
+```
