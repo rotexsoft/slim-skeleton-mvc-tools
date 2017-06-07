@@ -687,6 +687,7 @@ class BaseController
         if (preg_match('/\+(json|xml)/', $acceptHeader, $matches)) {
             
             $mediaType = 'application/' . $matches[1];
+            
             if (in_array($mediaType, $this->knownContentTypes)) {
                 return $mediaType;
             }
