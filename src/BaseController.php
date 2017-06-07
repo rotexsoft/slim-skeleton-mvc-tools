@@ -679,6 +679,7 @@ class BaseController
         $selectedContentTypes = array_intersect(explode(',', $acceptHeader), $this->knownContentTypes);
 
         if (count($selectedContentTypes)) {
+            
             return current($selectedContentTypes);
         }
 
