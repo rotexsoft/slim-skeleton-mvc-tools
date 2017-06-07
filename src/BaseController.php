@@ -635,6 +635,7 @@ class BaseController
                 break;
             
             case $auth->isValid():
+                
                 $msg = "You are still logged in.";
                 break;
             
