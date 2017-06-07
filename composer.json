@@ -39,3 +39,4 @@
     },
     "bin": ["src/scripts/s3mvc-create-controller", "src/scripts/s3mvc-create-controller-wizard"]
 }
+
