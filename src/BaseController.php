@@ -609,6 +609,7 @@ class BaseController
      * 
      * 
      * 
+     * 
      */
     public function actionLoginStatus() {
 
