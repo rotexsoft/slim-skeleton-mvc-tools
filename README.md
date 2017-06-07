@@ -9,7 +9,7 @@ This package contains a Base controller and other classes and functions used by 
 
 ### Changelog
 
-[Here](https://github.com/rotexsoft/slim3-skeleton-mvc-tools/releases).
+[Here](https://github.com/rotexsoft/slim3-skeleton-mvc-tools/releases)
 
 ### Running Tests
 
