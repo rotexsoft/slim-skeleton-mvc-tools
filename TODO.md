@@ -1,6 +1,5 @@
 * For a next major version, look into breaking actions apart e.g. actionShowLogin for GET requests to show login form and actionDoLogin for POST requests to do the login rather than have actionLogin handle both GET and POST requests.
 * Strive for 100% Unit Test Coverage
-* Update travis link in README.md
 * Look into using example in https://akrabat.com/testing-slim-framework-actions/ for writing unit tests for actions in the mvc-app package.
 
 ```
