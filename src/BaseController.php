@@ -689,6 +689,7 @@ class BaseController
             $mediaType = 'application/' . $matches[1];
             
             if (in_array($mediaType, $this->knownContentTypes)) {
+                
                 return $mediaType;
             }
         }

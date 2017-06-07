@@ -9,6 +9,7 @@ if( !isPhpRunningInCliMode() ) {
 } else {
 
     try {
+        
         createController($argc, $argv);
 
     } catch(\Exception $e) {
