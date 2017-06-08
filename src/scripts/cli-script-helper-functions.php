@@ -445,10 +445,7 @@ function createController($argc, array $argv) {
 
         $studly_controller_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name);
 
-        //controller names like blog_-post which would translate to Blog_Post should have 
-        //./view/blog_post as their view folder and should be entered as blog_post in the controller
-        //part of the uri. hence we need str_replace('_-', '_', ...)
-        $dashed_controller_name = str_replace('_-', '_', mb_strtolower($controller_name, 'UTF-8'));
+        $dashed_controller_name = mb_strtolower($controller_name, 'UTF-8');
         
         if( !isValidClassName($studly_controller_name) ) {
 
