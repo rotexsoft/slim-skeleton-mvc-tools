@@ -970,8 +970,8 @@ class BaseController
      * @param \Exception $exception exception that was raised (it contains info about the server error) 
      * @param ServerRequestInterface $req a request object
      * @param ResponseInterface $res a response object
-     * @param bool $render_layout should hold a value of true if the 405 page should be injected into your
-     *                            site's layout or false if the 405 page should be returned without being
+     * @param bool $render_layout should hold a value of true if the 500 page should be injected into your
+     *                            site's layout or false if the 500 page should be returned without being
      *                            injected into the layout.
      * 
      * @return ResponseInterface a response object with an http 500 status code, Content-Type 
