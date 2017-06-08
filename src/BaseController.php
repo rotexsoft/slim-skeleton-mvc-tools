@@ -656,12 +656,41 @@ class BaseController
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
-    public function actionHttpNotFound( $_404_page_content=null, $_404_additional_log_message=null) {
+    /**
+     * 
+     * @param ResponseInterface|string $_404_page_content a string or Response object containing the 
+     *                                                    html to display as the 404 page.
+     * 
+     *                                                    If it's null, or not a string or not a 
+     *                                                    Response object, then this method will
+     *                                                    generate a default 404 page.
+     * 
+     *                                                    If it's a string it will be written as 
+     *                                                    an html document into a response object.
+     * 
+     *                                                    If it's a response object, it will be 
+     *                                                    returned with a status code of 404 and
+     *                                                    Content-Type of `text/html`.
+     * 
+     * @param string $_404_additional_log_message a string containing more information about the 404 error.
+     *                                            It will be added to the log file entry for the 404 error.
+     * 
+     * @param bool $render_layout should hold a value of true if the 404 page should be injected into your
+     *                            site's layout or false if the 404 page should be returned without being
+     *                            injected into the layout.
+     * 
+     * @return ResponseInterface a response object with an http 404 status code, Content-Type 
+     *                           of `text/html` and appropriate body (eg the html showing the 
+     *                           404 message)
+     */
+    public function actionHttpNotFound( $_404_page_content=null, $_404_additional_log_message=null, $render_layout=true) {
         
-        return $this->generateNotFoundResponse($this->request, $this->response, $_404_page_content, $_404_additional_log_message);
+        return $this->generateNotFoundResponse(
+                    $this->request, $this->response, $_404_page_content, 
+                    $_404_additional_log_message, $render_layout
+                );
     }
     
-
     /**
      * Determine which content type we know about is wanted using Accept header
      * Lifted from SlimPHP 3
@@ -719,11 +748,18 @@ class BaseController
      *                                                    returned with a status code of 404 and
      *                                                    Content-Type of `text/html`.
      * 
+     * @param string $_404_additional_log_message a string containing more information about the 404 error.
+     *                                            It will be added to the log file entry for the 404 error.
+     * 
+     * @param bool $render_layout should hold a value of true if the 404 page should be injected into your
+     *                            site's layout or false if the 404 page should be returned without being
+     *                            injected into the layout.
+     * 
      * @return ResponseInterface a response object with an http 404 status code, Content-Type 
      *                           of `text/html` and appropriate body (eg the html showing the 
      *                           404 message)
      */
-    protected function generateNotFoundResponse(ServerRequestInterface $req=null, ResponseInterface $res=null, $_404_page_content=null, $_404_additional_log_message=null) {
+    protected function generateNotFoundResponse(ServerRequestInterface $req=null, ResponseInterface $res=null, $_404_page_content=null, $_404_additional_log_message=null, $render_layout=true) {
         
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
@@ -798,7 +834,11 @@ class BaseController
                     
                     // inject $_404_page_content into the default layout
                     // and write it into the response body
-                    $new_response->getBody()->write( $this->renderLayout( $this->layout_template_file_name, ['content'=>$_404_page_content] ) ) ;
+                    $new_response->getBody()->write(
+                        ($render_layout)
+                            ? $this->renderLayout( $this->layout_template_file_name, ['content'=>$_404_page_content] )
+                            : $_404_page_content
+                    );
                 }
                 
             } else if ( $_404_page_content instanceof ResponseInterface ) {
@@ -821,7 +861,9 @@ class BaseController
             
             //if renderLayout throws an exception it will be handled by 
             //$this->container['errorHandler'] (Slim functionality)
-            $_404_page_content .= $this->renderLayout( $this->layout_template_file_name, $layout_data );
+            $_404_page_content .= ($render_layout)
+                                    ? $this->renderLayout( $this->layout_template_file_name, $layout_data )
+                                    : $layout_data['content'];
 
             $new_response->getBody()->write( $_404_page_content );
         }
@@ -835,12 +877,15 @@ class BaseController
      * 
      * @param ServerRequestInterface $req a request object
      * @param ResponseInterface $res a response object
+     * @param bool $render_layout should hold a value of true if the 405 page should be injected into your
+     *                            site's layout or false if the 405 page should be returned without being
+     *                            injected into the layout.
      * 
      * @return ResponseInterface a response object with an http 405 status code, Content-Type 
      *                           of `text/html` and appropriate body (eg the html showing the 
      *                           405 message)
      */
-    public function generateNotAllowedResponse(array $methods, ServerRequestInterface $req=null, ResponseInterface $res=null) {
+    public function generateNotAllowedResponse(array $methods, ServerRequestInterface $req=null, ResponseInterface $res=null, $render_layout=true) {
         
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
@@ -907,7 +952,9 @@ class BaseController
         
         //if renderLayout throws an exception it will be handled by 
         //$this->container['errorHandler'] (Slim functionality)
-        $_405_page_content .= $this->renderLayout( $this->layout_template_file_name, $layout_data );
+        $_405_page_content .= ($render_layout)
+                               ? $this->renderLayout( $this->layout_template_file_name, $layout_data )
+                               : $layout_data['content'];
 
         $new_response->getBody()->write( $_405_page_content );
         
@@ -923,12 +970,15 @@ class BaseController
      * @param \Exception $exception exception that was raised (it contains info about the server error) 
      * @param ServerRequestInterface $req a request object
      * @param ResponseInterface $res a response object
+     * @param bool $render_layout should hold a value of true if the 405 page should be injected into your
+     *                            site's layout or false if the 405 page should be returned without being
+     *                            injected into the layout.
      * 
      * @return ResponseInterface a response object with an http 500 status code, Content-Type 
      *                           of `text/html` and appropriate body (eg the html showing the 
      *                           500 message)
      */
-    public function generateServerErrorResponse(\Exception $exception, ServerRequestInterface $req=null, ResponseInterface $res=null) {
+    public function generateServerErrorResponse(\Exception $exception, ServerRequestInterface $req=null, ResponseInterface $res=null, $render_layout=true) {
         
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
@@ -999,7 +1049,9 @@ class BaseController
         try {
             $layout_data = [];
             $layout_data['content'] = $layout_content.'<br><br>'.$error_str;
-            $_500_page_content .= $this->renderLayout( $this->layout_template_file_name, $layout_data );
+            $_500_page_content .= ($render_layout)
+                                    ? $this->renderLayout( $this->layout_template_file_name, $layout_data )
+                                    : $layout_data['content'];
             
         } catch ( \Exception $e) {
             
