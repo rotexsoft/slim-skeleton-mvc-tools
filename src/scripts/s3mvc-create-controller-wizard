@@ -34,7 +34,7 @@ if( !isPhpRunningInCliMode() ) {
         
         while( mb_strlen( ''.$controller_name, 'UTF-8') <= 0 ) {
             
-            $controller_name = readFromLine(printInfo($prompt_4_controller_name,false));
+            $controller_name = readFromLine(printInfo(PHP_EOL.$prompt_4_controller_name,false));
             //var_dump($controller_name);
         }
         $psuedo_argv[] = '-c';
@@ -48,12 +48,12 @@ if( !isPhpRunningInCliMode() ) {
                                   . ' it is relative to the current directory from which you are running'
                                   . ' this wizard (e.g. if you are running this wizard from `/home/myapp/`'
                                   . ' then entering `./src` will translate to `/home/myapp/src` as the absolute path):';
-        $path_2_src_folder = readFromLine(printInfo($prompt_4_path_2_src_folder, false));
+        $path_2_src_folder = readFromLine(printInfo(PHP_EOL.$prompt_4_path_2_src_folder, false));
         //var_dump($path_2_src_folder);
         
         while( mb_strlen( ''.$path_2_src_folder, 'UTF-8') <= 0 ) {
             
-            $path_2_src_folder = readFromLine(printInfo($prompt_4_path_2_src_folder,false));
+            $path_2_src_folder = readFromLine(printInfo(PHP_EOL.$prompt_4_path_2_src_folder,false));
             //var_dump($path_2_src_folder);
         }
         $psuedo_argv[] = '-p';
@@ -66,7 +66,7 @@ if( !isPhpRunningInCliMode() ) {
                                   . ' extend or hit enter to use `\\Slim3MvcTools\\Controllers\\BaseController`.'
                                   . ' The name should include the namespace and it should be a'
                                   . ' class that is a sub-class of \'\\Slim3MvcTools\\Controllers\\BaseController\' (for example, `\MyApp\Controllers\BaseController`):';
-        $parent_conroller_name = readFromLine(printInfo($prompt_4_parent_conroller_name,false));
+        $parent_conroller_name = readFromLine(printInfo(PHP_EOL.$prompt_4_parent_conroller_name,false));
         //var_dump($parent_conroller_name);
         
         if( mb_strlen( ''.$parent_conroller_name, 'UTF-8') > 0 ) {
@@ -81,7 +81,7 @@ if( !isPhpRunningInCliMode() ) {
         $prompt_4_namespace_name = 'Please enter the namespace your new controller will'
                                   . ' belong to (e.g. `MyApp\Controllers`) or hit enter if you don\'t want your new controller'
                                   . ' to belong to any namespace:';
-        $namespace_name = readFromLine(printInfo($prompt_4_namespace_name,false));
+        $namespace_name = readFromLine(printInfo(PHP_EOL.$prompt_4_namespace_name,false));
         //var_dump($namespace_name);
         
         if( mb_strlen( ''.$namespace_name, 'UTF-8') > 0 ) {
@@ -98,6 +98,7 @@ if( !isPhpRunningInCliMode() ) {
         
         ////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////
+        echo PHP_EOL;
         createController($psuedo_argc, $psuedo_argv);
 
     } catch(\Exception $e) {
