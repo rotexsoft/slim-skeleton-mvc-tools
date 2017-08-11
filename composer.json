@@ -20,7 +20,7 @@
         "slim/slim": "^3.0",
         "rotexsoft/file-renderer": "^1.0.0",
         "vespula/log": "^0.2.1",
-        "vespula/auth": "^0.1.2",
+        "vespula/auth": "^0.2.5",
         "container-interop/container-interop": "^1.2"
     },
     "require-dev": {
