@@ -45,7 +45,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
     public function actionIndex() {
         
         //get the contents of the view first
-        $view_str = $this->renderView('index.php');
+        $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
         return $view_str;
         
         //uncomment and edit the line below to incorporate the view above into your app's template
