@@ -437,7 +437,7 @@ class BaseController
     public function actionIndex() {
         
         //get the contents of the view first
-        $view_str = $this->renderView('index.php');
+        $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
         
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
