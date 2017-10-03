@@ -77,7 +77,7 @@ if( !isPhpRunningInCliMode() ) {
             
         } else {
             
-            $psuedo_argv[] = \Slim3MvcTools\Controllers\BaseController::class;
+            $psuedo_argv[] = '\\'.\Slim3MvcTools\Controllers\BaseController::class;
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////
