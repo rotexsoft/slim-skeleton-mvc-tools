@@ -69,10 +69,15 @@ if( !isPhpRunningInCliMode() ) {
         $parent_conroller_name = readFromLine(\Slim3MvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_parent_conroller_name, "cyan",  "black"));
         //var_dump($parent_conroller_name);
         
+        $psuedo_argv[] = '-e';
+        
         if( mb_strlen( ''.$parent_conroller_name, 'UTF-8') > 0 ) {
             
-            $psuedo_argv[] = '-e';
             $psuedo_argv[] = $parent_conroller_name;
+            
+        } else {
+            
+            $psuedo_argv[] = \Slim3MvcTools\Controllers\BaseController::class;
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////
