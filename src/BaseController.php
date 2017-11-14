@@ -543,7 +543,7 @@ class BaseController
                 }
 
                 //re-direct
-                return $this->response->withHeader('Location', $success_redirect_path);
+                return $this->response->withStatus(302)->withHeader('Location', $success_redirect_path);
             } else {
                 
                 //re-display login form with error messages
@@ -602,7 +602,7 @@ class BaseController
         }
  
         //re-direct
-        return $this->response->withHeader('Location', $redirect_path);
+        return $this->response->withStatus(302)->withHeader('Location', $redirect_path);
     }
     
     /**
@@ -1120,7 +1120,7 @@ EOT;
             $action = ($prepend_action) ? 'action-login' : 'login';
             $redr_path = s3MVC_GetBaseUrlPath() . "/{$controller}/$action";
 
-            return $this->response->withHeader('Location', $redr_path);
+            return $this->response->withStatus(302)->withHeader('Location', $redr_path);
         }
         
         return false;
