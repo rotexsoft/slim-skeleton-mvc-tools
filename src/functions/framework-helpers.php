@@ -101,7 +101,7 @@ function s3MVC_DumpAuthinfo(\Vespula\Auth\Auth $auth) {
 
     return 'Login Status: ' . $auth->getSession()->getStatus() . PHP_EOL
          . 'Logged in Person\'s Username: ' . $auth->getUsername().PHP_EOL
-         . 'Logged in User\'s Data: ' . PHP_EOL . print_r($auth->getUserData(), true);
+         . 'Logged in User\'s Data: ' . PHP_EOL . print_r($auth->getUserdata(), true);
 }
 
 /**
