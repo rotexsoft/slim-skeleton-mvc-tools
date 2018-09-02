@@ -35,3 +35,6 @@ phpunit.xml
 *.phar
 file-only-present-on-dev-pc-at-home.txt
 index.php
+
+# file below is generated when tests are run
+tests/test-template-output/FooBar.php
