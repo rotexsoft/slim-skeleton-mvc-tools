@@ -110,7 +110,7 @@ function s3MVC_DumpAuthinfo(\Vespula\Auth\Auth $auth) {
  */
 function s3MVC_DumpVar($v) {
 
-    $v = (!is_string($v)) ? (new \SebastianBergmann\Exporter\Exporter())->export($var) : $v;
+    $v = (!is_string($v)) ? (new \SebastianBergmann\Exporter\Exporter())->export($v) : $v;
     echo "<pre>$v</pre>";
 }
 
