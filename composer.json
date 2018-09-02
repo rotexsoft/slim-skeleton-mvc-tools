@@ -21,6 +21,7 @@
         "rotexsoft/file-renderer": "^1.0.0",
         "vespula/log": "^1.1.0",
         "vespula/auth": "^0.2.5",
+        "sebastian/exporter": "^1.2",
         "container-interop/container-interop": "^1.2"
     },
     "require-dev": {
