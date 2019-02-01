@@ -85,7 +85,7 @@ if( !isPhpRunningInCliMode() ) {
         // Can be empty meaning controller belongs to default or global namespace
         $prompt_4_namespace_name = 'Please enter the namespace your new controller will'
                                   . ' belong to (e.g. `MyApp\Controllers`) or hit enter if you don\'t want your new controller'
-                                  . ' to belong to any namespace:';
+                                  . ' to belong to any namespace. [NOTE: DO NOT add a trailing back slash to the namespace]:';
         $namespace_name = readFromLine(\Slim3MvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_namespace_name, "cyan",  "black"));
         //var_dump($namespace_name);
         
