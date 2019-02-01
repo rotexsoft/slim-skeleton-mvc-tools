@@ -257,6 +257,19 @@ function printInfo($str, $append_new_line = true) {
     if( ((bool)$append_new_line) ) { echo PHP_EOL; }
 }
 
+function normalizeNameSpaceName($namespace_name){
+    
+    $namespace_name = ''.$namespace_name;
+    
+    if(strlen($namespace_name) > 1 && $namespace_name[0] === '\\') {
+        
+        //strip off the preceding \
+        $namespace_name = substr($namespace_name, 1);
+    }
+    
+    return $namespace_name;
+}
+
 /**
  * 
  *  
@@ -516,6 +529,7 @@ function createController($argc, array $argv) {
                 }
 
                 //validation passed
+                $namepace_4_controller = normalizeNameSpaceName($namepace_4_controller);
                 $namepace_declaration = "namespace {$namepace_4_controller};";
 
             } else {
@@ -530,6 +544,7 @@ function createController($argc, array $argv) {
             }
 
             //validation passed
+            $namepace_4_controller = normalizeNameSpaceName($namepace_4_controller);
             $namepace_declaration = "namespace {$namepace_4_controller};";
         }
 
