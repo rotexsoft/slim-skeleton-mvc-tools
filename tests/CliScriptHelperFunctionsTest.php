@@ -7,7 +7,7 @@ include __DIR__."{$ds}..{$ds}src{$ds}scripts{$ds}cli-script-helper-functions.php
  *
  * @author Rotimi Adegbamigbe
  */
-class CliScriptHelperFunctionsTest extends \PHPUnit_Framework_TestCase
+class CliScriptHelperFunctionsTest extends \PHPUnit\Framework\TestCase
 {
     protected $ds; //directory separator
     
