@@ -17,7 +17,7 @@ This package contains a Base controller and other classes and functions used by 
 
 ### Requirements
 
-* PHP 5.5+
+* PHP 5.5+ (version 1.X) or PHP 7.2+ (version 2.X)
 * Compatibility with HHVM not guaranteed
 
 ### Installation
