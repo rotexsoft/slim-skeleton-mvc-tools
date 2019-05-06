@@ -761,6 +761,10 @@ class BaseController
      */
     protected function generateNotFoundResponse(ServerRequestInterface $req=null, ResponseInterface $res=null, $_404_page_content=null, $_404_additional_log_message=null, $render_layout=true) {
         
+        $this->container->has('logger')
+            && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+            && $this->container->get('logger')->notice('Http 404 handled by: `'. static::class . '`');
+        
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
         
@@ -887,6 +891,10 @@ class BaseController
      */
     public function generateNotAllowedResponse(array $methods, ServerRequestInterface $req=null, ResponseInterface $res=null, $render_layout=true) {
         
+        $this->container->has('logger')
+            && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+            && $this->container->get('logger')->notice('Http 405 handled by: `'. static::class . '`');
+        
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
         
@@ -979,6 +987,10 @@ class BaseController
      *                           500 message)
      */
     public function generateServerErrorResponse(\Exception $exception, ServerRequestInterface $req=null, ResponseInterface $res=null, $render_layout=true) {
+        
+        $this->container->has('logger')
+            && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+            && $this->container->get('logger')->notice('Http 500 handled by: `'. static::class . '`');
         
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
