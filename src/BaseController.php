@@ -763,7 +763,7 @@ class BaseController
         
         $this->container->has('logger')
             && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
-            && $this->container->get('logger')->notice('Http 404 handled by: `'. static::class . '`');
+            && $this->container->get('logger')->notice('Http 404 handled by: `'. static::class .'::'.__FUNCTION__ . '()`');
         
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
@@ -893,7 +893,7 @@ class BaseController
         
         $this->container->has('logger')
             && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
-            && $this->container->get('logger')->notice('Http 405 handled by: `'. static::class . '`');
+            && $this->container->get('logger')->notice('Http 405 handled by: `'. static::class .'::'.__FUNCTION__ . '()`');
         
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
@@ -990,7 +990,7 @@ class BaseController
         
         $this->container->has('logger')
             && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
-            && $this->container->get('logger')->notice('Http 500 handled by: `'. static::class . '`');
+            && $this->container->get('logger')->notice('Http 500 handled by: `'. static::class .'::'.__FUNCTION__ . '()`');
         
         is_null($req) && $req = $this->request;
         is_null($res) && $res = $this->response;
