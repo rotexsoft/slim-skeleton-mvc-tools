@@ -498,9 +498,9 @@ function s3MVC_psr7UploadedFileToString(\Psr\Http\Message\UploadedFileInterface 
            . PHP_EOL . "[[Uploaded File Size in Bytes]]: "
            . $file->getSize()
 
-           . PHP_EOL . PHP_EOL . "<<=================================================>>"
-           . PHP_EOL . "[[Uploaded File Contents]]:" . PHP_EOL
-           . var_export($file->getStream()->__toString(), true)
+//           . PHP_EOL . PHP_EOL . "<<=================================================>>"
+//           . PHP_EOL . "[[Uploaded File Contents]]:" . PHP_EOL
+//           . var_export($file->getStream()->__toString(), true)
 
            . PHP_EOL . PHP_EOL . "<<=================================================>>"
            . PHP_EOL . "[[Uploaded File Error(s) If Any]]: "
