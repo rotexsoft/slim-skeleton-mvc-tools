@@ -5,7 +5,7 @@
  *  
  * The controller class must be \Slim3MvcTools\Controllers\BaseController or one of its sub-classes
  * 
- * @param \Interop\Container\ContainerInterface $container
+ * @param \Psr\Container\ContainerInterface $container
  * @param string $controller_name_from_url
  * @param string $action_name_from_url
  * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -17,7 +17,7 @@
  *          page.
  */
 function s3MVC_CreateController(
-    \Interop\Container\ContainerInterface $container, 
+    \Psr\Container\ContainerInterface $container, 
     $controller_name_from_url, 
     $action_name_from_url,
     \Psr\Http\Message\ServerRequestInterface $request, 

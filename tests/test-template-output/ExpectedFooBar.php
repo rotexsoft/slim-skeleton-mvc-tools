@@ -28,7 +28,7 @@ class FooBar extends SomeNameSpace\Controller2Extend
     
     /**
      * 
-     * @param \Interop\Container\ContainerInterface $container
+     * @param \Psr\Container\ContainerInterface $container
      * @param string $controller_name_from_uri
      * @param string $action_name_from_uri
      * @param \Psr\Http\Message\ServerRequestInterface $req
@@ -36,7 +36,7 @@ class FooBar extends SomeNameSpace\Controller2Extend
      * 
      */
     public function __construct(
-        \Interop\Container\ContainerInterface $container, $controller_name_from_uri, $action_name_from_uri, 
+        \Psr\Container\ContainerInterface $container, $controller_name_from_uri, $action_name_from_uri, 
         \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res
     ) {
         parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
