@@ -21,10 +21,10 @@ after_script:
 
 matrix:
   include:
-    - php: hhvm
-      dist: trusty
+#    - php: hhvm
+#      dist: trusty
   allow_failures:
-    - php: hhvm
+#    - php: hhvm
 
 after_success:
   # - travis_retry php vendor/bin/coveralls
