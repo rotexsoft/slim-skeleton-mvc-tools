@@ -11,7 +11,7 @@ class CliScriptHelperFunctionsTest extends \PHPUnit\Framework\TestCase
 {
     protected $ds; //directory separator
     
-    protected function setUp() {
+    protected function setUp():void {
         
         parent::setUp();
         $this->ds = DIRECTORY_SEPARATOR;
@@ -51,7 +51,7 @@ Options:
     
   -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 INPUT;
-        $this->assertContains($expected_substr, $output);
+        $this->assertStringContainsString($expected_substr, $output);
         
         ///////////////////////////////////////////
         //Test \InvalidArgumentException messages 
@@ -79,7 +79,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -93,7 +93,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
     
@@ -133,7 +133,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -147,7 +147,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
 
@@ -187,7 +187,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -201,7 +201,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
 
@@ -246,7 +246,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -260,7 +260,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
 
@@ -298,7 +298,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -312,7 +312,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
     
@@ -351,7 +351,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -365,7 +365,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
     
@@ -404,7 +404,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -418,7 +418,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
     
@@ -465,7 +465,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -479,7 +479,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
 
@@ -558,7 +558,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -572,7 +572,7 @@ INPUT;
 
             $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
             
         foreach($args as $arg_type => $arg) {
@@ -586,7 +586,7 @@ INPUT;
 
                 $msg_substr = "The expected value for the second argument to `$function_sig_in_err_msg`"
                             . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertContains($msg_substr, $e->getMessage());
+                $this->assertStringContainsString($msg_substr, $e->getMessage());
             }
         }
         
@@ -600,7 +600,7 @@ INPUT;
 
             $msg_substr = "The expected value for the second argument to `$function_sig_in_err_msg`"
                         . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertContains($msg_substr, $e->getMessage());
+            $this->assertStringContainsString($msg_substr, $e->getMessage());
         }
     }
     
@@ -641,87 +641,87 @@ INPUT;
         $argv = ['s3mvc-create-controller']; //script name is always at index 0
         $captured_script_output = $this->execFuncAndReturnBufferedOutput('createController', [$argc, $argv], true);
 
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 /*
         //run script with -? arg
         $captured_script_output = `php {$this->script_2_test} -?`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with -h arg
         $captured_script_output = `php {$this->script_2_test} -h`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with -help arg
         $captured_script_output = `php {$this->script_2_test} -help`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --help arg
         $captured_script_output = `php {$this->script_2_test} --help`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with -c arg
         $captured_script_output = `php {$this->script_2_test} -c`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with -c arg with value
         $captured_script_output = `php {$this->script_2_test} -c SomeController`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --controller-name arg
         $captured_script_output = `php {$this->script_2_test} --controller-name`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --controller-name arg with value
         $captured_script_output = `php {$this->script_2_test} --controller-name SomeController`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with -p arg
         $captured_script_output = `php {$this->script_2_test} -p`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with -p arg with value
         $captured_script_output = `php {$this->script_2_test} -p /path/to/your/apps/source-files`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --path-to-src-folder arg
         $captured_script_output = `php {$this->script_2_test} --path-to-src-folder`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --path-to-src-folder arg with value
         $captured_script_output = `php {$this->script_2_test} --path-to-src-folder /path/to/your/apps/source-files`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
                 
         //run script with -e arg
         $captured_script_output = `php {$this->script_2_test} -e`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with -e arg with value
         $captured_script_output = `php {$this->script_2_test} -e SomeController2Extend`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --extends-controller arg
         $captured_script_output = `php {$this->script_2_test} --extends-controller`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --extends-controller arg with value
         $captured_script_output = `php {$this->script_2_test} --extends-controller SomeController2Extend`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
                 
         //run script with -n arg
         $captured_script_output = `php {$this->script_2_test} -n`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with -n arg with value
         $captured_script_output = `php {$this->script_2_test} -n SomeNameSpace\ForNewController`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --namespace-4-controller arg
         $captured_script_output = `php {$this->script_2_test} --namespace-4-controller`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
         
         //run script with --namespace-4-controller arg with value
         $captured_script_output = `php {$this->script_2_test} --namespace-4-controller SomeNameSpace\ForNewController`;
-        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 */
     }
     

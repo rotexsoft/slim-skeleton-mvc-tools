@@ -11,7 +11,7 @@ class CreateControllerScriptTest extends \PHPUnit\Framework\TestCase
     
     protected $script_2_test;
 
-    protected function setUp() {
+    protected function setUp(): void {
         
         parent::setUp();
         $ds = DIRECTORY_SEPARATOR;
@@ -58,87 +58,87 @@ class CreateControllerScriptTest extends \PHPUnit\Framework\TestCase
 //INPUT;
 //        //run script with no args
 //        $captured_script_output = `php {$this->script_2_test}`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -? arg
 //        $captured_script_output = `php {$this->script_2_test} -?`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -h arg
 //        $captured_script_output = `php {$this->script_2_test} -h`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -help arg
 //        $captured_script_output = `php {$this->script_2_test} -help`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --help arg
 //        $captured_script_output = `php {$this->script_2_test} --help`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -c arg
 //        $captured_script_output = `php {$this->script_2_test} -c`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -c arg with value
 //        $captured_script_output = `php {$this->script_2_test} -c SomeController`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --controller-name arg
 //        $captured_script_output = `php {$this->script_2_test} --controller-name`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --controller-name arg with value
 //        $captured_script_output = `php {$this->script_2_test} --controller-name SomeController`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -p arg
 //        $captured_script_output = `php {$this->script_2_test} -p`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -p arg with value
 //        $captured_script_output = `php {$this->script_2_test} -p /path/to/your/apps/source-files`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --path-to-src-folder arg
 //        $captured_script_output = `php {$this->script_2_test} --path-to-src-folder`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --path-to-src-folder arg with value
 //        $captured_script_output = `php {$this->script_2_test} --path-to-src-folder /path/to/your/apps/source-files`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //                
 //        //run script with -e arg
 //        $captured_script_output = `php {$this->script_2_test} -e`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -e arg with value
 //        $captured_script_output = `php {$this->script_2_test} -e SomeController2Extend`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --extends-controller arg
 //        $captured_script_output = `php {$this->script_2_test} --extends-controller`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --extends-controller arg with value
 //        $captured_script_output = `php {$this->script_2_test} --extends-controller SomeController2Extend`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //                
 //        //run script with -n arg
 //        $captured_script_output = `php {$this->script_2_test} -n`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with -n arg with value
 //        $captured_script_output = `php {$this->script_2_test} -n SomeNameSpace\ForNewController`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --namespace-4-controller arg
 //        $captured_script_output = `php {$this->script_2_test} --namespace-4-controller`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 //        
 //        //run script with --namespace-4-controller arg with value
 //        $captured_script_output = `php {$this->script_2_test} --namespace-4-controller SomeNameSpace\ForNewController`;
-//        $this->assertContains($expected_output_showing_help_page, $captured_script_output);
+//        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
 // *
 // */
 //    }
@@ -172,7 +172,7 @@ class CreateControllerScriptTest extends \PHPUnit\Framework\TestCase
 //        } catch (\Exception $e) {
 //            
 //            //echo PHP_EOL.$e->getMessage().PHP_EOL.'yoooo'.PHP_EOL;
-//            $this->assertContains($expected_msg, $e->getMessage());
+//            $this->assertStringContainsString($expected_msg, $e->getMessage());
 //            
 //            try {
 //                $renderer->key1; //Object access to a property that isn't defined & hasn't been set
@@ -187,7 +187,7 @@ class CreateControllerScriptTest extends \PHPUnit\Framework\TestCase
 //            } catch (\Exception $e) {
 //
 //                //echo PHP_EOL.$e->getMessage().PHP_EOL.'yoooo'.PHP_EOL;
-//                $this->assertContains($expected_msg, $e->getMessage());
+//                $this->assertStringContainsString($expected_msg, $e->getMessage());
 //            }
 //        }
 //        */
