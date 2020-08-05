@@ -442,6 +442,33 @@ class BaseController
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
+    /**
+     * Display an HTML table containing all the potential MVC routes in the application
+     * 
+     * @param bool $onlyPublicMethodsPrefixedWithAction true to include only public methods prefixed with `action` 
+     *                                                  or false to include all public methods
+     * @return \Psr\Http\Message\ResponseInterface|string
+     */
+    public function actionRoutes($onlyPublicMethodsPrefixedWithAction=true) {
+        
+        $resp = $this->getResponseObjForLoginRedirectionIfNotLoggedIn();
+        
+        if($resp !== false) {
+            
+            return $resp;
+        }
+        
+        ini_set('memory_limit', '256M');
+        ini_set('max_execution_time', 0);
+        
+        $view_str = $this->renderView(
+            'controller-classes-by-action-methods-report.php', 
+            ['onlyPublicMethodsPrefixedWithAction'=> ((bool)$onlyPublicMethodsPrefixedWithAction)]
+        );
+        
+        return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
+    }
+    
     public function actionLogin() {
 
         $request_obj = $this->request;
