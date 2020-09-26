@@ -139,14 +139,14 @@ function s3MVC_GetBaseUrlPath() {
 
         $base_path = '';
         $has_been_computed = true;
-        $requestScriptName = parse_url($server['SCRIPT_NAME'], PHP_URL_PATH);
+        $requestScriptName = (string) parse_url($server['SCRIPT_NAME'], PHP_URL_PATH);
         $requestScriptDir = dirname($requestScriptName);
         
         // parse_url() requires a full URL. As we don't extract the domain name or scheme,
         // we use a stand-in.
-        $requestUri = parse_url( 'http://example.com' . $server['REQUEST_URI'], PHP_URL_PATH);
+        $requestUri = (string) parse_url( 'http://example.com' . $server['REQUEST_URI'], PHP_URL_PATH);
 
-        if (strcasecmp($requestUri, $requestScriptName) === 0) {
+        if (stripos($requestUri, $requestScriptName) === 0) {
 
             $base_path = $requestScriptName;
 
