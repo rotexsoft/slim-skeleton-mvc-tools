@@ -549,11 +549,11 @@ function createController($argc, array $argv) {
         }
 
         //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
-        //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
+        //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
 
-        //make the dir S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
+        //make the dir SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
         //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
-        //write processed controller file to S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
+        //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
 
         $template_controller_file = $templates_dir.'controller-class-template.php.tpl';
         $dest_controller_class_file_folder = $src_folder_path.'controllers'.$ds;

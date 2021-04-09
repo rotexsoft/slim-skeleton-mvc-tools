@@ -194,7 +194,7 @@ class BaseController
         $this->container = $container;
         $this->request = $req;
         $this->response = $res;
-        $this->current_uri = s3MVC_UriToString($req->getUri());
+        $this->current_uri = sMVC_UriToString($req->getUri());
         $this->action_name_from_uri = $action_name_from_uri;
         $this->controller_name_from_uri = $controller_name_from_uri;
 
@@ -409,7 +409,7 @@ class BaseController
         //It takes precedence over the view folder
         //for the base controller.
         $ds = DIRECTORY_SEPARATOR;
-        $path_2_view_files = S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds;
+        $path_2_view_files = SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds;
 
         while ( $parent_class = array_pop($parent_classes) ) {
 
@@ -491,15 +491,15 @@ class BaseController
             //this is a POST request, process login
             $controller = $this->login_success_redirect_controller ?: 'base-controller';
 
-            $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+            $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = ($prepend_action) ? 'action-' : '';
             $success_redirect_path =
                 "{$controller}/{$action}{$this->login_success_redirect_action}";
 
             $this->ensureVespulaAuthObjectIsSet();
             $auth = $this->vespula_auth; //get the auth object
-            $username = s3MVC_GetSuperGlobal('post', 'username');
-            $password = s3MVC_GetSuperGlobal('post', 'password');
+            $username = sMVC_GetSuperGlobal('post', 'username');
+            $password = sMVC_GetSuperGlobal('post', 'password');
 
             $error_msg = '';
 
@@ -555,18 +555,18 @@ class BaseController
                 $msg = $error_msg;
             }
 
-            if( s3MVC_GetCurrentAppEnvironment() === S3MVC_APP_ENV_DEV ) {
+            if( sMVC_GetCurrentAppEnvironment() === SMVC_APP_ENV_DEV ) {
 
-                $msg .= '<br>'.nl2br(s3MVC_DumpAuthinfo($auth));
+                $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
             }
 
             if( $auth->isValid() ) {
 
-                if( s3MVC_GetBaseUrlPath().'' === '' || strpos($success_redirect_path, s3MVC_GetBaseUrlPath()) === false ) {
+                if( sMVC_GetBaseUrlPath().'' === '' || strpos($success_redirect_path, sMVC_GetBaseUrlPath()) === false ) {
 
                     //prepend base path
                     $success_redirect_path =
-                        s3MVC_GetBaseUrlPath().'/'.ltrim($success_redirect_path, '/');
+                        sMVC_GetBaseUrlPath().'/'.ltrim($success_redirect_path, '/');
                 }
 
                 //re-direct
@@ -607,7 +607,7 @@ class BaseController
             $show_status_on_completion = true;
         }
 
-        $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+        $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
         $action = ($prepend_action) ? 'action-' : '';
         $actn = ($show_status_on_completion) ? $action.'login-status' : $action.'login';
 
@@ -618,7 +618,7 @@ class BaseController
             $controller = 'base-controller';
         }
 
-        $redirect_path = s3MVC_GetBaseUrlPath() . "/{$controller}/{$actn}";
+        $redirect_path = sMVC_GetBaseUrlPath() . "/{$controller}/{$actn}";
 
         if(
             session_status() === PHP_SESSION_ACTIVE
@@ -672,9 +672,9 @@ class BaseController
                 break;
         }
 
-        if( s3MVC_GetCurrentAppEnvironment() === S3MVC_APP_ENV_DEV ) {
+        if( sMVC_GetCurrentAppEnvironment() === SMVC_APP_ENV_DEV ) {
 
-            $msg .= '<br>'.nl2br(s3MVC_DumpAuthinfo($auth));
+            $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
         }
 
         //get the contents of the view first
@@ -802,7 +802,7 @@ class BaseController
 
         try {
             $req_as_str =
-                s3MVC_psr7RequestObjToString(
+                sMVC_psr7RequestObjToString(
                     $req,
                     ['route','routeInfo'],
                     false, //$skip_req_attribs
@@ -838,7 +838,7 @@ class BaseController
 
         } catch (\Exception $e) {
 
-            if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+            if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
 
                 // for non production environments, capture the exception string and display
                 // it in the browser
@@ -947,7 +947,7 @@ class BaseController
 
         try {
             $req_as_str =
-                s3MVC_psr7RequestObjToString(
+                sMVC_psr7RequestObjToString(
                     $req,
                     ['route','routeInfo'],
                     false, //$skip_req_attribs
@@ -974,7 +974,7 @@ class BaseController
 
         } catch (\Exception $e) {
 
-            if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+            if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
 
                 // for non production environments, capture the exception string and display
                 // it in the browser
@@ -1035,7 +1035,7 @@ class BaseController
                         . ' in `'.$exception->getFile().'`'
                         . '<br><br>'.$exception->getTraceAsString();
 
-        if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+        if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
 
             //Append exception message if we are not in production.
             $layout_content .= '<br>'.nl2br($exception_info);
@@ -1043,7 +1043,7 @@ class BaseController
 
         try {
             $req_as_str =
-                s3MVC_psr7RequestObjToString(
+                sMVC_psr7RequestObjToString(
                     $req,
                     ['route','routeInfo'],
                     false, //$skip_req_attribs
@@ -1077,7 +1077,7 @@ class BaseController
 
         } catch (\Exception $e) {
 
-            if( s3MVC_GetCurrentAppEnvironment() !== S3MVC_APP_ENV_PRODUCTION ) {
+            if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
 
                 // for non production environments, capture the exception string and display
                 // it in the browser
@@ -1155,9 +1155,9 @@ EOT;
                 $controller = 'base-controller';
             }
 
-            $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+            $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = ($prepend_action) ? 'action-login' : 'login';
-            $redr_path = s3MVC_GetBaseUrlPath() . "/{$controller}/$action";
+            $redr_path = sMVC_GetBaseUrlPath() . "/{$controller}/$action";
 
             return $this->response->withStatus(302)->withHeader('Location', $redr_path);
         }
@@ -1195,7 +1195,7 @@ EOT;
         ) { return; }
 
         $uri = $this->request->getUri();
-        $base_path = s3MVC_GetBaseUrlPath();
+        $base_path = sMVC_GetBaseUrlPath();
         $fragment = $uri->getFragment();
         $query = $uri->getQuery();
         $path = $uri->getPath();

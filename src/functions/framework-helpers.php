@@ -16,7 +16,7 @@
  *          an instance \Psr\Http\Message\ResponseInterface containing the not found 
  *          page.
  */
-function s3MVC_CreateController(
+function sMVC_CreateController(
     \Psr\Container\ContainerInterface $container, 
     $controller_name_from_url, 
     $action_name_from_url,
@@ -97,7 +97,7 @@ function s3MVC_CreateController(
  * @param \Vespula\Auth\Auth $auth
  * @return string containing current authentication status info
  */
-function s3MVC_DumpAuthinfo(\Vespula\Auth\Auth $auth) {
+function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth) {
 
     return 'Login Status: ' . $auth->getSession()->getStatus() . PHP_EOL
          . 'Logged in Person\'s Username: ' . $auth->getUsername().PHP_EOL
@@ -108,7 +108,7 @@ function s3MVC_DumpAuthinfo(\Vespula\Auth\Auth $auth) {
  * 
  * @param mixed $v variable or expression to dump
  */
-function s3MVC_DumpVar($v) {
+function sMVC_DumpVar($v) {
 
     $v = (!is_string($v)) ? (new \SebastianBergmann\Exporter\Exporter())->export($v) : $v;
     echo "<pre>$v</pre>";
@@ -125,14 +125,14 @@ function s3MVC_DumpVar($v) {
  * 
  * @return string
  */
-function s3MVC_GetBaseUrlPath() {
+function sMVC_GetBaseUrlPath() {
 
     static $server, $base_path, $has_been_computed;
 
     if( !$server ) {
 
         //copy / capture the super global only once
-        $server = s3MVC_GetSuperGlobal('server');
+        $server = sMVC_GetSuperGlobal('server');
     }
 
     if( !$base_path && !$has_been_computed ) {
@@ -161,16 +161,16 @@ function s3MVC_GetBaseUrlPath() {
 
 /**
  * 
- * Generates a link prepended with s3MVC_GetBaseUrlPath().
+ * Generates a link prepended with sMVC_GetBaseUrlPath().
  * Can be used for generating values for the href attribute of an a or link tag, or the src 
  * atrribute of a script tag, etc.
  * 
  * @param string $path
  * @return string
  */
-function s3MVC_MakeLink($path){
+function sMVC_MakeLink($path){
     
-    return s3MVC_GetBaseUrlPath(). '/'.ltrim($path, '/');
+    return sMVC_GetBaseUrlPath(). '/'.ltrim($path, '/');
 }
 
 /**
@@ -178,22 +178,22 @@ function s3MVC_MakeLink($path){
  * This function stores a snapshot of the following super globals $_SERVER, $_GET,
  * $_POST, $_FILES, $_COOKIE, $_SESSION & $_ENV and then returns the stored values
  * on subsequent calls. (In the case of $_SESSION, a reference to it is kept so 
- * that modifying s3MVC_GetSuperGlobal('session') will also modify $_SESSION). 
- * If a session has not been started s3MVC_GetSuperGlobal('session') will always
- * return null, likewise s3MVC_GetSuperGlobal('session', 'some_key') will always
+ * that modifying sMVC_GetSuperGlobal('session') will also modify $_SESSION). 
+ * If a session has not been started sMVC_GetSuperGlobal('session') will always
+ * return null, likewise sMVC_GetSuperGlobal('session', 'some_key') will always
  * return $default_val.
  * 
  * IT IS STRONGLY RECOMMENDED THAY YOU USE LIBRARIES LIKE aura/session 
  * (https://github.com/auraphp/Aura.Session) TO WORK WITH $_SESSION.
- * USING s3MVC_GetSuperGlobal('session') IS HIGHLY DISCOURAGED.
+ * USING sMVC_GetSuperGlobal('session') IS HIGHLY DISCOURAGED.
  * 
  * @param string $global_name the name (case-insensitive) of a any of the super 
  *                            globals mentioned above (excluding the $_). For 
  *                            example 'Post', 'pOst', etc.
- *                            s3MVC_GetSuperGlobal('get') === s3MVC_GetSuperGlobal('gEt'), etc.
+ *                            sMVC_GetSuperGlobal('get') === sMVC_GetSuperGlobal('gEt'), etc.
  * 
  * @param string $key a key in the specified super global. For example $_GET['id']
- *                    is equivalent to s3MVC_GetSuperGlobal('get', 'id');
+ *                    is equivalent to sMVC_GetSuperGlobal('get', 'id');
  * 
  * @param string $default_val the value to return if $key is not an actual key in
  *                            the specified super global.
@@ -210,7 +210,7 @@ function s3MVC_MakeLink($path){
  *              super global associated with each key).
  * 
  */
-function s3MVC_GetSuperGlobal($global_name='', $key='', $default_val='') {
+function sMVC_GetSuperGlobal($global_name='', $key='', $default_val='') {
 
     static $super_globals;
 
@@ -278,11 +278,11 @@ function s3MVC_GetSuperGlobal($global_name='', $key='', $default_val='') {
  * @return string the string represntation of the uri object. 
  *                Eg. http://someserver.com/controller/action
  */
-function s3MVC_UriToString(\Psr\Http\Message\UriInterface $uri) {
+function sMVC_UriToString(\Psr\Http\Message\UriInterface $uri) {
     
     $scheme = $uri->getScheme();
     $authority = $uri->getAuthority();
-    $basePath = s3MVC_GetBaseUrlPath();
+    $basePath = sMVC_GetBaseUrlPath();
     $path = $uri->getPath();
     $query = $uri->getQuery();
     $fragment = $uri->getFragment();
@@ -301,7 +301,7 @@ function s3MVC_UriToString(\Psr\Http\Message\UriInterface $uri) {
  * Adds a query string parameter key/value pair to a uri object.
  * 
  * Given a uri object $uri1 representing http://someserver.com/controller/action?param1=val1 
- * s3MVC_addQueryStrParamToUri($uri1, 'param2', 'val2') will return a new uri object representing
+ * sMVC_addQueryStrParamToUri($uri1, 'param2', 'val2') will return a new uri object representing
  * http://someserver.com/controller/action?param1=val1&param2=val2
  * 
  * @param \Psr\Http\Message\UriInterface $uri
@@ -310,7 +310,7 @@ function s3MVC_UriToString(\Psr\Http\Message\UriInterface $uri) {
  * 
  * @return \Psr\Http\Message\UriInterface
  */
-function s3MVC_addQueryStrParamToUri(
+function sMVC_addQueryStrParamToUri(
     \Psr\Http\Message\UriInterface $uri, $param_name, $param_value
 ) {
     $query_params = [];
@@ -340,7 +340,7 @@ function s3MVC_addQueryStrParamToUri(
  * 
  * @return string
  */
-function s3MVC_psr7RequestObjToString(
+function sMVC_psr7RequestObjToString(
     \Psr\Http\Message\ServerRequestInterface $req, 
     array $request_attribute_keys_to_skip=['route','routeInfo'],
     $skip_req_attribs=false,
@@ -360,7 +360,7 @@ function s3MVC_psr7RequestObjToString(
             null : 
             array_reduce( 
                 $req->getUploadedFiles(),
-                function($prev, $curr) {  return $prev .= s3MVC_psr7UploadedFileToString($curr) . PHP_EOL; }, 
+                function($prev, $curr) {  return $prev .= sMVC_psr7UploadedFileToString($curr) . PHP_EOL; }, 
                 ''
             )
         ;
@@ -477,7 +477,7 @@ function s3MVC_psr7RequestObjToString(
                 (!$skip_req_uri)
                 ?
                     PHP_EOL . "[[Request Uri]]:" . PHP_EOL
-                    . var_export( s3MVC_UriToString($req->getUri()), true )
+                    . var_export( sMVC_UriToString($req->getUri()), true )
                     . PHP_EOL . PHP_EOL . "<<=================================================>>"
                 :
                     ''
@@ -485,7 +485,7 @@ function s3MVC_psr7RequestObjToString(
         ;
 }
     
-function s3MVC_psr7UploadedFileToString(\Psr\Http\Message\UploadedFileInterface $file) {
+function sMVC_psr7UploadedFileToString(\Psr\Http\Message\UploadedFileInterface $file) {
         
     return "[[Uploaded File Client Filename]]: "
            . $file->getClientFilename()
