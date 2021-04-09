@@ -1,7 +1,7 @@
 ## Support package for the [SlimPHP 3 Skeleton MVC App Framework](https://github.com/rotexsoft/slim3-skeleton-mvc-app)
 
-[![Build Status](https://img.shields.io/travis/rotexsoft/slim3-skeleton-mvc-tools/master.png?style=flat-square)](https://travis-ci.org/rotexsoft/slim3-skeleton-mvc-tools) &nbsp; 
-[![Release](https://img.shields.io/github/release/rotexsoft/slim3-skeleton-mvc-tools.png?style=flat-square)](https://github.com/rotexsoft/slim3-skeleton-mvc-tools/releases/latest) &nbsp; 
+[![Build Status](https://img.shields.io/travis/rotexsoft/slim-skeleton-mvc-tools/master.png?style=flat-square)](https://travis-ci.org/rotexsoft/slim-skeleton-mvc-tools) &nbsp; 
+[![Release](https://img.shields.io/github/release/rotexsoft/slim-skeleton-mvc-tools.png?style=flat-square)](https://github.com/rotexsoft/slim-skeleton-mvc-tools/releases/latest) &nbsp; 
 
 ### Introduction
 
@@ -9,7 +9,7 @@ This package contains a Base controller and other classes and functions used by 
 
 ### Changelog
 
-[Here](https://github.com/rotexsoft/slim3-skeleton-mvc-tools/releases)
+[Here](https://github.com/rotexsoft/slim-skeleton-mvc-tools/releases)
 
 ### Running Tests
 
@@ -21,4 +21,4 @@ This package contains a Base controller and other classes and functions used by 
 * Compatibility with HHVM not guaranteed
 
 ### Installation
-`composer require rotexsoft/slim3-skeleton-mvc-tools`
+`composer require rotexsoft/slim-skeleton-mvc-tools`

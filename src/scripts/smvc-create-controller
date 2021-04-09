@@ -17,7 +17,7 @@ if( !isPhpRunningInCliMode() ) {
         $msg = 'Exception was thrown in ' . $e->getFile() . ' on line ' . $e->getLine()
             . PHP_EOL . $e->getMessage()
             . PHP_EOL . 'Exception Trace:' . PHP_EOL . $e->getTraceAsString()
-            . PHP_EOL . PHP_EOL . 'Please submit a bug report to https://github.com/rotexsoft/slim3-skeleton-mvc-tools/issues if symptoms persist.' . PHP_EOL;
+            . PHP_EOL . PHP_EOL . 'Please submit a bug report to https://github.com/rotexsoft/slim-skeleton-mvc-tools/issues if symptoms persist.' . PHP_EOL;
 
         printError($msg);
     }
