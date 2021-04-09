@@ -1,11 +1,11 @@
-## Support package for the [SlimPHP 3 Skeleton MVC App Framework](https://github.com/rotexsoft/slim3-skeleton-mvc-app)
+## Support package for the [SlimPHP Skeleton MVC App Framework](https://github.com/rotexsoft/slim-skeleton-mvc-app)
 
 [![Build Status](https://img.shields.io/travis/rotexsoft/slim-skeleton-mvc-tools/master.png?style=flat-square)](https://travis-ci.org/rotexsoft/slim-skeleton-mvc-tools) &nbsp; 
 [![Release](https://img.shields.io/github/release/rotexsoft/slim-skeleton-mvc-tools.png?style=flat-square)](https://github.com/rotexsoft/slim-skeleton-mvc-tools/releases/latest) &nbsp; 
 
 ### Introduction
 
-This package contains a Base controller and other classes and functions used by the [SlimPHP 3 Skeleton MVC App Framework](https://github.com/rotexsoft/slim3-skeleton-mvc-app)
+This package contains a Base controller and other classes and functions used by the [SlimPHP Skeleton MVC App Framework](https://github.com/rotexsoft/slim-skeleton-mvc-app)
 
 ### Changelog
 

@@ -27,7 +27,7 @@ class CreateControllerScriptTest extends \PHPUnit\Framework\TestCase
 //    public function testThatCreateControllerScriptWorksAsExpectedWithValidArgsAndValidArgVals() {
 ///*
 //        $expected_output_showing_help_page = <<<INPUT
-//This is a script intended for creating a controller class and a default index view file in rotexsoft/slim3-skeleton-mvc-app derived projects.
+//This is a script intended for creating a controller class and a default index view file in rotexsoft/slim-skeleton-mvc-app derived projects.
 //
 //Usage:
 //  php smvc-create-controller [options]

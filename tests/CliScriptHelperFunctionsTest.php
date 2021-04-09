@@ -22,7 +22,7 @@ class CliScriptHelperFunctionsTest extends \PHPUnit\Framework\TestCase
         $output = $this->execFuncAndReturnBufferedOutput('displayHelp', ['smvc-create-controller']);
 
         $expected_substr = <<<INPUT
-This is a script intended for creating a controller class and a default index view file in rotexsoft/slim3-skeleton-mvc-app derived projects.
+This is a script intended for creating a controller class and a default index view file in rotexsoft/slim-skeleton-mvc-app derived projects.
 
 Usage:
   php smvc-create-controller [options]
@@ -607,7 +607,7 @@ INPUT;
     public function testThatCreateControllerScriptWorksAsExpectedWithValidArgsAndValidArgVals() {
 
         $expected_output_showing_help_page = <<<INPUT
-This is a script intended for creating a controller class and a default index view file in rotexsoft/slim3-skeleton-mvc-app derived projects.
+This is a script intended for creating a controller class and a default index view file in rotexsoft/slim-skeleton-mvc-app derived projects.
 
 Usage:
   php smvc-create-controller [options]
