@@ -1,5 +1,5 @@
 <?php
-namespace Slim3MvcTools\Controllers\Exceptions;
+namespace SlimMvcTools\Controllers\Exceptions;
 
 /**
  * Description of MissingPropertyException

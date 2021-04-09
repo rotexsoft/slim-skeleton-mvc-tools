@@ -29,12 +29,12 @@ if( !isPhpRunningInCliMode() ) {
                                   . ' you should enter `expired_-blog-posts` (the view files for this'
                                   . ' controller would be located in `./views/expired_-blog-posts` and'
                                   . ' the url would look like `http://localhost/expired_-blog-posts/`):';
-        $controller_name = readFromLine(\Slim3MvcTools\Functions\Str\color_4_console($prompt_4_controller_name, "cyan",  "black"));
+        $controller_name = readFromLine(\SlimMvcTools\Functions\Str\color_4_console($prompt_4_controller_name, "cyan",  "black"));
         //var_dump($controller_name);
         
         while( mb_strlen( ''.$controller_name, 'UTF-8') <= 0 ) {
             
-            $controller_name = readFromLine(\Slim3MvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_controller_name, "cyan",  "black"));
+            $controller_name = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_controller_name, "cyan",  "black"));
             //var_dump($controller_name);
         }
         $psuedo_argv[] = '-c';
@@ -48,12 +48,12 @@ if( !isPhpRunningInCliMode() ) {
                                   . ' it is relative to the current directory from which you are running'
                                   . ' this wizard (e.g. if you are running this wizard from `/home/myapp/`'
                                   . ' then entering `./src` will translate to `/home/myapp/src` as the absolute path):';
-        $path_2_src_folder = readFromLine(\Slim3MvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_path_2_src_folder, "cyan",  "black"));
+        $path_2_src_folder = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_path_2_src_folder, "cyan",  "black"));
         //var_dump($path_2_src_folder);
         
         while( mb_strlen( ''.$path_2_src_folder, 'UTF-8') <= 0 ) {
             
-            $path_2_src_folder = readFromLine(\Slim3MvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_path_2_src_folder, "cyan",  "black"));
+            $path_2_src_folder = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_path_2_src_folder, "cyan",  "black"));
             //var_dump($path_2_src_folder);
         }
         $psuedo_argv[] = '-p';
@@ -61,12 +61,12 @@ if( !isPhpRunningInCliMode() ) {
         
         ////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////
-        // Can be empty meaning '\\Slim3MvcTools\\Controllers\\BaseController' will be used
+        // Can be empty meaning '\\SlimMvcTools\\Controllers\\BaseController' will be used
         $prompt_4_parent_conroller_name = 'Please enter the name of the class your controller will'
-                                  . ' extend or hit enter to use `\\Slim3MvcTools\\Controllers\\BaseController`.'
+                                  . ' extend or hit enter to use `\\SlimMvcTools\\Controllers\\BaseController`.'
                                   . ' The name should include the namespace and it should be a'
-                                  . ' class that is a sub-class of \'\\Slim3MvcTools\\Controllers\\BaseController\' (for example, `\MyApp\Controllers\BaseController`):';
-        $parent_conroller_name = readFromLine(\Slim3MvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_parent_conroller_name, "cyan",  "black"));
+                                  . ' class that is a sub-class of \'\\SlimMvcTools\\Controllers\\BaseController\' (for example, `\MyApp\Controllers\BaseController`):';
+        $parent_conroller_name = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_parent_conroller_name, "cyan",  "black"));
         //var_dump($parent_conroller_name);
         
         $psuedo_argv[] = '-e';
@@ -77,7 +77,7 @@ if( !isPhpRunningInCliMode() ) {
             
         } else {
             
-            $psuedo_argv[] = '\\'.\Slim3MvcTools\Controllers\BaseController::class;
+            $psuedo_argv[] = '\\'.\SlimMvcTools\Controllers\BaseController::class;
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ if( !isPhpRunningInCliMode() ) {
         $prompt_4_namespace_name = 'Please enter the namespace your new controller will'
                                   . ' belong to (e.g. `MyApp\Controllers`) or hit enter if you don\'t want your new controller'
                                   . ' to belong to any namespace. [NOTE: DO NOT add a trailing back slash to the namespace]:';
-        $namespace_name = readFromLine(\Slim3MvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_namespace_name, "cyan",  "black"));
+        $namespace_name = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_namespace_name, "cyan",  "black"));
         //var_dump($namespace_name);
         
         if( mb_strlen( ''.$namespace_name, 'UTF-8') > 0 ) {

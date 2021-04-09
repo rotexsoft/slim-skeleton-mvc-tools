@@ -1,10 +1,10 @@
 <?php
-namespace Slim3MvcTools\Controllers;
+namespace SlimMvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
     \Psr\Http\Message\ResponseInterface,
-    \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException,
-    \Slim3MvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException;
+    \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException,
+    \SlimMvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException;
 
 /**
  *
@@ -50,7 +50,7 @@ class BaseController
      *  - actionLogout
      *  - actionLoginStatus
      *
-     * These methods will throw a \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * These methods will throw a \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
      * if this object was not set before the method call.
      *
      * @var \Vespula\Auth\Auth
@@ -233,7 +233,7 @@ class BaseController
 
     /**
      *
-     * @throws \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
      *
      */
     public function ensureVespulaAuthObjectIsSet() {
@@ -331,7 +331,7 @@ class BaseController
      *                    file (i.e. the file named $file_name).
      * @return string
      *
-     * @throws \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
      *
      */
     public function renderLayout( $file_name, array $data = ['content'=>'Content should be placed here!'] ) {
@@ -373,7 +373,7 @@ class BaseController
      *                    file (i.e. the file named $file_name).
      * @return string
      *
-     * @throws \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
      *
      */
     public function renderView( $file_name, array $data = [] ) {
@@ -413,7 +413,7 @@ class BaseController
 
         while ( $parent_class = array_pop($parent_classes) ) {
 
-            $parent_class_folder = \Slim3MvcTools\Functions\Str\toDashes($parent_class);
+            $parent_class_folder = \SlimMvcTools\Functions\Str\toDashes($parent_class);
 
             if(
                 !$this->view_renderer->hasPath($path_2_view_files . $parent_class_folder)
@@ -1216,7 +1216,7 @@ EOT;
      * @param string $item_key_in_container
      * @return mixed
      *
-     * @throws \Slim3MvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException
+     * @throws \SlimMvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException
      */
     protected function getContainerItem($item_key_in_container) {
 

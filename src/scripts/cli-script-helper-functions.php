@@ -30,7 +30,7 @@ Usage:
   php {$cur_script} [options]
 
 Example:
-# either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which by default extends `\Slim3MvcTools\Controllers\BaseController`)  and a default view in `src/views/foo-bar/index.php`
+# either of the commands below will create a controller with the class named `FooBar` in `src/controllers/FooBar.php` (which by default extends `\SlimMvcTools\Controllers\BaseController`)  and a default view in `src/views/foo-bar/index.php`
 
     php {$cur_script} -c foo-bar -p "/var/www/html/my-app/src"
 
@@ -47,7 +47,7 @@ Options:
 
   -c, --controller-name         The name of the controller class you want to create. The name will be converted to Studly case eg. foo-bar will be changed to FooBar. This option REQUIRES at least the `-p` or `--path-to-src-folder` option to work.
 
-  -e, --extends-controller      The name of the controller class (optionally including the name-space prefix) that you want your created controller to extend. `\\Slim3MvcTools\\Controllers\\BaseController` is the default value if this option is not specified. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is the correct full class name). This option REQUIRES at least the `-c` (or `--controller-name`) and the `-p` (or `--path-to-src-folder`) options to work.
+  -e, --extends-controller      The name of the controller class (optionally including the name-space prefix) that you want your created controller to extend. `\\SlimMvcTools\\Controllers\\BaseController` is the default value if this option is not specified. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is the correct full class name). This option REQUIRES at least the `-c` (or `--controller-name`) and the `-p` (or `--path-to-src-folder`) options to work.
 
   -n, --namespace-4-controller  The name of the namespace the new controller will belong to. If omitted the namespace declaration will not be present in the new controller class. Unlike the value supplied for `--controller-name`, the value supplied for this option will not be converted to Studly case (make sure the value is a valid name for a php namespace). This option REQUIRES at least the `-c` (or `--controller-name`) and the `-p` (or `--path-to-src-folder`) options to work.
 
@@ -224,7 +224,7 @@ function printError($str, $append_new_line = true) {
         throw new \InvalidArgumentException($msg);
     }
 
-    echo \Slim3MvcTools\Functions\Str\color_4_console( "ERROR: $str", "red",  "black");
+    echo \SlimMvcTools\Functions\Str\color_4_console( "ERROR: $str", "red",  "black");
 
     if( ((bool)$append_new_line) ) { echo PHP_EOL; }
 }
@@ -252,7 +252,7 @@ function printInfo($str, $append_new_line = true) {
         throw new \InvalidArgumentException($msg);
     }
 
-    echo \Slim3MvcTools\Functions\Str\color_4_console( $str, "green",  "black");
+    echo \SlimMvcTools\Functions\Str\color_4_console( $str, "green",  "black");
 
     if( ((bool)$append_new_line) ) { echo PHP_EOL; }
 }
@@ -456,7 +456,7 @@ function createController($argc, array $argv) {
             $controller_name = getOptVal('-c', $argv);
         }
 
-        $studly_controller_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name);
+        $studly_controller_name = \SlimMvcTools\Functions\Str\dashesToStudly($controller_name);
 
         $dashed_controller_name = mb_strtolower($controller_name, 'UTF-8');
 
@@ -482,7 +482,7 @@ function createController($argc, array $argv) {
         }
 
         ////////////////////////////////////////////////////////////////////////////
-        $default_controller_2_extend = '\\Slim3MvcTools\\Controllers\\BaseController';
+        $default_controller_2_extend = '\\SlimMvcTools\\Controllers\\BaseController';
 
         $controller_2_extend = getOptVal('--extends-controller', $argv);
 
@@ -548,12 +548,12 @@ function createController($argc, array $argv) {
             $namepace_declaration = "namespace {$namepace_4_controller};";
         }
 
-        //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
+        //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
         //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
 
-        //make the dir SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
-        //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
-        //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\Slim3MvcTools\Functions\Str\toDashes($controller_name_from_cli)
+        //make the dir SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\SlimMvcTools\Functions\Str\toDashes($controller_name_from_cli)
+        //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
+        //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\SlimMvcTools\Functions\Str\toDashes($controller_name_from_cli)
 
         $template_controller_file = $templates_dir.'controller-class-template.php.tpl';
         $dest_controller_class_file_folder = $src_folder_path.'controllers'.$ds;

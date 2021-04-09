@@ -3,7 +3,7 @@
  * 
  * Creates a controller object or returns a Respond object containing a not found page.
  *  
- * The controller class must be \Slim3MvcTools\Controllers\BaseController or one of its sub-classes
+ * The controller class must be \SlimMvcTools\Controllers\BaseController or one of its sub-classes
  * 
  * @param \Psr\Container\ContainerInterface $container
  * @param string $controller_name_from_url
@@ -11,8 +11,8 @@
  * @param \Psr\Http\Message\ServerRequestInterface $request
  * @param \Psr\Http\Message\ResponseInterface $response
  * 
- * @return \Slim3MvcTools\Controllers\BaseController|\Psr\Http\Message\ResponseInterface 
- *          an instance of \Slim3MvcTools\Controllers\BaseController or its sub-class or
+ * @return \SlimMvcTools\Controllers\BaseController|\Psr\Http\Message\ResponseInterface 
+ *          an instance of \SlimMvcTools\Controllers\BaseController or its sub-class or
  *          an instance \Psr\Http\Message\ResponseInterface containing the not found 
  *          page.
  */
@@ -27,7 +27,7 @@ function sMVC_CreateController(
                                 ? $container->get('notFoundHandler') 
                                 : null;
         
-    $controller_class_name = \Slim3MvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
+    $controller_class_name = \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
 
     if( 

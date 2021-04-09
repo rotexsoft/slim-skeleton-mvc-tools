@@ -1,5 +1,5 @@
 <?php
-namespace Slim3MvcTools\Controllers;
+namespace SlimMvcTools\Controllers;
 
 /**
  * 

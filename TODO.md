@@ -5,11 +5,11 @@
 
 ```
 Look at \Slim\Handlers\Error, \Slim\Handlers\NotAllowed and \Slim\Handlers\NotFound and see how 
-\Slim3MvcTools\Controllers\BaseController::generateNotAllowedResponse(..) ,
-\Slim3MvcTools\Controllers\BaseController::generateNotFoundResponse(..) and 
-\Slim3MvcTools\Controllers\BaseController::generateServerErrorResponse(..) 
+\SlimMvcTools\Controllers\BaseController::generateNotAllowedResponse(..) ,
+\SlimMvcTools\Controllers\BaseController::generateNotFoundResponse(..) and 
+\SlimMvcTools\Controllers\BaseController::generateServerErrorResponse(..) 
 can be improved upon whilst enjoying the preAction() and postAction() benefits 
-of the \Slim3MvcTools\Controllers\BaseController architecture. 
+of the \SlimMvcTools\Controllers\BaseController architecture. 
 Biggest thing is to allow the handlers to return appropriate content-type 
 for html, json and xml requests. Right now only html responses are being returned.
 
