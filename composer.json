@@ -19,7 +19,7 @@
         "php": ">=7.4.0",
         "slim/slim": "^4.0",
         "slim/psr7": "^1.3",
-        "rotexsoft/file-renderer": "^2.0.0",
+        "rotexsoft/file-renderer": "^3.0.0",
         "vespula/log": "^2.1",
         "vespula/auth": "^1.0.0",
         "sebastian/exporter": "^4.0 || ^3.0 || ^2.0 || ^1.2",
