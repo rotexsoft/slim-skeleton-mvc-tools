@@ -3,6 +3,7 @@ namespace Slim3MvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
     \Psr\Http\Message\ResponseInterface,
+    \Slim3MvcTools\Utils,
     \Slim3MvcTools\Controllers\Exceptions\IncorrectlySetPropertyException,
     \Slim3MvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException;
 
@@ -525,29 +526,78 @@ class BaseController
                                             //passwords with a specific list of 
                                             //allowed special characters.
                 ];
+                
+                try {
 
-                $auth->login($credentials); //try to login
+                    $auth->login($credentials); //try to login
 
-                if( $auth->isValid() ) {
+                    if( $auth->isValid() ) {
 
-                    $msg = "You are now logged into a new session.";
-                    
-                    //since we are successfully logged in, resume session if any
-                    if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+                        $msg = "You are now logged into a new session.";
 
-                    if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
+                        //since we are successfully logged in, resume session if any
+                        if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
-                        //there is an active session with a redirect url stored in it
-                        $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
+                        if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
 
-                        //since login is successful remove stored redirect url, 
-                        //it has served its purpose & we'll be redirecting now.
-                        unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
+                            //there is an active session with a redirect url stored in it
+                            $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
+
+                            //since login is successful remove stored redirect url, 
+                            //it has served its purpose & we'll be redirecting now.
+                            unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
+                        }
+
+                    } else {
+
+                        $msg = 'Login Failed!<br>' . $auth->getAdapter()->getError();
                     }
-
-                } else {
-
-                    $msg = 'Login Failed!<br>' . $auth->getAdapter()->getError();
+                } catch (\Vespula\Auth\Exception $vaExc) {
+                    
+                    $backendIssues = [
+                        'EXCEPTION_LDAP_CONNECT_FAILED', 
+                        'Could not bind to basedn',
+                    ];
+                    
+                    $usernamePswdMismatchIssues = [
+                        'The LDAP DN search failed'
+                    ];
+                    
+                    $msg = "Login Failed!<br>Login server is busy right now."
+                         . "<br>Please try again later.";
+                    
+                    if(\in_array($vaExc->getMessage(), $backendIssues)) {
+                        
+                        $msg = "Login Failed!<br>Can't connect to login server right now."
+                             . "<br>Please try again later.";
+                    }
+                    
+                    if(\in_array($vaExc->getMessage(), $usernamePswdMismatchIssues)) {
+                        
+                        $msg = "Login Failed!<br>Incorrect User Name and Password combination"
+                             . "<br>Please try again.";
+                    }
+                    
+                    $this->container->has('logger')
+                        && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+                        && $this->container->get('logger')
+                                ->error( 
+                                    \str_replace('<br>', PHP_EOL, $msg)
+                                    . Utils::getThrowableAsStr($vaExc)
+                                );
+                    
+                } catch(\Exception $basExc) {
+                    
+                    $msg = "Login Failed!"
+                         . "<br>Please contact the site administrator.";
+                    
+                    $this->container->has('logger')
+                        && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
+                        && $this->container->get('logger')
+                                ->error(
+                                    \str_replace('<br>', PHP_EOL, $msg)
+                                    . Utils::getThrowableAsStr($basExc)
+                                );
                 }
                 
             } else {
