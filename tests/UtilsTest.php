@@ -1,7 +1,7 @@
 <?php
 use \SlimMvcTools\Utils;
 /**
- * This class tests \slim3-skeleton-mvc-tools\src\scripts\smvc-create-controller
+ * This class tests \slim-skeleton-mvc-tools\src\scripts\smvc-create-controller
  *
  * @author Rotimi Adegbamigbe
  */

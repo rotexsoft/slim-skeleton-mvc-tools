@@ -1,10 +1,10 @@
 {
     "name": "rotexsoft/slim-skeleton-mvc-tools",
     "type": "library",
-    "description": "A support package for the SlimPHP Skeleton MVC App (https://github.com/rotexsoft/slim-skeleton-mvc-app).",
+    "description": "A support package for the SlimPHP Skeleton MVC App ( https://github.com/rotexsoft/slim-skeleton-mvc-app ).",
     "keywords": [ "mvc", "framework", "tools", "utils"],
     "homepage": "https://github.com/rotexsoft/slim-skeleton-mvc-tools",
-    "license": "BSD-2-Clause",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Rotimi Adegbamigbe",
@@ -17,18 +17,18 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.4.0",
-        "slim/slim": "^4.0",
-        "slim/psr7": "^1.3",
-        "rotexsoft/file-renderer": "^3.0.0",
-        "vespula/log": "^2.1",
-        "vespula/auth": "^1.0.0",
-        "sebastian/exporter": "^4.0 || ^3.0 || ^2.0 || ^1.2",
-        "psr/container": "^1.1",
-        "pimple/pimple": "^3.4"
+        "slim/slim": "^4.10",
+        "slim/psr7": "^1.5",
+        "rotexsoft/file-renderer": "^5.0.0",
+        "vespula/log": "^2.2.3",
+        "vespula/auth": "^1.1.1",
+        "sebastian/exporter": "^4.0",
+        "psr/container": "^2.0",
+        "pimple/pimple": "^3.5"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0",
-        "php-coveralls/php-coveralls": "^1.0 || ^2.0"
+        "phpunit/phpunit": "^9.5.20",
+        "php-coveralls/php-coveralls": "^2.5.2"
     },
     "autoload": {
         "classmap": ["src/"],
