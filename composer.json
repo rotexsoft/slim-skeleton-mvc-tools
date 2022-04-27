@@ -4,7 +4,7 @@
     "description": "A support package for the SlimPHP 3 Skeleton MVC App (https://github.com/rotexsoft/slim3-skeleton-mvc-app).",
     "keywords": [ "mvc", "framework", "tools", "utils"],
     "homepage": "https://github.com/rotexsoft/slim3-skeleton-mvc-tools",
-    "license": "BSD-2-Clause",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Rotimi Adegbamigbe",
