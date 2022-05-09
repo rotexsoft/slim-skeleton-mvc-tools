@@ -1,7 +1,12 @@
 ## Support package for the [SlimPHP 3 Skeleton MVC App Framework](https://github.com/rotexsoft/slim3-skeleton-mvc-app)
 
-[![Build Status](https://img.shields.io/travis/rotexsoft/slim3-skeleton-mvc-tools/master.png?style=flat-square)](https://travis-ci.org/rotexsoft/slim3-skeleton-mvc-tools) &nbsp; 
-[![Release](https://img.shields.io/github/release/rotexsoft/slim3-skeleton-mvc-tools.png?style=flat-square)](https://github.com/rotexsoft/slim3-skeleton-mvc-tools/releases/latest) &nbsp; 
+[![Coverage Status](https://coveralls.io/repos/github/rotexsoft/slim-skeleton-mvc-tools/badge.svg?branch=slim-3-edition)](https://coveralls.io/github/rotexsoft/slim-skeleton-mvc-tools?branch=slim-3-edition) &nbsp;
+![Packagist Downloads](https://img.shields.io/packagist/dt/rotexsoft/slim3-skeleton-mvc-tools) &nbsp;
+![GitHub top language](https://img.shields.io/github/languages/top/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+![Packagist PHP Version Support (specify version)](https://img.shields.io/packagist/php-v/rotexsoft/slim-skeleton-mvc-tools/3.0.5) &nbsp;
+![GitHub commits since latest release (by date) for a branch](https://img.shields.io/github/commits-since/rotexsoft/slim-skeleton-mvc-tools/3.0.5/slim-3-edition) &nbsp;
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/rotexsoft/slim-skeleton-mvc-tools/slim-3-edition) &nbsp;
+
 
 ### Introduction
 
