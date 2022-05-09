@@ -1,7 +1,7 @@
 ## Support package for the [SlimPHP Skeleton MVC App Framework](https://github.com/rotexsoft/slim-skeleton-mvc-app)
 
 [![Run PHP Tests and Code Quality Tools](https://github.com/rotexsoft/slim-skeleton-mvc-tools/actions/workflows/php.yml/badge.svg)](https://github.com/rotexsoft/slim-skeleton-mvc-tools/actions/workflows/php.yml) &nbsp;
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/rotexsoft/slim-skeleton-mvc-tools?label=latest%20release&sort=semver) &nbsp;
 ![GitHub](https://img.shields.io/github/license/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/rotexsoft/slim-skeleton-mvc-tools/badge.svg?branch=master)](https://coveralls.io/github/rotexsoft/slim-skeleton-mvc-tools?branch=master) &nbsp;
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
