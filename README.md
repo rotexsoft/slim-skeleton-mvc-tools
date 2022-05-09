@@ -1,7 +1,20 @@
 ## Support package for the [SlimPHP Skeleton MVC App Framework](https://github.com/rotexsoft/slim-skeleton-mvc-app)
 
-[![Build Status](https://img.shields.io/travis/rotexsoft/slim-skeleton-mvc-tools/master.png?style=flat-square)](https://travis-ci.org/rotexsoft/slim-skeleton-mvc-tools) &nbsp; 
-[![Release](https://img.shields.io/github/release/rotexsoft/slim-skeleton-mvc-tools.png?style=flat-square)](https://github.com/rotexsoft/slim-skeleton-mvc-tools/releases/latest) &nbsp; 
+[![Run PHP Tests and Code Quality Tools](https://github.com/rotexsoft/slim-skeleton-mvc-tools/actions/workflows/php.yml/badge.svg)](https://github.com/rotexsoft/slim-skeleton-mvc-tools/actions/workflows/php.yml) &nbsp;
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+![GitHub](https://img.shields.io/github/license/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+[![Coverage Status](https://coveralls.io/repos/github/rotexsoft/slim-skeleton-mvc-tools/badge.svg?branch=master)](https://coveralls.io/github/rotexsoft/slim-skeleton-mvc-tools?branch=master) &nbsp;
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+![Packagist Downloads](https://img.shields.io/packagist/dt/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+![GitHub top language](https://img.shields.io/github/languages/top/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+![GitHub commits since latest release (by date) for a branch](https://img.shields.io/github/commits-since/rotexsoft/slim-skeleton-mvc-tools/4.0.0/master) &nbsp;
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/rotexsoft/slim-skeleton-mvc-tools/master) &nbsp;
+![GitHub Release Date](https://img.shields.io/github/release-date/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
+<a href="https://libraries.io/github/rotexsoft/slim-skeleton-mvc-tools">
+<img alt="Libraries.io dependency status for GitHub repo" src="https://img.shields.io/librariesio/github/rotexsoft/slim-skeleton-mvc-tools">
+</a>
+
 
 ### Introduction
 
