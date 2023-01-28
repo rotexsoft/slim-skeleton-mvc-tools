@@ -507,3 +507,70 @@ function sMVC_psr7UploadedFileToString(\Psr\Http\Message\UploadedFileInterface $
            . $file->getError()                
         ;
 }
+
+
+/**
+ * @param string $error_message A brief description of the message
+ * @param string $file_path path to the missing file
+ * @param string $dist_file_path path to the dist file that can be used to create the missing file
+ * @param string $app_root_path should be set to the absolute path of where your mvc app is installed just pass SMVC_APP_ROOT_PATH
+ */
+function sMVC_DisplayAndLogFrameworkFileNotFoundError(
+    string $error_message, 
+    string $file_path, 
+    string $dist_file_path, 
+    string $app_root_path
+) {
+    $file_missing_error_page = <<<END
+<html>
+    <head>
+        <title>SlimPHP 4 Skeleton MVC App Error</title>
+        <style>
+            body{
+                margin:0;
+                padding:30px;
+                font:14px/1.5 Helvetica,Arial,Verdana,sans-serif;
+            }
+            h1{
+                margin:0;
+                font-size:48px;
+                font-weight:normal;
+                line-height:48px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>SlimPHP 4 Skeleton MVC App Error</h1>
+        <p>
+            $error_message <br>
+            Please check the most recent server log file in (<strong>./logs</strong>) for details.
+            <br>Goodbye!!!
+        </p>
+    </body>
+</html>
+END;
+    echo $file_missing_error_page;
+
+    $current_uri = isset($_SERVER['PATH_INFO'])
+             ? $_SERVER['PATH_INFO']
+             : '';
+    $current_uri .= isset($_SERVER['QUERY_STRING'])
+            ? '?' . $_SERVER['QUERY_STRING']
+            : '';
+
+    // Write full message to log via error_log(...)
+    // http://php.net/manual/en/function.error-log.php
+    $log_message = "ERROR: [$current_uri] `$file_path` not found."
+        . " Please copy `$dist_file_path` to `$file_path` and"
+        . " configure `$file_path` for your application's current environment.";
+
+    $ds = DIRECTORY_SEPARATOR;
+    $file = $app_root_path . "{$ds}logs{$ds}daily_log_" . date('Y_M_d') . '.txt';
+
+    file_put_contents(
+        $file,
+        '[' . date('Y-M-d g:i:s A') . '] ' . $log_message 
+    ); // log to log file
+    
+    error_log ( $log_message , 4 ); // message is sent directly to the SAPI logging handler.
+}
