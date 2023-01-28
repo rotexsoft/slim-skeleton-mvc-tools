@@ -574,3 +574,55 @@ END;
     
     error_log ( $log_message , 4 ); // message is sent directly to the SAPI logging handler.
 }
+
+
+/**
+ *
+ * This function detects which environment your web-app is running in
+ * (i.e. one of Production, Development, Staging or Testing).
+ *
+ * NOTE: Make sure you edit ../config/env.php to return one of SMVC_APP_ENV_DEV,
+ *       SMVC_APP_ENV_PRODUCTION, SMVC_APP_ENV_STAGING or SMVC_APP_ENV_TESTING
+ *       relevant to the environment you are installing your web-app.
+ * 
+ * @param string $app_path should be set to the absolute path of where your mvc app is installed just pass SMVC_APP_ROOT_PATH
+ *
+ * @return string
+ */
+function sMVC_DoGetCurrentAppEnvironment(string $app_path) {
+
+    static $current_env;
+
+    if( !$current_env ) {
+
+        $root_dir = $app_path. DIRECTORY_SEPARATOR;
+        $env_file_path = $root_dir.'config'. DIRECTORY_SEPARATOR.'env.php';
+
+        if( !file_exists($env_file_path) ) {
+
+            $env_dist_file_path = "{$root_dir}config". DIRECTORY_SEPARATOR.'env-dist.php';
+            sMVC_DisplayAndLogFrameworkFileNotFoundError(
+                'Missing Environment Configuration File Error',
+                $env_file_path,
+                $env_dist_file_path,
+                $app_path
+            );
+            exit;
+        } // if( !file_exists($env_file) )
+
+        $current_env = include $env_file_path;
+
+    } // if( !$current_env )
+
+    return $current_env;
+}
+
+function sMVC_PrependAction2ActionMethodName($action_method_name) {
+
+    if( strtolower( substr($action_method_name, 0, 6) ) !== "action"){
+
+        $action_method_name = 'action'.  ucfirst($action_method_name);
+    }
+
+    return $action_method_name;
+}
