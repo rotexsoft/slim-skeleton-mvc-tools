@@ -1,6 +1,5 @@
 <?php
 /**
- * 
  * Creates a controller object or returns a Respond object containing a not found page.
  *  
  * The controller class must be \SlimMvcTools\Controllers\BaseController or one of its sub-classes
@@ -22,11 +21,7 @@ function sMVC_CreateController(
     $action_name_from_url,
     \Psr\Http\Message\ServerRequestInterface $request, 
     \Psr\Http\Message\ResponseInterface $response
-) {    
-    $notFoundHandler = $container->has('notFoundHandler') 
-                                ? $container->get('notFoundHandler') 
-                                : null;
-        
+) {
     $controller_class_name = \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
 
@@ -37,18 +32,7 @@ function sMVC_CreateController(
         //any number of letters, numbers, or underscores.
 
         $extra_log_message = "`" . __FILE__ . "` on line " . __LINE__ . ": Bad controller name `{$controller_class_name}`";
-        
-        if ( !is_null($notFoundHandler) ) {
-            
-            //Make sure the controller name is a valid string usable as a class name
-            //in php as defined in http://php.net/manual/en/language.oop5.basic.php
-            //trigger 404 not found
-            return $notFoundHandler($request, $response, null, $extra_log_message);
-            
-        } else {
-            
-            throw new \Exception($extra_log_message);
-        }
+        throw new \Slim\Exception\HttpNotFoundException($request, $extra_log_message);
     } 
 
     if( !class_exists($controller_class_name) ) {
@@ -73,18 +57,7 @@ function sMVC_CreateController(
 
             //404 Not Found: Controller class not found.
             $extra_log_message = "`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.";
-            
-            if ( !is_null($notFoundHandler) ) {
-
-                //Make sure the controller name is a valid string usable as a class name
-                //in php as defined in http://php.net/manual/en/language.oop5.basic.php
-                //trigger 404 not found
-                return $notFoundHandler($request, $response, null, $extra_log_message);
-
-            } else {
-
-                throw new \Exception($extra_log_message);
-            }
+            throw new \Slim\Exception\HttpNotFoundException($request, $extra_log_message);
         }
     }
 
@@ -93,7 +66,6 @@ function sMVC_CreateController(
 }
 
 /**
- * 
  * @param \Vespula\Auth\Auth $auth
  * @return string containing current authentication status info
  */
@@ -105,7 +77,6 @@ function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth) {
 }
 
 /**
- * 
  * @param mixed $v variable or expression to dump
  */
 function sMVC_DumpVar($v) {
@@ -115,7 +86,6 @@ function sMVC_DumpVar($v) {
 }
 
 /**
- * 
  * Returns the base path segment of the URI.
  * It performs the same function as \Slim\Http\Uri::getBasePath()
  * You are strongly advised to use this function instead of 
@@ -160,7 +130,6 @@ function sMVC_GetBaseUrlPath() {
 }
 
 /**
- * 
  * Generates a link prepended with sMVC_GetBaseUrlPath().
  * Can be used for generating values for the href attribute of an a or link tag, or the src 
  * atrribute of a script tag, etc.
@@ -174,7 +143,6 @@ function sMVC_MakeLink($path){
 }
 
 /**
- * 
  * This function stores a snapshot of the following super globals $_SERVER, $_GET,
  * $_POST, $_FILES, $_COOKIE, $_SESSION & $_ENV and then returns the stored values
  * on subsequent calls. (In the case of $_SESSION, a reference to it is kept so 
@@ -270,7 +238,6 @@ function sMVC_GetSuperGlobal($global_name='', $key='', $default_val='') {
 }
 
 /**
- * 
  * Converts a uri object to a string in the format <scheme>://<server_address>/<path>?<query_string>#<fragment>
  * 
  * @param \Psr\Http\Message\UriInterface $uri uri object to be converted to a string
@@ -297,7 +264,6 @@ function sMVC_UriToString(\Psr\Http\Message\UriInterface $uri) {
 }
 
 /**
- * 
  * Adds a query string parameter key/value pair to a uri object.
  * 
  * Given a uri object $uri1 representing http://someserver.com/controller/action?param1=val1 
@@ -321,193 +287,6 @@ function sMVC_addQueryStrParamToUri(
     
     return $uri->withQuery(http_build_query($query_params)); // return a uri object with updated query params
 }
-
-/**
- * 
- * @param \Psr\Http\Message\ServerRequestInterface $req
- * @param array $request_attribute_keys_to_skip
- * @param bool $skip_req_attribs
- * @param bool $skip_req_body
- * @param bool $skip_req_cookie_params
- * @param bool $skip_req_headers
- * @param bool $skip_req_method
- * @param bool $skip_req_proto_ver
- * @param bool $skip_req_query_params
- * @param bool $skip_req_target
- * @param bool $skip_req_server_params
- * @param bool $skip_req_uploaded_files
- * @param bool $skip_req_uri
- * 
- * @return string
- */
-function sMVC_psr7RequestObjToString(
-    \Psr\Http\Message\ServerRequestInterface $req, 
-    array $request_attribute_keys_to_skip=['route','routeInfo'],
-    $skip_req_attribs=false,
-    $skip_req_body=false,
-    $skip_req_cookie_params=false,
-    $skip_req_headers=false,
-    $skip_req_method=false,
-    $skip_req_proto_ver=false,
-    $skip_req_query_params=false,
-    $skip_req_target=false,
-    $skip_req_server_params=false,
-    $skip_req_uploaded_files=false,
-    $skip_req_uri=false
-) { 
-    $uploaded_files_as_str = 
-        empty($req->getUploadedFiles()) ? 
-            null : 
-            array_reduce( 
-                $req->getUploadedFiles(),
-                function($prev, $curr) {  return $prev .= sMVC_psr7UploadedFileToString($curr) . PHP_EOL; }, 
-                ''
-            )
-        ;
-
-    $request_attributes = empty($req->getAttributes())? [] : $req->getAttributes();
-
-    $attribs_filterer = function ($val, $key) use (&$request_attributes) {
-        if( array_key_exists($val, $request_attributes) ) { unset($request_attributes[$val]); }
-    };
-
-    array_walk($request_attribute_keys_to_skip, $attribs_filterer);
-
-    return (
-                (!$skip_req_attribs)
-                ?
-                    "[[Request Attributes]]:" . PHP_EOL
-                   . print_r( $request_attributes, true )
-                   . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_body)
-                ?
-                    PHP_EOL . "[[Request Body]]:" . PHP_EOL
-                    . $req->getBody()->__toString()
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_cookie_params)
-                ?
-                    PHP_EOL . "[[Request Cookie Params]]:" . PHP_EOL
-                    . var_export( $req->getCookieParams(), true )
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_headers)
-                ?
-                    PHP_EOL . "[[Request Headers]]:" . PHP_EOL
-                    . var_export( $req->getHeaders(), true )
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_method)
-                ?
-                    PHP_EOL . "[[Request Method]]: "
-                    . $req->getMethod()
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_proto_ver)
-                ?
-                    PHP_EOL . "[[Request Protocol Version]]: "
-                    . $req->getProtocolVersion()
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_query_params)
-                ?
-                    PHP_EOL . "[[Request Query Params]]:" . PHP_EOL
-                    . var_export( $req->getQueryParams(), true )
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_target)
-                ?
-                    PHP_EOL . "[[Request Target]]: "
-                    . $req->getRequestTarget()
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_server_params)
-                ?
-                    PHP_EOL . "[[Request Server Params]]:" . PHP_EOL
-                    . var_export( $req->getServerParams(), true )
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_uploaded_files)
-                ?
-                    PHP_EOL . "[[Request Uploaded Files]]:" . PHP_EOL
-                    . var_export( $uploaded_files_as_str, true )
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-            .
-            (
-                (!$skip_req_uri)
-                ?
-                    PHP_EOL . "[[Request Uri]]:" . PHP_EOL
-                    . var_export( sMVC_UriToString($req->getUri()), true )
-                    . PHP_EOL . PHP_EOL . "<<=================================================>>"
-                :
-                    ''
-            )
-        ;
-}
-    
-function sMVC_psr7UploadedFileToString(\Psr\Http\Message\UploadedFileInterface $file) {
-        
-    return "[[Uploaded File Client Filename]]: "
-           . $file->getClientFilename()
-
-           . PHP_EOL . PHP_EOL . "<<=================================================>>"
-           . PHP_EOL . "[[Uploaded Client Media Type]]: "
-           . $file->getClientMediaType()
-
-           . PHP_EOL . PHP_EOL . "<<=================================================>>"
-           . PHP_EOL . "[[Uploaded File Size in Bytes]]: "
-           . $file->getSize()
-
-//           . PHP_EOL . PHP_EOL . "<<=================================================>>"
-//           . PHP_EOL . "[[Uploaded File Contents]]:" . PHP_EOL
-//           . var_export($file->getStream()->__toString(), true)
-
-           . PHP_EOL . PHP_EOL . "<<=================================================>>"
-           . PHP_EOL . "[[Uploaded File Error(s) If Any]]: "
-           . $file->getError()                
-        ;
-}
-
 
 /**
  * @param string $error_message A brief description of the message
@@ -577,7 +356,6 @@ END;
 
 
 /**
- *
  * This function detects which environment your web-app is running in
  * (i.e. one of Production, Development, Staging or Testing).
  *
