@@ -348,7 +348,8 @@ END;
 
     file_put_contents(
         $file,
-        '[' . date('Y-M-d g:i:s A') . '] ' . $log_message 
+        '[' . date('Y-M-d g:i:s A') . '] ' . $log_message,
+        FILE_APPEND
     ); // log to log file
     
     error_log ( $log_message , 4 ); // message is sent directly to the SAPI logging handler.
