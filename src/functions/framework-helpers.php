@@ -348,7 +348,7 @@ END;
 
     file_put_contents(
         $file,
-        '[' . date('Y-M-d g:i:s A') . '] ' . $log_message,
+        '[' . date('Y-M-d g:i:s A') . '] ' . $log_message . PHP_EOL,
         FILE_APPEND
     ); // log to log file
     
