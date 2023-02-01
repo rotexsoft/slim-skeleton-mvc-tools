@@ -85,7 +85,7 @@ class BaseController
      * @var \Psr\Http\Message\ServerRequestInterface
      */
     protected $request;
-
+    
     /**
      *
      * Response Object
@@ -279,11 +279,21 @@ class BaseController
         $this->view_renderer = $renderer;
     }
 
+    public function getRequest():\Psr\Http\Message\ServerRequestInterface {
+
+        return $this->request;
+    }
+    
     public function setRequest(\Psr\Http\Message\ServerRequestInterface $request) {
 
         $this->request = $request;
     }
 
+    public function getResponse(): \Psr\Http\Message\ResponseInterface {
+
+        return $this->response;
+    }
+    
     public function setResponse(\Psr\Http\Message\ResponseInterface $response) {
 
         $this->response = $response;
