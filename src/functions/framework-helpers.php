@@ -2,9 +2,11 @@
 declare(strict_types=1);
 
 /**
- * Creates a controller object or returns a Respond object containing a not found page.
+ * Creates & returns a controller object that is an instance of 
+ * \SlimMvcTools\Controllers\BaseController or its sub-classes
  *  
- * The controller class must be \SlimMvcTools\Controllers\BaseController or one of its sub-classes
+ * The controller class must be \SlimMvcTools\Controllers\BaseController 
+ * or one of its sub-classes
  * 
  * @param \Psr\Container\ContainerInterface $container
  * @param string $controller_name_from_url
@@ -12,10 +14,8 @@ declare(strict_types=1);
  * @param \Psr\Http\Message\ServerRequestInterface $request
  * @param \Psr\Http\Message\ResponseInterface $response
  * 
- * @return \SlimMvcTools\Controllers\BaseController|\Psr\Http\Message\ResponseInterface 
- *          an instance of \SlimMvcTools\Controllers\BaseController or its sub-class or
- *          an instance \Psr\Http\Message\ResponseInterface containing the not found 
- *          page.
+ * @throws \Slim\Exception\HttpBadRequestException
+ * @throws \Slim\Exception\HttpNotFoundException
  */
 function sMVC_CreateController(
     \Psr\Container\ContainerInterface $container, 
@@ -23,7 +23,8 @@ function sMVC_CreateController(
     $action_name_from_url,
     \Psr\Http\Message\ServerRequestInterface $request, 
     \Psr\Http\Message\ResponseInterface $response
-) {
+):\SlimMvcTools\Controllers\BaseController {
+    
     $controller_class_name = \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_url);
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
 
@@ -32,7 +33,6 @@ function sMVC_CreateController(
     ) {
         //A valid php class name starts with a letter or underscore, followed by 
         //any number of letters, numbers, or underscores.
-
         $extra_log_message = "`" . __FILE__ . "` on line " . __LINE__ . ": Bad controller name `{$controller_class_name}`";
         throw new \Slim\Exception\HttpBadRequestException($request, $extra_log_message);
     } 
