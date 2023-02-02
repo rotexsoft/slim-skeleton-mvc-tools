@@ -32,4 +32,22 @@ class LogErrorRenderer extends \Slim\Error\Renderers\PlainTextErrorRenderer {
         return $text;
     }
     
+    private function formatExceptionFragment(Throwable $exception): string {
+        
+        $text = sprintf("Type: %s\n", get_class($exception));
+
+        $code = $exception->getCode();
+        /** @var int|string $code */
+        $text .= sprintf("Code: %s\n", $code);
+
+        $text .= sprintf("Message: %s\n", htmlentities($exception->getMessage()));
+
+        $text .= sprintf("File: %s\n", $exception->getFile());
+
+        $text .= sprintf("Line: %s\n", $exception->getLine());
+
+        $text .= sprintf('Trace: %s', $exception->getTraceAsString());
+
+        return $text;
+    }
 }
