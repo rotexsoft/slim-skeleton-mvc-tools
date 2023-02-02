@@ -81,7 +81,7 @@ function sMVC_CreateController(
  * @param \Vespula\Auth\Auth $auth
  * @return string containing current authentication status info
  */
-function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth) {
+function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth): string {
 
     return 'Login Status: ' . $auth->getSession()->getStatus() . PHP_EOL
          . 'Logged in Person\'s Username: ' . $auth->getUsername().PHP_EOL
@@ -89,12 +89,15 @@ function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth) {
 }
 
 /**
- * @param mixed $v variable or expression to dump
+ * @param mixed $vals variables or expressions to dump
  */
-function sMVC_DumpVar($v) {
+function sMVC_DumpVar(...$vals): void {
 
-    $v = (!is_string($v)) ? (new \SebastianBergmann\Exporter\Exporter())->export($v) : $v;
-    echo "<pre>$v</pre>";
+    foreach($vals as $val) {
+        
+        $val = (!is_string($val)) ? (new \SebastianBergmann\Exporter\Exporter())->export($val) : $val;
+        echo "<pre>$val</pre><br><br>";
+    }
 }
 
 /**
@@ -104,10 +107,8 @@ function sMVC_DumpVar($v) {
  * \Slim\Http\Uri::getBasePath(), in order to ensure that your 
  * app will be compatible with other PSR-7 implementations because
  * \Slim\Http\Uri::getBasePath() is not a PSR-7 method.
- * 
- * @return string
  */
-function sMVC_GetBaseUrlPath() {
+function sMVC_GetBaseUrlPath(): string {
 
     static $server, $base_path, $has_been_computed;
 
@@ -149,7 +150,7 @@ function sMVC_GetBaseUrlPath() {
  * @param string $path
  * @return string
  */
-function sMVC_MakeLink($path){
+function sMVC_MakeLink(string $path) {
     
     return sMVC_GetBaseUrlPath(). '/'.ltrim($path, '/');
 }
@@ -175,7 +176,7 @@ function sMVC_MakeLink($path){
  * @param string $key a key in the specified super global. For example $_GET['id']
  *                    is equivalent to sMVC_GetSuperGlobal('get', 'id');
  * 
- * @param string $default_val the value to return if $key is not an actual key in
+ * @param mixed $default_val the value to return if $key is not an actual key in
  *                            the specified super global.
  * 
  * @return mixed Returns an array containing all values in the specified super 
@@ -190,7 +191,7 @@ function sMVC_MakeLink($path){
  *              super global associated with each key).
  * 
  */
-function sMVC_GetSuperGlobal($global_name='', $key='', $default_val='') {
+function sMVC_GetSuperGlobal(string $global_name='', string $key='', $default_val='') {
 
     static $super_globals;
 
@@ -257,22 +258,9 @@ function sMVC_GetSuperGlobal($global_name='', $key='', $default_val='') {
  * @return string the string represntation of the uri object. 
  *                Eg. http://someserver.com/controller/action
  */
-function sMVC_UriToString(\Psr\Http\Message\UriInterface $uri) {
+function sMVC_UriToString(\Psr\Http\Message\UriInterface $uri): string {
     
-    $scheme = $uri->getScheme();
-    $authority = $uri->getAuthority();
-    $basePath = sMVC_GetBaseUrlPath();
-    $path = $uri->getPath();
-    $query = $uri->getQuery();
-    $fragment = $uri->getFragment();
-
-    $path = $basePath . '/' . ltrim($path, '/');
-
-    return ($scheme ? $scheme . ':' : '')
-        . ($authority ? '//' . $authority : '')
-        . $path
-        . ($query ? '?' . $query : '')
-        . ($fragment ? '#' . $fragment : '');
+    return (string)$uri;
 }
 
 /**
@@ -284,15 +272,13 @@ function sMVC_UriToString(\Psr\Http\Message\UriInterface $uri) {
  * 
  * @param \Psr\Http\Message\UriInterface $uri
  * @param string $param_name
- * @param string $param_value
- * 
- * @return \Psr\Http\Message\UriInterface
+ * @param string $param_value 
  */
 function sMVC_addQueryStrParamToUri(
-    \Psr\Http\Message\UriInterface $uri, $param_name, $param_value
-) {
-    $query_params = [];
+    \Psr\Http\Message\UriInterface $uri, string $param_name, string $param_value
+): \Psr\Http\Message\UriInterface {
     
+    $query_params = [];
     parse_str($uri->getQuery(), $query_params); // Extract existing query string params to an array
     
     $query_params[$param_name] = $param_value; // Add new param the query string params array
@@ -311,7 +297,7 @@ function sMVC_DisplayAndLogFrameworkFileNotFoundError(
     string $file_path, 
     string $dist_file_path, 
     string $app_root_path
-) {
+): void {
     $file_missing_error_page = <<<END
 <html>
     <head>
@@ -367,7 +353,6 @@ END;
     error_log ( $log_message , 4 ); // message is sent directly to the SAPI logging handler.
 }
 
-
 /**
  * This function detects which environment your web-app is running in
  * (i.e. one of Production, Development, Staging or Testing).
@@ -408,7 +393,7 @@ function sMVC_DoGetCurrentAppEnvironment(string $app_path) {
     return $current_env;
 }
 
-function sMVC_PrependAction2ActionMethodName($action_method_name) {
+function sMVC_PrependAction2ActionMethodName(string $action_method_name) {
 
     if( strtolower( substr($action_method_name, 0, 6) ) !== "action"){
 

@@ -14,7 +14,7 @@ namespace SlimMvcTools\Functions\Str {
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
      * 
      */
-    function dashesToCamel($str)
+    function dashesToCamel(string $str): string
     {
         $str = ucwords(str_replace('-', ' ', $str));
         $str = str_replace(' ', '', $str);
@@ -33,7 +33,7 @@ namespace SlimMvcTools\Functions\Str {
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
      * 
      */
-    function dashesToStudly($str)
+    function dashesToStudly(string $str): string
     {
         $str = dashesToCamel($str);
         $str[0] = strtoupper($str[0]);
@@ -51,7 +51,7 @@ namespace SlimMvcTools\Functions\Str {
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
      * 
      */
-    function underToCamel($str)
+    function underToCamel(string $str): string
     {
         $str = ucwords(str_replace('_', ' ', $str));
         $str = str_replace(' ', '', $str);
@@ -70,7 +70,7 @@ namespace SlimMvcTools\Functions\Str {
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
      * 
      */
-    function underToStudly($str)
+    function underToStudly(string $str): string
     {
         $str = underToCamel($str);
         $str[0] = strtoupper($str[0]);
@@ -89,7 +89,7 @@ namespace SlimMvcTools\Functions\Str {
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
      * 
      */
-    function toDashes($str)
+    function toDashes(string $str): string
     {
         $str = preg_replace('/[^a-z0-9 _-]/i', '', $str);
         $str = camelToDashes($str);
@@ -108,7 +108,7 @@ namespace SlimMvcTools\Functions\Str {
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
      * 
      */
-    function camelToUnder($str)
+    function camelToUnder(string $str): string
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
         $str = str_replace(' ', '_', ucwords($str));
@@ -126,7 +126,7 @@ namespace SlimMvcTools\Functions\Str {
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
      * 
      */
-    function camelToDashes($str)
+    function camelToDashes(string $str): string
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
         $str = str_replace(' ', '-', ucwords($str));
@@ -134,16 +134,16 @@ namespace SlimMvcTools\Functions\Str {
     }
 
     function color_4_console(
-        $string, $foreground_color = null, $background_color = null
-    ) {
+        string $string, $foreground_color = null, $background_color = null
+    ): string {
         if( PHP_OS !== 'Linux') {
             
             //just return the string as is
             return $string;
         }
         
-        $foreground_colors = array();
-        $background_colors = array();
+        $foreground_colors = [];
+        $background_colors = [];
 
         // Set up shell colors
         $foreground_colors['black'] = '0;30';
