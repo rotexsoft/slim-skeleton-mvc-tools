@@ -17,7 +17,7 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         $this->full_path_to_error_template_file = $full_path_to_error_template_file;
     }
     
-    public function __invoke(Throwable $exception, bool $displayErrorDetails): string {
+    public function __invoke(\Throwable $exception, bool $displayErrorDetails): string {
         
         $requestLine = '';
         
