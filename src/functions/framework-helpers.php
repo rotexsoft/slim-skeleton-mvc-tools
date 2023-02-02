@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Creates a controller object or returns a Respond object containing a not found page.
  *  
@@ -32,7 +34,7 @@ function sMVC_CreateController(
         //any number of letters, numbers, or underscores.
 
         $extra_log_message = "`" . __FILE__ . "` on line " . __LINE__ . ": Bad controller name `{$controller_class_name}`";
-        throw new \Slim\Exception\HttpNotFoundException($request, $extra_log_message);
+        throw new \Slim\Exception\HttpBadRequestException($request, $extra_log_message);
     } 
 
     if( !class_exists($controller_class_name) ) {
@@ -59,6 +61,16 @@ function sMVC_CreateController(
             $extra_log_message = "`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.";
             throw new \Slim\Exception\HttpNotFoundException($request, $extra_log_message);
         }
+    }
+    
+    if(!is_a($controller_class_name, \SlimMvcTools\Controllers\BaseController::class, true)) {
+
+        //400 Bad Request: Controller class is not a subclass of \SlimMvcTools\Controllers\BaseController.
+        $extra_log_message = 
+                "`".__FILE__."` on line ".__LINE__
+                . sprintf(': `%s` could not be mapped to a valid controller.', $request->getUri()->__toString());
+        
+        throw new \Slim\Exception\HttpBadRequestException($request, $extra_log_message);
     }
 
     //Create the controller object

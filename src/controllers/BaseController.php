@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace SlimMvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
