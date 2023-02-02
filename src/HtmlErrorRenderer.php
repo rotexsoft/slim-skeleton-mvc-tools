@@ -21,10 +21,12 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         
         $requestLine = '';
         
-        if($exception instanceof \Slim\Exception\HttpException) {
-            
-            $requestLine .=  sprintf('<div><strong>Request Uri:</strong> %s</div><br>', $exception->getRequest()->getUri()->__toString());
-        }
+        // It may lead to injecting bad markup into the html
+        // Look into escaping thoroughly before uncommenting
+//        if($exception instanceof \Slim\Exception\HttpException) {
+//            
+//            $requestLine .=  sprintf('<div><strong>Request Uri:</strong> %s</div><br>', $exception->getRequest()->getUri()->__toString());
+//        }
         
         if ($displayErrorDetails) {
             
