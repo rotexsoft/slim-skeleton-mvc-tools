@@ -54,4 +54,25 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         
         return sprintf($file_contents, $title, $title, $html);
     }
+    
+
+    private function renderExceptionFragment(\Throwable $exception): string {
+        
+        $html = sprintf('<div><strong>Type:</strong> %s</div>', get_class($exception));
+
+        /** @var int|string $code */
+        $code = $exception->getCode();
+        $html .= sprintf('<div><strong>Code:</strong> %s</div>', $code);
+
+        $html .= sprintf('<div><strong>Message:</strong> %s</div>', htmlentities($exception->getMessage()));
+
+        $html .= sprintf('<div><strong>File:</strong> %s</div>', $exception->getFile());
+
+        $html .= sprintf('<div><strong>Line:</strong> %s</div>', $exception->getLine());
+
+        $html .= '<h2>Trace</h2>';
+        $html .= sprintf('<pre>%s</pre>', htmlentities($exception->getTraceAsString()));
+
+        return $html;
+    }
 }
