@@ -31,7 +31,7 @@ class MvcRouteHandler {
     public function __invoke(
         \Psr\Http\Message\ServerRequestInterface $req,
         \Psr\Http\Message\ResponseInterface $resp,
-        ...$args
+        $args
     ) {
         $container = $this->app->getContainer();
 
