@@ -1,6 +1,65 @@
 <?php
 declare(strict_types=1);
 
+namespace {
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Polyfills for PHP 8.0+ string functions. 
+    // Delete when PHP 8.1 becomes minimum version 
+    ////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * @see https://www.php.net/manual/en/function.str-starts-with
+     */
+    if (!function_exists('str_starts_with')) {
+        function str_starts_with (string $haystack, string $needle)
+        {
+            return empty($needle) || strpos($haystack, $needle) === 0;
+        }
+    }
+
+    /**
+     * @see https://www.php.net/manual/en/function.str-contains
+     */
+    if (!function_exists('str_contains')) {
+        function str_contains (string $haystack, string $needle)
+        {
+            return empty($needle) || strpos($haystack, $needle) !== false;
+        }
+    }
+
+    /**
+     * @see https://www.php.net/manual/en/function.str-ends-with
+     */
+    if (!function_exists('str_ends_with')) {
+        function str_ends_with (string $haystack, string $needle)
+        {
+            return empty($needle) || substr($haystack, -strlen($needle)) === $needle;
+        }
+    }
+
+    if (!function_exists('mb_str_starts_with')) {
+        function mb_str_starts_with (string $haystack, string $needle)
+        {
+            return empty($needle) || mb_strpos($haystack, $needle) === 0;
+        }
+    }
+
+    if (!function_exists('mb_str_contains')) {
+        function mb_str_contains (string $haystack, string $needle)
+        {
+            return empty($needle) || mb_strpos($haystack, $needle) !== false;
+        }
+    }
+
+    if (!function_exists('mb_str_ends_with')) {
+        function mb_str_ends_with (string $haystack, string $needle)
+        {
+            return empty($needle) || mb_substr($haystack, -mb_strlen($needle)) === $needle;
+        }
+    }
+}
+
 namespace SlimMvcTools\Functions\Str {
 
     /**
