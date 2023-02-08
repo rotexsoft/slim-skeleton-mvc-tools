@@ -741,7 +741,7 @@ class BaseController
             )
             || strtolower($this->request->getHeaderLine('X-Requested-With')) === strtolower('XMLHttpRequest') //ajax request
             || ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ) //ajax request
-        ) { return; }
+        ) { return $this; }
 
         $uri = $this->request->getUri();
         $base_path = sMVC_GetBaseUrlPath();
