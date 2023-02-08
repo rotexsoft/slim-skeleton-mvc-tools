@@ -121,8 +121,10 @@ class BaseController
      */
     public function __construct(
         \Psr\Container\ContainerInterface $container, 
-        $controller_name_from_uri, $action_name_from_uri,
-        ServerRequestInterface $req, ResponseInterface $res
+        string $controller_name_from_uri, 
+        string $action_name_from_uri,
+        ServerRequestInterface $req, 
+        ResponseInterface $res
     ) {
         $this->container = $container;
         $this->request = $req;

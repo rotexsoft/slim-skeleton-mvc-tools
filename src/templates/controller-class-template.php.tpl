@@ -19,7 +19,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
      * 
      * @var string
      */
-    protected $login_success_redirect_action = 'index';
+    protected string $login_success_redirect_action = 'index';
     
     /**
      * 
@@ -28,24 +28,21 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
      * 
      * @var string
      */
-    protected $login_success_redirect_controller = '__login_success_redirect_controller__';
+    protected string $login_success_redirect_controller = '__login_success_redirect_controller__';
     
-    /**
-     * 
-     * @param \Psr\Container\ContainerInterface $container
-     * @param string $controller_name_from_uri
-     * @param string $action_name_from_uri
-     * @param \Psr\Http\Message\ServerRequestInterface $req
-     * @param \Psr\Http\Message\ResponseInterface $res
-     * 
-     */
     public function __construct(
-        ContainerInterface $container, ?string $controller_name_from_uri, ?string $action_name_from_uri, 
-        ServerRequestInterface $req, ResponseInterface $res
+        ContainerInterface $container, 
+        string $controller_name_from_uri, 
+        string $action_name_from_uri,
+        ServerRequestInterface $req, 
+        ResponseInterface $res
     ) {
         parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
     }
     
+    /**
+     * @return \Psr\Http\Message\ResponseInterface|string
+     */
     public function actionIndex() {
         
         //get the contents of the view first
@@ -56,7 +53,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
         //return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
-    public function preAction() {
+    public function preAction(): ResponseInterface {
         
         // add code that you need to be executed before each controller action method is executed
         $response = parent::preAction();
@@ -64,7 +61,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
         return $response;
     }
     
-    public function postAction(ResponseInterface $response) {
+    public function postAction(ResponseInterface $response): ResponseInterface {
         
         // add code that you need to be executed after each controller action method is executed
         $new_response = parent::postAction($response);
