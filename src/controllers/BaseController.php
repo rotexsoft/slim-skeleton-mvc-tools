@@ -19,34 +19,21 @@ use \Psr\Http\Message\ServerRequestInterface,
 class BaseController
 {
     /**
-     *
      * A container object containing dependencies needed by the controller.
-     *
-     * @var \Psr\Container\ContainerInterface
-     *
      */
-    protected $container;
+    protected \Psr\Container\ContainerInterface $container;
 
     /**
-     *
      * View object for rendering layout files.
-     *
-     * @var \Rotexsoft\FileRenderer\Renderer
-     *
      */
-    protected $layout_renderer;
+    protected \Rotexsoft\FileRenderer\Renderer $layout_renderer;
 
     /**
-     *
      * View object for rendering view files associated with controller actions.
-     *
-     * @var \Rotexsoft\FileRenderer\Renderer
-     *
      */
-    protected $view_renderer;
+    protected \Rotexsoft\FileRenderer\Renderer $view_renderer;
 
     /**
-     *
      * An auth object used by the following methods of this class:
      *  - isLoggedIn
      *  - actionLogin
@@ -55,49 +42,32 @@ class BaseController
      *
      * These methods will throw a \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
      * if this object was not set before the method call.
-     *
-     * @var \Vespula\Auth\Auth
-     *
      */
-    protected $vespula_auth;
-
+    protected \Vespula\Auth\Auth $vespula_auth;
 
     /**
-     *
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
      * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
-     *
-     * @var string
      */
-    protected $login_success_redirect_action = 'login-status';
+    protected string $login_success_redirect_action = 'login-status';
 
     /**
-     *
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
      * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
-     *
-     * @var string
      */
-    protected $login_success_redirect_controller = 'base-controller';
+    protected string $login_success_redirect_controller = 'base-controller';
 
     /**
-     *
-     * Request Object
-     *
-     * @var \Psr\Http\Message\ServerRequestInterface
+     * Request Object 
      */
-    protected $request;
+    protected \Psr\Http\Message\ServerRequestInterface $request;
     
     /**
-     *
-     * Response Object
-     *
-     * @var \Psr\Http\Message\ResponseInterface
+     * Response Object 
      */
-    protected $response;
+    protected \Psr\Http\Message\ResponseInterface $response;
 
     /**
-     *
      * The action section of the url.
      *
      * It should be set to an empty string if the action was not specified via the url
@@ -107,14 +77,10 @@ class BaseController
      *
      * http://localhost/slim-skeleton-mvc-app/public/base-controller/
      * will result in $this->action_name_from_uri === ''
-     *
-     * @var string
-     *
      */
-    public $action_name_from_uri;
+    public string $action_name_from_uri;
 
     /**
-     *
      * The controller section of the url.
      *
      * It should be set to an empty string if the controller was not specified via the url
@@ -124,30 +90,19 @@ class BaseController
      *
      * http://localhost/slim-skeleton-mvc-app/public/
      * will result in $this->controller_name_from_uri === ''
-     *
-     * @var string
-     *
      */
-    public $controller_name_from_uri;
+    public string $controller_name_from_uri;
 
     /**
-     *
      * The full url of the current request e.g. http://someserver.com/controller/action
-     *
-     * @var string
-     *
      */
-    public $current_uri;
+    public string $current_uri;
 
     /**
-     *
      * The name of the layout file that will be rendered by $this->layout_renderer inside
      * $this->renderLayout(..)
-     *
-     * @var string
-     *
      */
-    public $layout_template_file_name = 'main-template.php';
+    public string $layout_template_file_name = 'main-template.php';
     
     //////////////////////////////////
     // Session Parameter keys
@@ -165,8 +120,9 @@ class BaseController
      *
      */
     public function __construct(
-        \Psr\Container\ContainerInterface $container, $controller_name_from_uri, $action_name_from_uri,
-        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res
+        \Psr\Container\ContainerInterface $container, 
+        $controller_name_from_uri, $action_name_from_uri,
+        ServerRequestInterface $req, ResponseInterface $res
     ) {
         $this->container = $container;
         $this->request = $req;
@@ -209,11 +165,9 @@ class BaseController
     }
 
     /**
-     *
      * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
-     *
      */
-    public function ensureVespulaAuthObjectIsSet() {
+    public function ensureVespulaAuthObjectIsSet(): self {
 
         if( !($this->vespula_auth instanceof \Vespula\Auth\Auth) ) {
 
@@ -230,55 +184,51 @@ class BaseController
 
                 throw new IncorrectlySetPropertyException($msg);
             }
-        }
+        } // if( !($this->vespula_auth instanceof \Vespula\Auth\Auth) )
+        
+        return $this;
     }
 
     /**
-     *
-     *
-     *
      * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
      * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS
      * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
      *
      * @param \Vespula\Auth\Auth $vespula_auth
-     *
      */
-    public function setVespulaAuthObject(\Vespula\Auth\Auth $vespula_auth) {
+    public function setVespulaAuthObject(\Vespula\Auth\Auth $vespula_auth): self {
 
         $this->vespula_auth = $vespula_auth;
+        
+        return $this;
     }
 
     /**
-     *
-     *
-     *
      * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
      * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS
      * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
      *
      * @param \Rotexsoft\FileRenderer\Renderer $renderer
-     *
      */
-    public function setLayoutRenderer(\Rotexsoft\FileRenderer\Renderer $renderer) {
+    public function setLayoutRenderer(\Rotexsoft\FileRenderer\Renderer $renderer): self {
 
         $this->layout_renderer = $renderer;
+        
+        return $this;
     }
 
     /**
-     *
-     *
-     *
      * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
      * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS
      * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
      *
      * @param \Rotexsoft\FileRenderer\Renderer $renderer
-     *
      */
-    public function setViewRenderer(\Rotexsoft\FileRenderer\Renderer $renderer) {
+    public function setViewRenderer(\Rotexsoft\FileRenderer\Renderer $renderer): self {
 
         $this->view_renderer = $renderer;
+        
+        return $this;
     }
 
     public function getRequest():\Psr\Http\Message\ServerRequestInterface {
@@ -286,9 +236,11 @@ class BaseController
         return $this->request;
     }
     
-    public function setRequest(\Psr\Http\Message\ServerRequestInterface $request) {
+    public function setRequest(\Psr\Http\Message\ServerRequestInterface $request): self {
 
         $this->request = $request;
+        
+        return $this;
     }
 
     public function getResponse(): \Psr\Http\Message\ResponseInterface {
@@ -296,9 +248,11 @@ class BaseController
         return $this->response;
     }
     
-    public function setResponse(\Psr\Http\Message\ResponseInterface $response) {
+    public function setResponse(\Psr\Http\Message\ResponseInterface $response): self {
 
         $this->response = $response;
+        
+        return $this;
     }
 
     /**
@@ -316,12 +270,11 @@ class BaseController
      *                    will result in a variable named $content (with a
      *                    value of 'yabadabadoo') being available in the layout
      *                    file (i.e. the file named $file_name).
-     * @return string
      *
      * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
      *
      */
-    public function renderLayout( $file_name, array $data = ['content'=>'Content should be placed here!'] ) {
+    public function renderLayout( string $file_name, array $data = ['content'=>'Content should be placed here!'] ): string {
 
         if( !($this->layout_renderer instanceof \Rotexsoft\FileRenderer\Renderer) ) {
 
@@ -337,7 +290,7 @@ class BaseController
 
                 throw new IncorrectlySetPropertyException($msg);
             }
-        }
+        } // if( !($this->layout_renderer instanceof \Rotexsoft\FileRenderer\Renderer) )
 
         return $this->layout_renderer->renderToString($file_name, $data);
     }
@@ -358,12 +311,10 @@ class BaseController
      *                    will result in a variable named $content (with a
      *                    value of 'yabadabadoo') being available in the view
      *                    file (i.e. the file named $file_name).
-     * @return string
      *
      * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
-     *
      */
-    public function renderView( $file_name, array $data = [] ) {
+    public function renderView( string $file_name, array $data = [] ): string {
 
         if( !($this->view_renderer instanceof \Rotexsoft\FileRenderer\Renderer) ) {
 
@@ -421,6 +372,9 @@ class BaseController
         return $this->view_renderer->renderToString($file_name, $data);
     }
 
+    /**
+     * @return \Psr\Http\Message\ResponseInterface|string
+     */
     public function actionIndex() {
 
         //get the contents of the view first
@@ -456,6 +410,9 @@ class BaseController
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
 
+    /**
+     * @return \Psr\Http\Message\ResponseInterface|string
+     */
     public function actionLogin() {
 
         $request_obj = $this->request;
@@ -623,13 +580,13 @@ class BaseController
     }
 
     /**
-     *
      * @param mixed $show_status_on_completion any value that evaluates to true or false.
      *                                         When the value is true, the user will be
      *                                         redirected to actionLoginStatus(). When it
      *                                         is false, the user will be redirected to
      *                                         actionLogin()
-     * @return type
+     * 
+     * @return \Psr\Http\Message\ResponseInterface|string
      */
     public function actionLogout($show_status_on_completion = false) {
 
@@ -669,10 +626,7 @@ class BaseController
     }
 
     /**
-     *
-     *
-     *
-     *
+     * @return \Psr\Http\Message\ResponseInterface|string
      */
     public function actionLoginStatus() {
 
@@ -719,14 +673,13 @@ class BaseController
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
 
-    public function isLoggedIn() {
+    public function isLoggedIn(): bool {
 
         $this->ensureVespulaAuthObjectIsSet();
         return ($this->vespula_auth->isValid() === true);
     }
 
     /**
-     *
      * Return a response object (an instance of \Psr\Http\Message\ResponseInterface)
      * if the user is not logged in (The url the user is currently accessing will be
      * stored in $_SESSION with the key `static::SESSN_PARAM_LOGIN_REDIRECT`. Upon
@@ -736,8 +689,7 @@ class BaseController
      * False is returned if the user is logged in and there is no need to redirect to
      * the login page.
      *
-     * @return boolean|\Psr\Http\Message\ResponseInterface
-     *
+     * @return bool|\Psr\Http\Message\ResponseInterface
      */
     protected function getResponseObjForLoginRedirectionIfNotLoggedIn() {
 
@@ -762,7 +714,7 @@ class BaseController
         return false;
     }
 
-    public function preAction() {
+    public function preAction(): ResponseInterface {
 
         //Inject some dependencies into the controller
         $this->setLayoutRenderer($this->getContainerItem('new_layout_renderer'));
@@ -772,12 +724,12 @@ class BaseController
         return $this->response;
     }
 
-    public function postAction(\Psr\Http\Message\ResponseInterface $response) {
+    public function postAction(\Psr\Http\Message\ResponseInterface $response): ResponseInterface {
 
         return $response;
     }
 
-    protected function storeCurrentUrlForLoginRedirection() {
+    protected function storeCurrentUrlForLoginRedirection(): self {
 
         if(
             in_array(
@@ -806,10 +758,11 @@ class BaseController
 
         //store current url in session
         $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
+        
+        return $this;
     }
 
     /**
-     *
      * @param string $item_key_in_container
      * @return mixed
      *
@@ -831,8 +784,48 @@ class BaseController
         }
     }
 
-    public function getContainer() {
+    public function getContainer(): \Psr\Container\ContainerInterface {
 
         return $this->container;
+    }
+    
+    public function forceHttp400(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw new \Slim\Exception\HttpBadRequestException(($request ?? $this->request), $message);
+    }
+    
+    public function forceHttp401(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw new \Slim\Exception\HttpUnauthorizedException(($request ?? $this->request), $message);
+    }
+    
+    public function forceHttp403(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw new \Slim\Exception\HttpForbiddenException(($request ?? $this->request), $message);
+    }
+    
+    public function forceHttp404(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw new \Slim\Exception\HttpNotFoundException(($request ?? $this->request), $message);
+    }
+    
+    public function forceHttp405(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw new \Slim\Exception\HttpMethodNotAllowedException(($request ?? $this->request), $message);
+    }
+    
+    public function forceHttp410(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw new \Slim\Exception\HttpGoneException(($request ?? $this->request), $message);
+    }
+    
+    public function forceHttp500(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw new \Slim\Exception\HttpInternalServerErrorException(($request ?? $this->request), $message);
+    }
+    
+    public function forceHttp501(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw new \Slim\Exception\HttpNotImplementedException(($request ?? $this->request), $message);
     }
 }
