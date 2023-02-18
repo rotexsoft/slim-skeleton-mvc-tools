@@ -78,7 +78,12 @@ class BaseController
      * http://localhost/slim-skeleton-mvc-app/public/base-controller/
      * will result in $this->action_name_from_uri === ''
      */
-    public string $action_name_from_uri;
+    protected string $action_name_from_uri;
+    
+    public function getActionNameFromUri(): string {
+        
+        return $this->action_name_from_uri;
+    }
 
     /**
      * The controller section of the url.
@@ -91,24 +96,28 @@ class BaseController
      * http://localhost/slim-skeleton-mvc-app/public/
      * will result in $this->controller_name_from_uri === ''
      */
-    public string $controller_name_from_uri;
+    protected string $controller_name_from_uri;
+    
+    public function getControllerNameFromUri(): string {
+        
+        return $this->controller_name_from_uri;
+    }
 
     /**
      * The full url of the current request e.g. http://someserver.com/controller/action
      */
-    public string $current_uri;
+    protected string $current_uri;
 
     /**
      * The name of the layout file that will be rendered by $this->layout_renderer inside
      * $this->renderLayout(..)
      */
-    public string $layout_template_file_name = 'main-template.php';
+    protected string $layout_template_file_name = 'main-template.php';
     
     //////////////////////////////////
     // Session Parameter keys
     //////////////////////////////////
     const SESSN_PARAM_LOGIN_REDIRECT = 'login_redirect_path';
-    
     
     /**
      *
@@ -268,7 +277,6 @@ class BaseController
     }
     
     /**
-     *
      * Executes a PHP file and returns its output as a string. This file is
      * supposed to contain the layout template of your site.
      *
@@ -442,8 +450,8 @@ class BaseController
         $request_obj = $this->request;
 
         $data_4_login_view = [
-            'controller_object' => $this, 'error_message' => '', 'username' => '',
-            'password' => ''
+            'controller_object' => $this, 'error_message' => '', 
+            'username' => '', 'password' => ''
         ];
 
         if( strtoupper($request_obj->getMethod()) === 'GET' ) {
@@ -460,7 +468,12 @@ class BaseController
             $controller = $this->login_success_redirect_controller ?: 'base-controller';
 
             $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
-            $action = ($prepend_action) ? 'action-' : '';
+            $action = (
+                        $prepend_action 
+                        && !str_starts_with(mb_strtolower($this->login_success_redirect_action, 'UTF-8'), 'action')
+                      ) 
+                      ? 'action-' : '';
+            
             $success_redirect_path =
                 "{$controller}/{$action}{$this->login_success_redirect_action}";
 
@@ -488,10 +501,11 @@ class BaseController
                     'username'=> filter_var($username, FILTER_SANITIZE_STRING),
                     'password'=> $password, //Not sanitizing this. Sanitizing or
                                             //validating passwords should be app
-                                            //specific. For example an app can be
-                                            //setup to allow only alphanumeric
-                                            //passwords with a specific list of
-                                            //allowed special characters.
+                                            //specific & done during user creation. 
+                                            //For example an app can be setup to 
+                                            //allow only alphanumeric passwords 
+                                            //with a specific list of allowed 
+                                            //special characters.
                 ];
                 
                 try {
@@ -517,7 +531,12 @@ class BaseController
 
                     } else {
 
-                        $msg = 'Login Failed!<br>' . $auth->getAdapter()->getError();
+                        $msg = 'Login Failed!' ;
+                        
+                        if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
+                            
+                            $msg .=  '<br>' . $auth->getAdapter()->getError();
+                        }
                     }
                 } catch (\Vespula\Auth\Exception $vaExc) {
                     
