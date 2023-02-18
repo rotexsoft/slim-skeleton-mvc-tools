@@ -579,11 +579,11 @@ class BaseController
 
             if( $auth->isValid() ) {
 
-                if( sMVC_GetBaseUrlPath().'' === '' || strpos($success_redirect_path, sMVC_GetBaseUrlPath()) === false ) {
+                if( $this->getAppBasePath().'' === '' || strpos($success_redirect_path, $this->getAppBasePath()) === false ) {
 
                     //prepend base path
                     $success_redirect_path =
-                        sMVC_GetBaseUrlPath().'/'.ltrim($success_redirect_path, '/');
+                        $this->getAppBasePath().'/'.ltrim($success_redirect_path, '/');
                 }
 
                 //re-direct
@@ -635,7 +635,7 @@ class BaseController
             $controller = 'base-controller';
         }
 
-        $redirect_path = sMVC_GetBaseUrlPath() . "/{$controller}/{$actn}";
+        $redirect_path = $this->getAppBasePath() . "/{$controller}/{$actn}";
 
         if(
             session_status() === PHP_SESSION_ACTIVE
@@ -730,7 +730,7 @@ class BaseController
 
             $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = ($prepend_action) ? 'action-login' : 'login';
-            $redr_path = sMVC_GetBaseUrlPath() . "/{$controller}/$action";
+            $redr_path = $this->getAppBasePath() . "/{$controller}/$action";
 
             return $this->response->withStatus(302)->withHeader('Location', $redr_path);
         }
@@ -768,7 +768,7 @@ class BaseController
         ) { return $this; }
 
         $uri = $this->request->getUri();
-        $base_path = sMVC_GetBaseUrlPath();
+        $base_path = $this->getAppBasePath();
         $fragment = $uri->getFragment();
         $query = $uri->getQuery();
         $path = $uri->getPath();

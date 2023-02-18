@@ -107,6 +107,9 @@ function sMVC_DumpVar(...$vals): void {
  * \Slim\Http\Uri::getBasePath(), in order to ensure that your 
  * app will be compatible with other PSR-7 implementations because
  * \Slim\Http\Uri::getBasePath() is not a PSR-7 method.
+ * 
+ * @deprecated since version 4.x
+ * @see SlimMvcTools\Controllers\BaseController->getAppBasePath()
  */
 function sMVC_GetBaseUrlPath(): string {
 
@@ -149,6 +152,9 @@ function sMVC_GetBaseUrlPath(): string {
  * 
  * @param string $path
  * @return string
+ * 
+ * @deprecated since version 4.x
+ * @see SlimMvcTools\Controllers\BaseController->makeLink(string $path): string
  */
 function sMVC_MakeLink(string $path) {
     
