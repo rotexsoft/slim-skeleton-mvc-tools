@@ -256,7 +256,17 @@ class BaseController
         
         return $this;
     }
-
+    
+    public function getAppBasePath(): string {
+        
+        return $this->getContainer()->get('settings')['app_base_path'];
+    }
+    
+    public function makeLink(string $path): string {
+            
+        return rtrim($this->getAppBasePath(), '/')  . '/' . ltrim($path, '/'); 
+    }
+    
     /**
      *
      * Executes a PHP file and returns its output as a string. This file is
@@ -294,6 +304,12 @@ class BaseController
             }
         } // if( !($this->layout_renderer instanceof \Rotexsoft\FileRenderer\Renderer) )
 
+        $self = $this;
+        $data['sMVC_MakeLink'] = function(string $path) use ($self): string {
+            
+            return $self->makeLink($path);
+        };
+        
         return $this->layout_renderer->renderToString($file_name, $data);
     }
 
@@ -371,6 +387,12 @@ class BaseController
             $this->view_renderer->prependPath($path_2_view_files . $this->controller_name_from_uri);
         }
 
+        $self = $this;
+        $data['sMVC_MakeLink'] = function(string $path) use ($self): string {
+            
+            return $self->makeLink($path);
+        };
+        
         return $this->view_renderer->renderToString($file_name, $data);
     }
 
