@@ -1,28 +1,8 @@
 <?php
 include_once __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."functions".DIRECTORY_SEPARATOR."str-helpers.php";
 
-/**
- *
- *
- *
- * @param string $cur_script
- *
- * @return void
- *
- * @throws \InvalidArgumentException
- */
-function displayHelp($cur_script) {
-
-    if( !is_string($cur_script) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($cur_script)` should be a String value.'
-             . ' `' . ucfirst(gettype($cur_script)) . '` with the value below was supplied:'
-             . PHP_EOL . var_export($cur_script, true) . PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
-
+function displayHelp(string $cur_script): void {
+    
     $help = <<<HELP
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim-skeleton-mvc-app derived projects.
 
@@ -58,32 +38,16 @@ HELP;
 }
 
 /**
- *
- *
- *
- * @param string $opt
  * @param array $args a non-associative array of strings [ 'key1', 'val1', .... 'keyN', 'valN'].
  *                    Values with even indices are the keys while values with odd indices are the
  *                    values.
  *                    For example, $args[0] is the key to $args[1], $args[2] is the key to $args[3], etc.
  *
  * @return boolean|string
- *
- * @throws \InvalidArgumentException
  */
-function getOptVal($opt, array $args) {
+function getOptVal(string $opt, array $args) {
 
-    $search_key = (is_numeric($opt)) ? '' . $opt : $opt; //convert to string if numeric
-
-    if( !is_string($search_key) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($opt, array $args)` should be a String value.'
-             . ' `'. ucfirst(gettype($search_key)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($search_key, true) . PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
+    $search_key = $opt;
 
     $opts_index = array_search($search_key, $args);
 
@@ -96,54 +60,17 @@ function getOptVal($opt, array $args) {
 }
 
 /**
- *
- *
- *
- * @param string $class_name
- *
- * @return boolean|int 1 if is valid, 0 OR FALSE if is not valid
- *
- * @throws \InvalidArgumentException
+ * @return boolean true if valid OR false if not valid
  */
-function isValidClassName($class_name) {
-
-    if( !is_string($class_name) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($class_name)` should be a String value.'
-             . ' `'. ucfirst(gettype($class_name)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($class_name, true).PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
+function isValidClassName(string $class_name): bool {
 
     $regex_4_valid_class_name = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
 
-    return preg_match( $regex_4_valid_class_name, preg_quote($class_name, '/') );
+    return (bool)preg_match( $regex_4_valid_class_name, preg_quote($class_name, '/') );
 }
 
-/**
- *
- *
- *
- * @param string $controller_2_extend
- *
- * @return boolean
- *
- * @throws \InvalidArgumentException
- */
-function isValidExtendsClassName($controller_2_extend) {
-
-    if( !is_string($controller_2_extend) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($controller_2_extend)` should be a String value.'
-             . ' `'. ucfirst(gettype($controller_2_extend)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($controller_2_extend, true).PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
-
+function isValidExtendsClassName(string $controller_2_extend): bool {
+    
     $extend_class_parts = explode('\\', $controller_2_extend);
 
     if( strlen($extend_class_parts[0]) <= 0 ) {
@@ -161,27 +88,7 @@ function isValidExtendsClassName($controller_2_extend) {
     return true;
 }
 
-/**
- *
- *
- *
- * @param string $namepace_4_controller
- *
- * @return boolean
- *
- * @throws \InvalidArgumentException
- */
-function isValidNamespaceName($namepace_4_controller) {
-
-    if( !is_string($namepace_4_controller) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($namepace_4_controller)` should be a String value.'
-             . ' `'. ucfirst(gettype($namepace_4_controller)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($namepace_4_controller, true).PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
+function isValidNamespaceName(string $namepace_4_controller): bool {
 
     $namespace_parts = explode('\\', $namepace_4_controller);
 
@@ -200,64 +107,21 @@ function isValidNamespaceName($namepace_4_controller) {
     return true;
 }
 
-/**
- *
- *
- *
- * @param string $str
- *
- * @param boolean $append_new_line
- *
- * @return void
- *
- * @throws \InvalidArgumentException
- */
-function printError($str, $append_new_line = true) {
-
-    if( !is_string($str) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($str, $append_new_line = true)` should be a String value.'
-             . ' `'. ucfirst(gettype($str)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($str, true) . PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
+function printError(string $str, bool $append_new_line = true): void {
 
     echo \SlimMvcTools\Functions\Str\color_4_console( "ERROR: $str", "red",  "black");
 
     if( ((bool)$append_new_line) ) { echo PHP_EOL; }
 }
 
-/**
- *
- *
- *
- * @param string $str
- * @param boolean $append_new_line
- *
- * @return void
- *
- * @throws \InvalidArgumentException
- */
-function printInfo($str, $append_new_line = true) {
-
-    if( !is_string($str) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($str, $append_new_line = true)` should be a String value.'
-             . ' `'. ucfirst(gettype($str)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($str, true).PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
+function printInfo(string $str, bool $append_new_line = true): void {
 
     echo \SlimMvcTools\Functions\Str\color_4_console( $str, "green",  "black");
 
     if( ((bool)$append_new_line) ) { echo PHP_EOL; }
 }
 
-function normalizeNameSpaceName($namespace_name){
+function normalizeNameSpaceName(string $namespace_name): string {
 
     $namespace_name = ''.$namespace_name;
 
@@ -270,28 +134,8 @@ function normalizeNameSpaceName($namespace_name){
     return $namespace_name;
 }
 
-/**
- *
- *
- *
- * @param string $path
- *
- * @return string
- *
- * @throws \InvalidArgumentException
- */
-function normalizeFolderPathForOs($path) {
-
-    if( !is_string($path) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($path)` should be a String value.'
-             . ' `'. ucfirst(gettype($path)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($path, true).PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
-
+function normalizeFolderPathForOs(string $path): string {
+    
     //trim right-most linux style path separator if any
     $trimed_path = rtrim($path, '/');
 
@@ -315,31 +159,9 @@ function normalizeFolderPathForOs($path) {
  *
  * @return int|boolean the number of bytes that were written to the file located at $dest,
  *                     or FALSE on failure.
- *
- * @throws \InvalidArgumentException
  */
-function processTemplateFile($target, $dest, array $replaces) {
-
-    if( !is_string($target) ) {
-
-        $msg = 'The expected value for the first argument to '
-             . '`' . __FUNCTION__ . '($target, $dest, array $replaces)` should be a String value.'
-             . ' `'. ucfirst(gettype($target)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($target, true).PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
-
-    if( !is_string($dest) ) {
-
-        $msg = 'The expected value for the second argument to '
-             . '`' . __FUNCTION__ . '($target, $dest, array $replaces)` should be a String value.'
-             . ' `'. ucfirst(gettype($dest)). '` with the value below was supplied:'
-             . PHP_EOL . var_export($dest, true) . PHP_EOL;
-
-        throw new \InvalidArgumentException($msg);
-    }
-
+function processTemplateFile(string $target, string $dest, array $replaces) {
+    
     $retval = file_get_contents($target);
 
     if($retval !== false) {
@@ -372,8 +194,6 @@ function processTemplateFile($target, $dest, array $replaces) {
 }
 
 /**
- *
- *
  * @param int $argc
  * @param array $argv
  *
@@ -638,23 +458,13 @@ function createController($argc, array $argv) {
         printInfo("All done!!");
 
         if ( strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            
+            printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
 
-            //test if composer is avaliable only if server OS on which this script is being run
-            //is not windows
-//            if( @isCommandAvailableOnOs('composer') ) {
-//
-//                passthru('composer dumpautoload');
-//
-//            } else {
-
-                printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
-//            }
         } else {
+            
             printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
         }
-
-
-
         //we are done
 
     } else {
@@ -666,22 +476,7 @@ function createController($argc, array $argv) {
     //////////////////////////////////
 }
 
-function isPhpRunningInCliMode()
-{
+function isPhpRunningInCliMode(): bool {
+    
     return php_sapi_name() === 'cli';
-}
-
-function isCommandAvailableOnOs($command) {
-
-    $output = [];
-
-    exec( 'command -v '.$command.' >& /dev/null && echo "Found" || echo "Not Found"', $output );
-
-    if ( $output[0] === "Found" ) {
-        // command is available
-        return TRUE;
-    } else {
-        // command is unavailable
-        return FALSE;
-    }
 }

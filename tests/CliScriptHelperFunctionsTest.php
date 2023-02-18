@@ -52,49 +52,6 @@ Options:
   -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 INPUT;
         $this->assertStringContainsString($expected_substr, $output);
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            'Integer' => 111,
-            'Double' => 111.1234,
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'displayHelp($cur_script)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                displayHelp($arg);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            displayHelp(function() { echo 'blah'; });
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatPrintErrorWorksAsExpected() {
@@ -106,49 +63,6 @@ INPUT;
         $this->assertStringStartsWith("\033[0;31m\033[40m", $output2);
         $this->assertStringEndsWith("\033[0m", $output1);
         $this->assertStringEndsWith(PHP_EOL, $output2);
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            'Integer' => 111,
-            'Double' => 111.1234,
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'printError($str, $append_new_line = true)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                printError($arg);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            printError(function() { echo 'blah'; });
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatPrintInfoWorksAsExpected() {
@@ -160,49 +74,6 @@ INPUT;
         $this->assertStringStartsWith("\033[0;32m\033[40m", $output2);
         $this->assertStringEndsWith("\033[0m", $output1);
         $this->assertStringEndsWith(PHP_EOL, $output2);
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            'Integer' => 111,
-            'Double' => 111.1234,
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'printInfo($str, $append_new_line = true)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                printInfo($arg);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            printInfo(function() { echo 'blah'; });
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatGetOptValWorksAsExpected() {
@@ -219,49 +90,6 @@ INPUT;
         $this->assertEquals('n`s-val', getOptVal('-n', $opts_vals));
         $this->assertEquals(false, getOptVal('-d', $opts_vals));
         $this->assertEquals(false, getOptVal('-x', $opts_vals));
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            //'Integer' => 111, //not applicable to this test
-            //'Double' => 111.1234, //not applicable to this test
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'getOptVal($opt, array $args)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                getOptVal($arg, []);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            getOptVal(function() { echo 'blah'; }, []);
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatNormalizeFolderPathForOsWorksAsExpected() {
@@ -271,49 +99,6 @@ INPUT;
         $expected_normalized_path = __DIR__.DIRECTORY_SEPARATOR;
         $this->assertEquals($expected_normalized_path, normalizeFolderPathForOs($path1));
         $this->assertEquals($expected_normalized_path, normalizeFolderPathForOs($path2));
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            'Integer' => 111,
-            'Double' => 111.1234,
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'normalizeFolderPathForOs($path)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                normalizeFolderPathForOs($arg);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            normalizeFolderPathForOs(function() { echo 'blah'; });
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatIsValidNamespaceNameWorksAsExpected() {
@@ -324,49 +109,6 @@ INPUT;
         $this->assertEquals(false, isValidNamespaceName('\\Name\\Space\\'));
         $this->assertEquals(false, isValidNamespaceName('-Name\\Space'));
         $this->assertEquals(false, isValidNamespaceName('Name\\-Space'));
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            'Integer' => 111,
-            'Double' => 111.1234,
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'isValidNamespaceName($namepace_4_controller)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                isValidNamespaceName($arg);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            isValidNamespaceName(function() { echo 'blah'; });
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatIsValidExtendsClassNameWorksAsExpected() {
@@ -377,49 +119,6 @@ INPUT;
         $this->assertEquals(false, isValidExtendsClassName('\\NameSpace\\Class\\'));
         $this->assertEquals(false, isValidExtendsClassName('-NameSpace\\Class'));
         $this->assertEquals(false, isValidExtendsClassName('NameSpace\\-Class'));
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            'Integer' => 111,
-            'Double' => 111.1234,
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'isValidExtendsClassName($controller_2_extend)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                isValidExtendsClassName($arg);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            isValidExtendsClassName(function() { echo 'blah'; });
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatIsValidClassNameWorksAsExpected() {
@@ -438,49 +137,6 @@ INPUT;
         $this->assertEquals(false, isValidClassName('Some-Class'));
         $this->assertEquals(false, isValidClassName('-SomeClass'));
         $this->assertEquals(false, isValidClassName('SomeClass-'));
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            'Integer' => 111,
-            'Double' => 111.1234,
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'isValidClassName($class_name)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                isValidClassName($arg);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            isValidClassName(function() { echo 'blah'; });
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatProcessTemplateFileWorksAsExpected() {
@@ -531,77 +187,6 @@ INPUT;
         //clean up
         unlink($dest_controller_class_file);
         unlink($dest_view_file);
-
-        ///////////////////////////////////////////
-        //Test \InvalidArgumentException messages
-        ///////////////////////////////////////////
-        $args = array (
-            'Integer' => 111,
-            'Double' => 111.1234,
-            'Boolean' => true,
-            'Array' => [],
-            'Object' => (new stdclass()),
-            'NULL' => null,
-            'Resource' => tmpfile(),
-            //'Object' => $func , //doesn't seem to work as an array value
-        );
-        $function_sig_in_err_msg = 'processTemplateFile($target, $dest, array $replaces)';
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                processTemplateFile($arg, '', $replaces);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            processTemplateFile(function() { echo 'blah'; }, '', $replaces);
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the first argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
-
-        foreach($args as $arg_type => $arg) {
-
-            try {
-                processTemplateFile('', $arg, $replaces);
-                $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-                static::fail($msg);
-
-            } catch(\InvalidArgumentException $e) {
-
-                $msg_substr = "The expected value for the second argument to `$function_sig_in_err_msg`"
-                            . " should be a String value. `{$arg_type}` with the value below was supplied:";
-                $this->assertStringContainsString($msg_substr, $e->getMessage());
-            }
-        }
-
-        // test the callable type
-        try {
-            processTemplateFile('', function() { echo 'blah'; }, $replaces);
-            $msg = '\InvalidArgumentException should have been thrown in `' . __FILE__ . '`' . ' on line '. (__LINE__ - 1) ;
-            static::fail($msg);
-
-        } catch(\InvalidArgumentException $e) {
-
-            $msg_substr = "The expected value for the second argument to `$function_sig_in_err_msg`"
-                        . " should be a String value. `Object` with the value below was supplied:";
-            $this->assertStringContainsString($msg_substr, $e->getMessage());
-        }
     }
 
     public function testThatCreateControllerScriptWorksAsExpectedWithValidArgsAndValidArgVals() {
