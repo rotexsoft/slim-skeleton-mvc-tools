@@ -63,7 +63,6 @@ namespace {
 namespace SlimMvcTools\Functions\Str {
 
     /**
-     * 
      * Returns "foo-bar-baz" as "fooBarBaz".
      * 
      * @param string $str The dashed word.
@@ -71,7 +70,6 @@ namespace SlimMvcTools\Functions\Str {
      * @return string The word in camel-caps.
      * 
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
-     * 
      */
     function dashesToCamel(string $str): string
     {
@@ -82,7 +80,6 @@ namespace SlimMvcTools\Functions\Str {
     }
 
     /**
-     * 
      * Returns "foo-bar-baz" as "FooBarBaz".
      * 
      * @param string $str The dashed word.
@@ -90,7 +87,6 @@ namespace SlimMvcTools\Functions\Str {
      * @return string The word in studly-caps.
      * 
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
-     * 
      */
     function dashesToStudly(string $str): string
     {
@@ -100,7 +96,6 @@ namespace SlimMvcTools\Functions\Str {
     }
 
     /**
-     * 
      * Returns "foo_bar_baz" as "fooBarBaz".
      * 
      * @param string $str The underscore word.
@@ -108,7 +103,6 @@ namespace SlimMvcTools\Functions\Str {
      * @return string The word in camel-caps.
      * 
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
-     * 
      */
     function underToCamel(string $str): string
     {
@@ -119,7 +113,6 @@ namespace SlimMvcTools\Functions\Str {
     }
 
     /**
-     * 
      * Returns "foo_bar_baz" as "FooBarBaz".
      * 
      * @param string $str The underscore word.
@@ -127,7 +120,6 @@ namespace SlimMvcTools\Functions\Str {
      * @return string The word in studly-caps.
      * 
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
-     * 
      */
     function underToStudly(string $str): string
     {
@@ -137,7 +129,6 @@ namespace SlimMvcTools\Functions\Str {
     }
 
     /**
-     * 
      * Returns any string, converted to using dashes with only lowercase 
      * alphanumerics.
      * 
@@ -146,7 +137,6 @@ namespace SlimMvcTools\Functions\Str {
      * @return string The converted string.
      * 
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
-     * 
      */
     function toDashes(string $str): string
     {
@@ -157,7 +147,6 @@ namespace SlimMvcTools\Functions\Str {
     }
 
     /**
-     * 
      * Returns "camelCapsWord" and "CamelCapsWord" as "Camel_Caps_Word".
      * 
      * @param string $str The camel-caps word.
@@ -165,7 +154,6 @@ namespace SlimMvcTools\Functions\Str {
      * @return string The word with underscores in place of camel caps.
      * 
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
-     * 
      */
     function camelToUnder(string $str): string
     {
@@ -175,7 +163,6 @@ namespace SlimMvcTools\Functions\Str {
     }
 
     /**
-     * 
      * Returns "camelCapsWord" and "CamelCapsWord" as "camel-caps-word".
      * 
      * @param string $str The camel-caps word.
@@ -183,7 +170,6 @@ namespace SlimMvcTools\Functions\Str {
      * @return string The word with dashes in place of camel caps.
      * 
      * This code originally from the Solar_Inflect class in the SolarPHP framework.
-     * 
      */
     function camelToDashes(string $str): string
     {

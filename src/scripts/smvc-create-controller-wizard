@@ -13,12 +13,10 @@ if( !isPhpRunningInCliMode() ) {
         $psuedo_argv = [];
         
         ////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////
         $my_script_name = $argv[0];
         //var_dump($my_script_name);
         $psuedo_argv[] = $my_script_name;
         
-        ////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////
         $prompt_4_controller_name = 'Please enter the controller name (all lower case with words'
                                   . ' separated with dashes).' 
@@ -41,7 +39,6 @@ if( !isPhpRunningInCliMode() ) {
         $psuedo_argv[] = $controller_name;
         
         ////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////
         $prompt_4_path_2_src_folder = 'Please enter the path to your application\'s `src` folder'
                                   . '  (it could be absolute e.g. `/home/myapp/src` or relative'
                                   . ' e.g. `./src`). If you are entering a relative path, make sure'
@@ -60,14 +57,12 @@ if( !isPhpRunningInCliMode() ) {
         $psuedo_argv[] = $path_2_src_folder;
         
         ////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////
         // Can be empty meaning '\\SlimMvcTools\\Controllers\\BaseController' will be used
         $prompt_4_parent_conroller_name = 'Please enter the name of the class your controller will'
                                   . ' extend or hit enter to use `\\SlimMvcTools\\Controllers\\BaseController`.'
                                   . ' The name should include the namespace and it should be a'
                                   . ' class that is a sub-class of \'\\SlimMvcTools\\Controllers\\BaseController\' (for example, `\MyApp\Controllers\BaseController`):';
         $parent_conroller_name = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_parent_conroller_name, "cyan",  "black"));
-        //var_dump($parent_conroller_name);
         
         $psuedo_argv[] = '-e';
         
@@ -81,13 +76,11 @@ if( !isPhpRunningInCliMode() ) {
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////
         // Can be empty meaning controller belongs to default or global namespace
         $prompt_4_namespace_name = 'Please enter the namespace your new controller will'
                                   . ' belong to (e.g. `MyApp\Controllers`) or hit enter if you don\'t want your new controller'
                                   . ' to belong to any namespace. [NOTE: DO NOT add a trailing back slash to the namespace]:';
         $namespace_name = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_namespace_name, "cyan",  "black"));
-        //var_dump($namespace_name);
         
         if( mb_strlen( ''.$namespace_name, 'UTF-8') > 0 ) {
             
@@ -96,12 +89,8 @@ if( !isPhpRunningInCliMode() ) {
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////
         $psuedo_argc = count($psuedo_argv);
-        //var_dump($psuedo_argc);
-        //var_dump($psuedo_argv);
         
-        ////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////
         echo PHP_EOL;
         createController($psuedo_argc, $psuedo_argv);

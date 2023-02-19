@@ -151,12 +151,11 @@ function sMVC_GetBaseUrlPath(): string {
  * atrribute of a script tag, etc.
  * 
  * @param string $path
- * @return string
  * 
  * @deprecated since version 4.x
  * @see SlimMvcTools\Controllers\BaseController->makeLink(string $path): string
  */
-function sMVC_MakeLink(string $path) {
+function sMVC_MakeLink(string $path): string {
     
     return sMVC_GetBaseUrlPath(). '/'.ltrim($path, '/');
 }
@@ -368,10 +367,8 @@ END;
  *       relevant to the environment you are installing your web-app.
  * 
  * @param string $app_path should be set to the absolute path of where your mvc app is installed just pass SMVC_APP_ROOT_PATH
- *
- * @return string
  */
-function sMVC_DoGetCurrentAppEnvironment(string $app_path) {
+function sMVC_DoGetCurrentAppEnvironment(string $app_path): string {
 
     static $current_env;
 
@@ -399,7 +396,7 @@ function sMVC_DoGetCurrentAppEnvironment(string $app_path) {
     return $current_env;
 }
 
-function sMVC_PrependAction2ActionMethodName(string $action_method_name) {
+function sMVC_PrependAction2ActionMethodName(string $action_method_name): string {
 
     if( strtolower( substr($action_method_name, 0, 6) ) !== "action"){
 
