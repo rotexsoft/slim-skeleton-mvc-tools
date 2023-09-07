@@ -1,8 +1,6 @@
 <?php
 use \SlimMvcTools\Utils;
 /**
- * This class tests \slim-skeleton-mvc-tools\src\scripts\smvc-create-controller
- *
  * @author Rotimi Adegbamigbe
  */
 class UtilsTest extends \PHPUnit\Framework\TestCase
