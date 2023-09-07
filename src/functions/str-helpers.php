@@ -14,7 +14,7 @@ namespace {
     if (!function_exists('str_starts_with')) {
         function str_starts_with (string $haystack, string $needle)
         {
-            return empty($needle) || strpos($haystack, $needle) === 0;
+            return $needle === '' || strpos($haystack, $needle) === 0;
         }
     }
 
@@ -24,7 +24,7 @@ namespace {
     if (!function_exists('str_contains')) {
         function str_contains (string $haystack, string $needle)
         {
-            return empty($needle) || strpos($haystack, $needle) !== false;
+            return $needle === '' || strpos($haystack, $needle) !== false;
         }
     }
 
@@ -34,28 +34,28 @@ namespace {
     if (!function_exists('str_ends_with')) {
         function str_ends_with (string $haystack, string $needle)
         {
-            return empty($needle) || substr($haystack, -strlen($needle)) === $needle;
+            return $needle === '' || substr($haystack, -strlen($needle)) === $needle;
         }
     }
 
     if (!function_exists('mb_str_starts_with')) {
         function mb_str_starts_with (string $haystack, string $needle)
         {
-            return empty($needle) || mb_strpos($haystack, $needle) === 0;
+            return $needle === '' || mb_strpos($haystack, $needle) === 0;
         }
     }
 
     if (!function_exists('mb_str_contains')) {
         function mb_str_contains (string $haystack, string $needle)
         {
-            return empty($needle) || mb_strpos($haystack, $needle) !== false;
+            return $needle === '' || mb_strpos($haystack, $needle) !== false;
         }
     }
 
     if (!function_exists('mb_str_ends_with')) {
         function mb_str_ends_with (string $haystack, string $needle)
         {
-            return empty($needle) || mb_substr($haystack, -mb_strlen($needle)) === $needle;
+            return $needle === '' || mb_substr($haystack, -mb_strlen($needle)) === $needle;
         }
     }
 }
@@ -178,8 +178,23 @@ namespace SlimMvcTools\Functions\Str {
         return strtolower($str);
     }
 
+    /**
+     * @param string $string string to be colored
+     * @param string $foreground_color any of 
+     *                                          'black', 'dark_gray', 'blue', 
+     *                                          'light_blue', 'green', 'light_green', 
+     *                                          'cyan', 'light_cyan', 'red', 'light_red', 
+     *                                          'purple', 'light_purple', 'brown', 'yellow', 
+     *                                          'light_gray' and 'white'
+     * @param string $background_color any of 
+     *                                         'black', 'red', 'green', 'yellow', 'blue', 
+     *                                         'magenta', 'cyan' and 'light_gray' 
+     * @return string
+     */
     function color_4_console(
-        string $string, $foreground_color = null, $background_color = null
+        string $string, 
+        string $foreground_color = 'white', 
+        string $background_color = 'black'
     ): string {
         if( PHP_OS !== 'Linux') {
             
@@ -218,17 +233,26 @@ namespace SlimMvcTools\Functions\Str {
         $background_colors['light_gray'] = '47';
 
         $colored_string = "";
-
-        // Check if given foreground color found
-        if (isset($foreground_colors[$foreground_color])) {
-
-            $colored_string .= "\033[" . $foreground_colors[$foreground_color] . "m";
-        }
-        // Check if given background color found
-        if (isset($background_colors[$background_color])) {
-
-            $colored_string .= "\033[" . $background_colors[$background_color] . "m";
-        }
+        
+        // add foreground color
+        $colored_string .= 
+            "\033[" . 
+            (
+                isset($foreground_colors[$foreground_color])
+                ? $foreground_colors[$foreground_color]
+                : $foreground_colors['white']
+            ) 
+            . "m";
+            
+        // add background color
+        $colored_string .= 
+            "\033[" .
+            (
+                isset($background_colors[$background_color])
+                ? $background_colors[$background_color]
+                : $background_colors['black']
+            )
+            . "m";
 
         // Add string and end coloring
         $colored_string .= $string . "\033[0m";
