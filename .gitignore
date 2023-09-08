@@ -37,5 +37,8 @@ phpunit.xml
 file-only-present-on-dev-pc-at-home.txt
 index.php
 
-# file below is generated when tests are run
+tests/test-template-output/logs/*
+!tests/test-template-output/logs/.gitkeep
+
+# files below are generated when tests are run
 tests/test-template-output/FooBar.php

@@ -21,7 +21,6 @@
         "rotexsoft/file-renderer": "^5.0.0",
         "vespula/log": "^2.2.3",
         "vespula/auth": "^2.1.1",
-        "sebastian/exporter": "^4.0",
         "psr/container": "^2.0",
         "pimple/pimple": "^3.5",
         "nyholm/psr7": "^1.5",

@@ -8,19 +8,13 @@ declare(strict_types=1);
  * The controller class must be \SlimMvcTools\Controllers\BaseController 
  * or one of its sub-classes
  * 
- * @param \Psr\Container\ContainerInterface $container
- * @param string $controller_name_from_url
- * @param string $action_name_from_url
- * @param \Psr\Http\Message\ServerRequestInterface $request
- * @param \Psr\Http\Message\ResponseInterface $response
- * 
  * @throws \Slim\Exception\HttpBadRequestException
  * @throws \Slim\Exception\HttpNotFoundException
  */
 function sMVC_CreateController(
     \Psr\Container\ContainerInterface $container, 
-    $controller_name_from_url, 
-    $action_name_from_url,
+    string $controller_name_from_url, 
+    string $action_name_from_url,
     \Psr\Http\Message\ServerRequestInterface $request, 
     \Psr\Http\Message\ResponseInterface $response
 ):\SlimMvcTools\Controllers\BaseController {
@@ -89,14 +83,33 @@ function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth): string {
 }
 
 /**
- * @param mixed $vals variables or expressions to dump
+ * @param mixed[] $vals variables or expressions to dump
  */
 function sMVC_DumpVar(...$vals): void {
 
+    $var_to_string = function($var): string {
+
+        // Start capturing the output
+        ob_start();
+
+        /** @psalm-suppress ForbiddenCode */
+        var_dump($var);
+
+        // Get the captured output, close the buffer & return the captured output
+        $output = ob_get_clean();
+
+        return ($output === false) ? '' : $output;
+    };
+    
     foreach($vals as $val) {
         
-        $val = (!is_string($val)) ? (new \SebastianBergmann\Exporter\Exporter())->export($val) : $val;
-        echo "<pre>$val</pre><br><br>";
+        $line_breaker = (PHP_SAPI === 'cli') ? PHP_EOL : '<br>';
+        $pre_open = (PHP_SAPI === 'cli') ? '' : '<pre>';
+        $pre_close = (PHP_SAPI === 'cli') ? '' : '</pre>';
+        
+        echo $pre_open . $var_to_string($val) . $pre_close 
+           . $line_breaker 
+           . $line_breaker;
     }
 }
 
@@ -222,7 +235,7 @@ function sMVC_GetSuperGlobal(string $global_name='', string $key='', $default_va
         }
     }
 
-    if( empty($global_name) ) {
+    if( $global_name === '' ) {
 
         //return everything
         return $super_globals;
@@ -236,7 +249,7 @@ function sMVC_GetSuperGlobal(string $global_name='', string $key='', $default_va
         $global_name = substr($global_name, 2);
     }
 
-    if( empty($key) ) {
+    if( $key === '' ) {
 
         //return everything for the specified global
         return array_key_exists($global_name, $super_globals)
@@ -355,7 +368,7 @@ END;
         FILE_APPEND
     ); // log to log file
     
-    error_log ( $log_message , 4 ); // message is sent directly to the SAPI logging handler.
+    error_log ( PHP_EOL . PHP_EOL . $log_message . PHP_EOL , 4 ); // message is sent directly to the SAPI logging handler.
 }
 
 /**
