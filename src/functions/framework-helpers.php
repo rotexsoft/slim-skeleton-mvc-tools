@@ -35,13 +35,17 @@ function sMVC_CreateController(
         
         if( $container->has('namespaces_for_controllers') ) {
             
+            /** @psalm-suppress MixedAssignment */
             $namespaces_4_controllers = $container->get('namespaces_for_controllers');
 
             //try to prepend name space
+            /** @psalm-suppress MixedAssignment */
             foreach($namespaces_4_controllers as $namespace_4_controllers) {
 
+                /** @psalm-suppress MixedOperand */
                 if( class_exists($namespace_4_controllers.$controller_class_name) ) {
 
+                    /** @psalm-suppress MixedOperand */
                     $controller_class_name = $namespace_4_controllers.$controller_class_name;
                     break;
                 }
@@ -68,6 +72,7 @@ function sMVC_CreateController(
     }
 
     //Create the controller object
+    /** @psalm-suppress UnsafeInstantiation */
     return new $controller_class_name($container, $controller_name_from_url, $action_name_from_url, $request, $response);
 }
 
@@ -77,8 +82,8 @@ function sMVC_CreateController(
  */
 function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth): string {
 
-    return 'Login Status: ' . $auth->getSession()->getStatus() . PHP_EOL
-         . 'Logged in Person\'s Username: ' . $auth->getUsername().PHP_EOL
+    return 'Login Status: ' . ( $auth->getSession()->getStatus() ?? '' ) . PHP_EOL
+         . 'Logged in Person\'s Username: ' . ( $auth->getUsername() ?? '' ).PHP_EOL
          . 'Logged in User\'s Data: ' . PHP_EOL . print_r($auth->getUserdata(), true);
 }
 
@@ -87,6 +92,7 @@ function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth): string {
  */
 function sMVC_DumpVar(...$vals): void {
 
+    /** @psalm-suppress MissingClosureParamType */
     $var_to_string = function($var): string {
 
         // Start capturing the output
@@ -101,6 +107,7 @@ function sMVC_DumpVar(...$vals): void {
         return ($output === false) ? '' : $output;
     };
     
+    /** @psalm-suppress MixedAssignment */
     foreach($vals as $val) {
         
         $line_breaker = (PHP_SAPI === 'cli') ? PHP_EOL : '<br>';
@@ -123,6 +130,7 @@ function sMVC_DumpVar(...$vals): void {
  * 
  * @deprecated since version 4.x
  * @see SlimMvcTools\Controllers\BaseController->getAppBasePath()
+ * @psalm-suppress MixedInferredReturnType
  */
 function sMVC_GetBaseUrlPath(): string {
 
@@ -131,6 +139,7 @@ function sMVC_GetBaseUrlPath(): string {
     if( !$server ) {
 
         //copy / capture the super global only once
+        /** @psalm-suppress MixedAssignment */
         $server = sMVC_GetSuperGlobal('server');
     }
 
@@ -138,11 +147,19 @@ function sMVC_GetBaseUrlPath(): string {
 
         $base_path = '';
         $has_been_computed = true;
+        /** 
+         * @psalm-suppress MixedArgument 
+         * @psalm-suppress MixedArrayAccess 
+         */
         $requestScriptName = (string) parse_url($server['SCRIPT_NAME'], PHP_URL_PATH);
         $requestScriptDir = dirname($requestScriptName);
         
         // parse_url() requires a full URL. As we don't extract the domain name or scheme,
         // we use a stand-in.
+        /** 
+         * @psalm-suppress MixedArrayAccess
+         * @psalm-suppress MixedOperand
+         */
         $requestUri = (string) parse_url( 'http://example.com' . $server['REQUEST_URI'], PHP_URL_PATH);
 
         if (stripos($requestUri, $requestScriptName) === 0) {
@@ -155,6 +172,7 @@ function sMVC_GetBaseUrlPath(): string {
         }
     }
 
+    /** @psalm-suppress MixedReturnStatement */
     return $base_path;
 }
 
@@ -170,6 +188,7 @@ function sMVC_GetBaseUrlPath(): string {
  */
 function sMVC_MakeLink(string $path): string {
     
+    /** @psalm-suppress DeprecatedFunction */
     return sMVC_GetBaseUrlPath(). '/'.ltrim($path, '/');
 }
 
@@ -218,12 +237,42 @@ function sMVC_GetSuperGlobal(string $global_name='', string $key='', $default_va
     if( !$super_globals ) {
 
         $super_globals = [];
-        $super_globals['server'] = isset($_SERVER)? $_SERVER : []; //copy
-        $super_globals['get'] = isset($_GET)? $_GET : []; //copy
-        $super_globals['post'] = isset($_POST)? $_POST : []; //copy
-        $super_globals['files'] = isset($_FILES)? $_FILES : []; //copy
-        $super_globals['cookie'] = isset($_COOKIE)? $_COOKIE : []; //copy
-        $super_globals['env'] = isset($_ENV)? $_ENV : []; //copy
+        
+        /** 
+         * @psalm-suppress RedundantCondition 
+         * @psalm-suppress TypeDoesNotContainNull 
+         */
+        $super_globals['server'] = $_SERVER ?? []; //copy
+        
+        /** 
+         * @psalm-suppress RedundantCondition 
+         * @psalm-suppress TypeDoesNotContainNull 
+         */
+        $super_globals['get'] = $_GET ?? []; //copy
+        
+        /** 
+         * @psalm-suppress RedundantCondition 
+         * @psalm-suppress TypeDoesNotContainNull 
+         */
+        $super_globals['post'] = $_POST ?? []; //copy
+        
+        /** 
+         * @psalm-suppress RedundantCondition 
+         * @psalm-suppress TypeDoesNotContainNull 
+         */
+        $super_globals['files'] = $_FILES ?? []; //copy
+        
+        /** 
+         * @psalm-suppress RedundantCondition 
+         * @psalm-suppress TypeDoesNotContainNull 
+         */
+        $super_globals['cookie'] = $_COOKIE ?? []; //copy
+        
+        /** 
+         * @psalm-suppress RedundantCondition 
+         * @psalm-suppress TypeDoesNotContainNull 
+         */
+        $super_globals['env'] = $_ENV ?? []; //copy
 
         if( $is_session_started ) {
 
@@ -252,6 +301,7 @@ function sMVC_GetSuperGlobal(string $global_name='', string $key='', $default_va
     if( $key === '' ) {
 
         //return everything for the specified global
+        /** @psalm-suppress MixedArgument */
         return array_key_exists($global_name, $super_globals)
                                     ? $super_globals[$global_name] : [];
     }
@@ -263,6 +313,12 @@ function sMVC_GetSuperGlobal(string $global_name='', string $key='', $default_va
     }
 
     //return value of the specified key in the specified global or the default value
+    /** 
+     * @psalm-suppress MixedArrayAccess
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress PossiblyNullArgument
+     * @psalm-suppress PossiblyNullArrayAccess
+     */
     return array_key_exists($key, $super_globals[$global_name])
                                 ? $super_globals[$global_name][$key] : $default_val;
 
@@ -292,15 +348,14 @@ function sMVC_UriToString(\Psr\Http\Message\UriInterface $uri): string {
  * @param string $param_name
  * @param string $param_value 
  */
-function sMVC_addQueryStrParamToUri(
+function sMVC_AddQueryStrParamToUri(
     \Psr\Http\Message\UriInterface $uri, string $param_name, string $param_value
 ): \Psr\Http\Message\UriInterface {
-    
+
     $query_params = [];
     parse_str($uri->getQuery(), $query_params); // Extract existing query string params to an array
-    
     $query_params[$param_name] = $param_value; // Add new param the query string params array
-    
+
     return $uri->withQuery(http_build_query($query_params)); // return a uri object with updated query params
 }
 
@@ -346,9 +401,7 @@ function sMVC_DisplayAndLogFrameworkFileNotFoundError(
 END;
     echo $file_missing_error_page;
 
-    $current_uri = isset($_SERVER['PATH_INFO'])
-             ? $_SERVER['PATH_INFO']
-             : '';
+    $current_uri = $_SERVER['PATH_INFO'] ?? '';
     $current_uri .= isset($_SERVER['QUERY_STRING'])
             ? '?' . $_SERVER['QUERY_STRING']
             : '';
@@ -367,7 +420,7 @@ END;
         '[' . date('Y-M-d g:i:s A') . '] ' . $log_message . PHP_EOL,
         FILE_APPEND
     ); // log to log file
-    
+
     error_log ( PHP_EOL . PHP_EOL . $log_message . PHP_EOL , 4 ); // message is sent directly to the SAPI logging handler.
 }
 
@@ -380,6 +433,7 @@ END;
  *       relevant to the environment you are installing your web-app.
  * 
  * @param string $app_path should be set to the absolute path of where your mvc app is installed just pass SMVC_APP_ROOT_PATH
+ * @psalm-suppress MixedInferredReturnType
  */
 function sMVC_DoGetCurrentAppEnvironment(string $app_path): string {
 
@@ -402,10 +456,12 @@ function sMVC_DoGetCurrentAppEnvironment(string $app_path): string {
             exit;
         } // if( !file_exists($env_file) )
 
+        /** @psalm-suppress MixedAssignment */
         $current_env = include $env_file_path;
 
     } // if( !$current_env )
 
+    /** @psalm-suppress MixedReturnStatement */
     return $current_env;
 }
 

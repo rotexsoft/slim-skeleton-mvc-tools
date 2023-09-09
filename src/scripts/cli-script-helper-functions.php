@@ -34,28 +34,31 @@ Options:
   -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 
 HELP;
-    echo printInfo( $help);
+    printInfo( $help);
 }
 
 /**
- * @param array $args a non-associative array of strings [ 'key1', 'val1', .... 'keyN', 'valN'].
+ * @param string[] $args a non-associative array of strings [ 'key1', 'val1', .... 'keyN', 'valN'].
  *                    Values with even indices are the keys while values with odd indices are the
  *                    values.
  *                    For example, $args[0] is the key to $args[1], $args[2] is the key to $args[3], etc.
- *
- * @return boolean|string
  */
-function getOptVal(string $opt, array $args) {
+function getOptVal(string $opt, array $args): string {
 
     $search_key = $opt;
 
-    $opts_index = array_search($search_key, $args);
+    $opts_index = array_search($search_key, $args, true);
 
+    /** 
+     * @psalm-suppress InvalidOperand
+     * @psalm-suppress MixedArrayOffset
+     */
     if( $opts_index === false || !isset($args[++$opts_index]) ) {
 
-        return false;
+        return '';
     }
 
+    /** @psalm-suppress MixedArrayOffset */
     return $args[$opts_index];
 }
 
@@ -109,16 +112,16 @@ function isValidNamespaceName(string $namepace_4_controller): bool {
 
 function printError(string $str, bool $append_new_line = true): void {
 
-    echo \SlimMvcTools\Functions\Str\color_4_console( "ERROR: $str", "red",  "black");
+    echo \SlimMvcTools\Functions\Str\color_4_console( "ERROR: {$str}", "red",  "black");
 
-    if( ((bool)$append_new_line) ) { echo PHP_EOL; }
+    if( $append_new_line ) { echo PHP_EOL; }
 }
 
 function printInfo(string $str, bool $append_new_line = true): void {
 
     echo \SlimMvcTools\Functions\Str\color_4_console( $str, "green",  "black");
 
-    if( ((bool)$append_new_line) ) { echo PHP_EOL; }
+    if( $append_new_line ) { echo PHP_EOL; }
 }
 
 function normalizeNameSpaceName(string $namespace_name): string {
@@ -194,8 +197,8 @@ function processTemplateFile(string $target, string $dest, array $replaces) {
 }
 
 /**
- * @param int $argc
- * @param array $argv
+ * @param int|string $argc number of arguments
+ * @param string[] $argv
  *
  * @return void
  *
@@ -221,8 +224,8 @@ function createController($argc, array $argv) {
 
     if( !is_int($argc) ) {
 
-        $err_msg = 'The expected value for the first argument to '
-                   . '`' . __FUNCTION__ . '($argc, array $argv)` should be an int.'
+        $err_msg = 'The expected value for the first argument to `' 
+                   . __FUNCTION__ . '($argc, array $argv)` should be an int.'
                    . ' `'. ucfirst(gettype($argc)). '` with the value below was supplied:'.PHP_EOL
                    . var_export($argc, true).PHP_EOL.PHP_EOL
                    . 'Good bye!!!';
@@ -231,8 +234,8 @@ function createController($argc, array $argv) {
 
     if( count($argv) < 1 ) {
 
-        $err_msg = 'The expected value for the second argument to '
-                   . '`' . __FUNCTION__ . '($argc, array $argv)` should be an array with at least one element. Empty Array was supplied.'
+        $err_msg = 'The expected value for the second argument to `' 
+                   . __FUNCTION__ . '($argc, array $argv)` should be an array with at least one element. Empty Array was supplied.'
                    . 'This second argument is expected to be the $argv array passed by PHP to the script calling this function.';
         throw new \InvalidArgumentException($err_msg);
     }
@@ -271,7 +274,7 @@ function createController($argc, array $argv) {
         $templates_dir = dirname(__DIR__).$ds.'templates'.$ds;
         $controller_name = getOptVal('--controller-name', $argv);
 
-        if($controller_name === false) {
+        if($controller_name === '') {
 
             $controller_name = getOptVal('-c', $argv);
         }
@@ -288,7 +291,7 @@ function createController($argc, array $argv) {
 
         $src_folder_path = getOptVal('--path-to-src-folder', $argv);
 
-        if($src_folder_path === false) {
+        if($src_folder_path === '') {
 
             $src_folder_path = getOptVal('-p', $argv);
         }
@@ -302,15 +305,15 @@ function createController($argc, array $argv) {
         }
 
         ////////////////////////////////////////////////////////////////////////////
-        $default_controller_2_extend = '\\SlimMvcTools\\Controllers\\BaseController';
+        $default_controller_2_extend = '\\' . \SlimMvcTools\Controllers\BaseController::class;
 
         $controller_2_extend = getOptVal('--extends-controller', $argv);
 
-        if($controller_2_extend === false) {
+        if($controller_2_extend === '') {
 
             $controller_2_extend = getOptVal('-e', $argv);
 
-            if($controller_2_extend !== false) {
+            if ($controller_2_extend !== '') {
 
                 if( !isValidExtendsClassName($controller_2_extend) ) {
 
@@ -323,24 +326,22 @@ function createController($argc, array $argv) {
                 //use default controller class to be extended
                 $controller_2_extend = $default_controller_2_extend;
             }
-        } else {
+        } elseif( !isValidExtendsClassName($controller_2_extend) ) {
 
-            if( !isValidExtendsClassName($controller_2_extend) ) {
-
-                printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
-                return;
-            }
+            printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
+            return;
         }
 
         ////////////////////////////////////////////////////////////////////////////
-        $namepace_declaration = '';//omit namespace declaration by default
+        $namepace_declaration = '';
+        //omit namespace declaration by default
         $namepace_4_controller = getOptVal('--namespace-4-controller', $argv);
 
-        if($namepace_4_controller === false) {
+        if($namepace_4_controller === '') {
 
             $namepace_4_controller = getOptVal('-n', $argv);
 
-            if($namepace_4_controller !== false) {
+            if($namepace_4_controller !== '') {
 
                 if( !isValidNamespaceName($namepace_4_controller) ) {
 
@@ -457,18 +458,11 @@ function createController($argc, array $argv) {
 
         printInfo("All done!!");
 
-        if ( strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-            
-            printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
-
-        } else {
-            
-            printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
-        }
+        printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
         //we are done
 
     } else {
-
+        /** @psalm-suppress MixedArgument */
         displayHelp(basename($argv[0]));
     }
     //////////////////////////////////

@@ -1,11 +1,11 @@
 <?php
 use \SlimMvcTools\Utils;
+
 /**
  * @author Rotimi Adegbamigbe
  */
 class UtilsTest extends \PHPUnit\Framework\TestCase
 {
-
     protected function setUp(): void {
         
         parent::setUp();

@@ -39,6 +39,9 @@ index.php
 
 tests/test-template-output/logs/*
 !tests/test-template-output/logs/.gitkeep
+!tests/fake-smvc-app-root/src/views/base/index.php
+!tests/fake-smvc-app-root/src/views/child-controller/index.php
+!tests/fake-smvc-app-root/src/views/grand-child-controller/index.php
 
 # files below are generated when tests are run
 tests/test-template-output/FooBar.php

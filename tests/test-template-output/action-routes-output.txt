@@ -1,0 +1,37 @@
+Layout: View:             <h1>App Routes</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Controller Class Name</th>
+                        <th>Action Method Name</th>
+                        <th>Route</th>
+                    </tr>
+                </thead>
+                <tbody>
+                                            <tr>
+                            <td>SlimMvcTools\Controllers\BaseController</td>
+                            <td>actionIndex</td>
+                            <td>base-controller/index</td>
+                        </tr>
+                                            <tr>
+                            <td>SlimMvcTools\Controllers\BaseController</td>
+                            <td>actionLogin</td>
+                            <td>base-controller/login</td>
+                        </tr>
+                                            <tr>
+                            <td>SlimMvcTools\Controllers\BaseController</td>
+                            <td>actionLoginStatus</td>
+                            <td>base-controller/login-status</td>
+                        </tr>
+                                            <tr>
+                            <td>SlimMvcTools\Controllers\BaseController</td>
+                            <td>actionLogout</td>
+                            <td>base-controller/logout[/show_status_on_completion=false]</td>
+                        </tr>
+                                            <tr>
+                            <td>SlimMvcTools\Controllers\BaseController</td>
+                            <td>actionRoutes</td>
+                            <td>base-controller/routes[/onlyPublicMethodsPrefixedWithAction=true]</td>
+                        </tr>
+                                    </tbody>
+            </table>

@@ -10,6 +10,7 @@ use \Psr\Container\ContainerInterface;
  * Description of Container
  *
  * @author rotimi
+ * @psalm-suppress UnusedClass
  */
 class Container extends PimpleContainer implements ContainerInterface {
 

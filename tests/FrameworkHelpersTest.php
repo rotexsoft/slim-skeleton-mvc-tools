@@ -1,74 +1,18 @@
 <?php
 declare(strict_types=1);
 
-use Pimple\Container;
-use Pimple\Psr11\Container as PsrContainer;
-
 /**
- * Description of StrHelpersTest
+ * Description of FrameworkHelpersTest
  *
  * @author rotimi
  */
 class FrameworkHelpersTest extends \PHPUnit\Framework\TestCase
 {
+    use BaseControllerDependenciesTrait;
+    
     protected function setUp(): void {
         
         parent::setUp();
-    }
-    
-    protected function newResponse(): \Psr\Http\Message\ResponseInterface {
-        
-        $psr17Factory = new \Nyholm\Psr7\Factory\Psr17Factory();
-        $responseBody = $psr17Factory->createStream('Hello world');
-        $response = $psr17Factory->createResponse(200)->withBody($responseBody);
-        
-        return $response;
-    }
-    
-    protected function newRequest(): \Psr\Http\Message\ServerRequestInterface {
-        
-        $psr17Factory = new \Nyholm\Psr7\Factory\Psr17Factory();
-        $request = $psr17Factory->createServerRequest('GET', 'http://tnyholm.se/blah?var=1');
-        
-        return $request;
-    }
-    
-    protected function newVespulaAuth(): \Vespula\Auth\Auth {
-
-        $pdo = new \PDO(
-                    'sqlite::memory:', 
-                    null, 
-                    null, 
-                    [
-                        PDO::ATTR_PERSISTENT => true, 
-                        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION
-                    ]
-                );
-        $pass1 = password_hash('admin' , PASSWORD_DEFAULT);
-        $pass2 = password_hash('root' , PASSWORD_DEFAULT);
-
-        $sql = <<<SQL
-DROP TABLE IF EXISTS "user_authentication_accounts";
-CREATE TABLE user_authentication_accounts (
-    username VARCHAR(255), password VARCHAR(255)
-);
-INSERT INTO "user_authentication_accounts" VALUES( 'admin', '$pass1' );
-INSERT INTO "user_authentication_accounts" VALUES( 'root', '$pass2' );
-SQL;
-        $pdo->exec($sql); //add two default user accounts
-
-        //Optionally pass a maximum idle time and a time until the session 
-        //expires (in seconds)
-        $expire = 3600;
-        $max_idle = 1200;
-        $session = new \Vespula\Auth\Session\Session($max_idle, $expire);
-
-        $cols = ['username', 'password'];
-        $from = 'user_authentication_accounts';
-        $where = ''; //optional
-        $adapter = new \Vespula\Auth\Adapter\Sql($pdo, $from, $cols, $where);
-
-        return new \Vespula\Auth\Auth($adapter, $session);
     }
 
     public function testThat_sMVC_CreateController_WorksAsExpected() {
@@ -77,33 +21,9 @@ SQL;
         // START: Setup Container, Request & Response  
         // objects needed by sMVC_CreateController
         /////////////////////////////////////////////////
-        $container = new Container();
-        $container['settings'] = [
-            'displayErrorDetails' => false,
-            'logErrors' => false,
-            'logErrorDetails' => false,
-            'addContentLengthHeader' => true,
-            
-            'app_base_path' => '',
-            'error_template_file'=> 'error-template.php',
-            'use_mvc_routes' => true,
-            'mvc_routes_http_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-            'auto_prepend_action_to_action_method_names' => false,
-            'default_controller_class_name' => \SlimMvcTools\Controllers\BaseController::class,
-            'default_action_name' => 'actionIndex',
-
-            'error_handler_class' => \SlimMvcTools\ErrorHandler::class,
-            'html_renderer_class' => \SlimMvcTools\HtmlErrorRenderer::class,
-            'log_renderer_class'  => \SlimMvcTools\LogErrorRenderer::class,
-        ];
-        $container['namespaces_for_controllers'] = [
-            '\\SlimMvcTools\\Controllers\\',
-            '\\SMVCTools\\Tests\\TestObjects\\',
-        ];
-        $psr11Container = new PsrContainer($container);
-        
         $req = $this->newRequest();
         $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
         /////////////////////////////////////////////
         // END: Setup Container, Request & Response  
         // objects needed by sMVC_CreateController
@@ -225,20 +145,20 @@ SQL;
         self::assertArrayHasKey('env', $all_globals);
         self::assertArrayHasKey('session', $all_globals);
         
-        self::assertEquals(isset($_SERVER)? $_SERVER : [], $all_globals['server']);
-        self::assertEquals(isset($_GET)? $_GET : [], $all_globals['get']);
-        self::assertEquals(isset($_POST)? $_POST : [], $all_globals['post']);
-        self::assertEquals(isset($_FILES)? $_FILES : [], $all_globals['files']);
-        self::assertEquals(isset($_COOKIE)? $_COOKIE : [], $all_globals['cookie']);
-        self::assertEquals(isset($_ENV)? $_ENV : [], $all_globals['env']);
+        self::assertEquals($_SERVER ?? [], $all_globals['server']);
+        self::assertEquals($_GET ?? [], $all_globals['get']);
+        self::assertEquals($_POST ?? [], $all_globals['post']);
+        self::assertEquals($_FILES ?? [], $all_globals['files']);
+        self::assertEquals($_COOKIE ?? [], $all_globals['cookie']);
+        self::assertEquals($_ENV ?? [], $all_globals['env']);
         self::assertEquals($_SESSION, $all_globals['session']);
         
-        self::assertEquals(isset($_SERVER)? $_SERVER : [], sMVC_GetSuperGlobal('$_server'));
-        self::assertEquals(isset($_GET)? $_GET : [], sMVC_GetSuperGlobal('$_get'));
-        self::assertEquals(isset($_POST)? $_POST : [], sMVC_GetSuperGlobal('$_post'));
-        self::assertEquals(isset($_FILES)? $_FILES : [], sMVC_GetSuperGlobal('$_files'));
-        self::assertEquals(isset($_COOKIE)? $_COOKIE : [], sMVC_GetSuperGlobal('$_cookie'));
-        self::assertEquals(isset($_ENV)? $_ENV : [], sMVC_GetSuperGlobal('$_env'));
+        self::assertEquals($_SERVER ?? [], sMVC_GetSuperGlobal('$_server'));
+        self::assertEquals($_GET ?? [], sMVC_GetSuperGlobal('$_get'));
+        self::assertEquals($_POST ?? [], sMVC_GetSuperGlobal('$_post'));
+        self::assertEquals($_FILES ?? [], sMVC_GetSuperGlobal('$_files'));
+        self::assertEquals($_COOKIE ?? [], sMVC_GetSuperGlobal('$_cookie'));
+        self::assertEquals($_ENV ?? [], sMVC_GetSuperGlobal('$_env'));
         self::assertEquals($_SESSION, sMVC_GetSuperGlobal('$_session'));
         
         self::assertEquals([], sMVC_GetSuperGlobal('non-existent'));
@@ -268,7 +188,7 @@ SQL;
     
     public function testThat_sMVC_addQueryStrParamToUri_WorksAsExpected() {
         
-        $result = sMVC_addQueryStrParamToUri(
+        $result = sMVC_AddQueryStrParamToUri(
                     $this->newRequest()->getUri(),
                     'baa', 'yoo'
                 );

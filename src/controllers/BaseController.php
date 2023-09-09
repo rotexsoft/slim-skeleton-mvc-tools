@@ -5,16 +5,13 @@ namespace SlimMvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
     \Psr\Http\Message\ResponseInterface,
-    \SlimMvcTools\Utils,
-    \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException,
-    \SlimMvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException;
+    \SlimMvcTools\Utils;
 
 /**
  *
  * Description of BaseController
  *
  * @author Rotimi Adegbamigbe
- *
  */
 class BaseController
 {
@@ -78,8 +75,11 @@ class BaseController
      * http://localhost/slim-skeleton-mvc-app/public/base-controller/
      * will result in $this->action_name_from_uri === ''
      */
-    protected string $action_name_from_uri;
+    protected string $action_name_from_uri = '';
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function getActionNameFromUri(): string {
         
         return $this->action_name_from_uri;
@@ -96,8 +96,11 @@ class BaseController
      * http://localhost/slim-skeleton-mvc-app/public/
      * will result in $this->controller_name_from_uri === ''
      */
-    protected string $controller_name_from_uri;
+    protected string $controller_name_from_uri = '';
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function getControllerNameFromUri(): string {
         
         return $this->controller_name_from_uri;
@@ -105,8 +108,18 @@ class BaseController
 
     /**
      * The full url of the current request e.g. http://someserver.com/controller/action
+     * @psalm-suppress PossiblyUnusedProperty
      */
     protected string $current_uri;
+    
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getCurrentUri(): string {
+        
+        return $this->current_uri;
+    }
 
     /**
      * The name of the layout file that will be rendered by $this->layout_renderer inside
@@ -117,20 +130,15 @@ class BaseController
     //////////////////////////////////
     // Session Parameter keys
     //////////////////////////////////
-    const SESSN_PARAM_LOGIN_REDIRECT = 'login_redirect_path';
+    public const SESSN_PARAM_LOGIN_REDIRECT = 'login_redirect_path';
     
     /**
-     *
-     * @param \Psr\Container\ContainerInterface $container
-     * @param string $controller_name_from_uri
-     * @param string $action_name_from_uri
-     * @param \Psr\Http\Message\ServerRequestInterface $req
-     * @param \Psr\Http\Message\ResponseInterface $res
-     *
+     * 
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function __construct(
         \Psr\Container\ContainerInterface $container, 
-        string $controller_name_from_uri, 
+        string $controller_name_from_uri,
         string $action_name_from_uri,
         ServerRequestInterface $req, 
         ResponseInterface $res
@@ -139,10 +147,19 @@ class BaseController
         $this->request = $req;
         $this->response = $res;
         $this->current_uri = sMVC_UriToString($req->getUri());
-        $this->action_name_from_uri = $action_name_from_uri;
-        $this->controller_name_from_uri = $controller_name_from_uri;
+        $this->action_name_from_uri = ($action_name_from_uri !== '') ? $action_name_from_uri : $this->action_name_from_uri;
+        $this->controller_name_from_uri = ($controller_name_from_uri !== '') ? $controller_name_from_uri : $this->controller_name_from_uri;
+        
+        /** @psalm-suppress MixedAssignment */
+        $this->vespula_auth = $this->getContainerItem('vespula_auth');
+        
+        /** @psalm-suppress MixedAssignment */
+        $this->layout_renderer = $this->getContainerItem('new_layout_renderer');
+        
+        /** @psalm-suppress MixedAssignment */
+        $this->view_renderer = $this->getContainerItem('new_view_renderer');
 
-        if( empty($controller_name_from_uri) || empty($action_name_from_uri) ) {
+        if( ($this->controller_name_from_uri === '') || ($this->action_name_from_uri === '') ) {
 
             // calculate $this->controller_name_from_uri and / or
             // $this->action_name_from_uri if necessary
@@ -150,7 +167,7 @@ class BaseController
             $uri_path = ($req->getUri() instanceof \Psr\Http\Message\UriInterface)
                                                         ? $req->getUri()->getPath() : '';
 
-            if( !empty($uri_path) && $uri_path !== '/' && strpos($uri_path, '/') !== false ) {
+            if( ($uri_path !== '') && $uri_path !== '/' && strpos($uri_path, '/') !== false ) {
 
                 if( $uri_path[0] === '/' ) {
 
@@ -160,12 +177,12 @@ class BaseController
 
                 $uri_path_parts = explode('/', $uri_path);
 
-                if( count($uri_path_parts) >= 1 && empty($controller_name_from_uri) ) {
+                if( count($uri_path_parts) >= 1 && ($this->controller_name_from_uri === '') ) {
 
                     $this->controller_name_from_uri = $uri_path_parts[0];
                 }
 
-                if( count($uri_path_parts) >= 2 && empty($action_name_from_uri) ) {
+                if( count($uri_path_parts) >= 2 && ($this->action_name_from_uri === '') ) {
 
                     $this->action_name_from_uri = $uri_path_parts[1];
                 }
@@ -176,36 +193,15 @@ class BaseController
     }
 
     /**
-     * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function ensureVespulaAuthObjectIsSet(): self {
-
-        if( !($this->vespula_auth instanceof \Vespula\Auth\Auth) ) {
-
-            try {
-
-                $this->vespula_auth = $this->getContainerItem('vespula_auth');
-
-            } catch (ExpectedContainerItemMissingException $ex) {
-
-                $msg = "ERROR: The `vespula_auth` property of `" . get_class($this) . "`"
-                     . " must be set via a call to `" . get_class($this) . '::setVespulaAuthObject(...)` '
-                     . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.'
-                     . PHP_EOL;
-
-                throw new IncorrectlySetPropertyException($msg);
-            }
-        } // if( !($this->vespula_auth instanceof \Vespula\Auth\Auth) )
+    public function getVespulaAuthObject(): \Vespula\Auth\Auth {
         
-        return $this;
+        return $this->vespula_auth;
     }
 
     /**
-     * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
-     * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS
-     * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
-     *
-     * @param \Vespula\Auth\Auth $vespula_auth
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function setVespulaAuthObject(\Vespula\Auth\Auth $vespula_auth): self {
 
@@ -215,11 +211,15 @@ class BaseController
     }
 
     /**
-     * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
-     * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS
-     * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
-     *
-     * @param \Rotexsoft\FileRenderer\Renderer $renderer
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getLayoutRenderer(): \Rotexsoft\FileRenderer\Renderer {
+        
+        return $this->layout_renderer;
+    }
+
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function setLayoutRenderer(\Rotexsoft\FileRenderer\Renderer $renderer): self {
 
@@ -229,11 +229,15 @@ class BaseController
     }
 
     /**
-     * USING SETTER INJECTION AS OPPOSED TO CONSTRUCTOR INJECTION TO AVOID HARD DEPENDENCY ON THE
-     * OBJECT BEING SET BY THIS METHOD. USERS OF THIS CLASS SHOULD MAKE SURE THIS SETTER IS
-     * CALLED BEFORE CALLING ANY OTHER METHOD IN THIS CLASS THAT RELIES ON THE SET OBJECT.
-     *
-     * @param \Rotexsoft\FileRenderer\Renderer $renderer
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getViewRenderer(): \Rotexsoft\FileRenderer\Renderer {
+        
+        return $this->view_renderer;
+    }
+
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function setViewRenderer(\Rotexsoft\FileRenderer\Renderer $renderer): self {
 
@@ -242,11 +246,17 @@ class BaseController
         return $this;
     }
 
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function getRequest():\Psr\Http\Message\ServerRequestInterface {
 
         return $this->request;
     }
-    
+
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function setRequest(\Psr\Http\Message\ServerRequestInterface $request): self {
 
         $this->request = $request;
@@ -254,6 +264,9 @@ class BaseController
         return $this;
     }
 
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function getResponse(): \Psr\Http\Message\ResponseInterface {
 
         return $this->response;
@@ -266,8 +279,13 @@ class BaseController
         return $this;
     }
     
+    /** @psalm-suppress MixedInferredReturnType */
     public function getAppBasePath(): string {
         
+        /** 
+         * @psalm-suppress MixedArrayAccess
+         * @psalm-suppress MixedReturnStatement
+         */
         return $this->getContainer()->get('settings')['app_base_path'];
     }
     
@@ -290,34 +308,23 @@ class BaseController
      *                    will result in a variable named $content (with a
      *                    value of 'yabadabadoo') being available in the layout
      *                    file (i.e. the file named $file_name).
-     *
-     * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * 
+     * @psalm-suppress MixedInferredReturnType
      *
      */
     public function renderLayout( string $file_name, array $data = ['content'=>'Content should be placed here!'] ): string {
 
-        if( !($this->layout_renderer instanceof \Rotexsoft\FileRenderer\Renderer) ) {
-
-            try {
-                $this->layout_renderer = $this->getContainerItem('new_layout_renderer');
-
-            } catch (ExpectedContainerItemMissingException $ex) {
-
-                $msg = "ERROR: The `layout_renderer` property of `" . get_class($this) . "`"
-                     . " must be set via a call to `" . get_class($this) . '::setLayoutRenderer(...)` '
-                     . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.'
-                     . PHP_EOL;
-
-                throw new IncorrectlySetPropertyException($msg);
-            }
-        } // if( !($this->layout_renderer instanceof \Rotexsoft\FileRenderer\Renderer) )
-
         $self = $this;
-        $data['sMVC_MakeLink'] = function(string $path) use ($self): string {
-            
-            return $self->makeLink($path);
-        };
+        $data['sMVC_MakeLink'] = fn(string $path): string => $self->makeLink($path);
         
+        // get new instance
+        /** @psalm-suppress MixedAssignment */
+        $this->layout_renderer = $this->getContainerItem('new_layout_renderer');
+        
+        /** 
+         * @psalm-suppress MixedReturnStatement
+         * @psalm-suppress MixedMethodCall
+         */
         return $this->layout_renderer->renderToString($file_name, $data);
     }
 
@@ -337,31 +344,19 @@ class BaseController
      *                    will result in a variable named $content (with a
      *                    value of 'yabadabadoo') being available in the view
      *                    file (i.e. the file named $file_name).
-     *
-     * @throws \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * 
+     * @psalm-suppress MixedInferredReturnType
      */
     public function renderView( string $file_name, array $data = [] ): string {
 
-        if( !($this->view_renderer instanceof \Rotexsoft\FileRenderer\Renderer) ) {
-
-            try {
-                $this->view_renderer = $this->getContainerItem('new_view_renderer');
-
-            } catch (ExpectedContainerItemMissingException $ex) {
-
-                $msg = "ERROR: The `view_renderer` property of `" . get_class($this) . "`"
-                     . " must be set via a call to `" . get_class($this) . '::setViewRenderer(...)` '
-                     . " before calling `" . get_class($this) . '::' . __FUNCTION__ . '(...)`.'
-                     . PHP_EOL;
-
-                throw new IncorrectlySetPropertyException($msg);
-            }
-        }
-
         $parent_classes = [];
         $parent_class = get_parent_class($this);
+        
+        // get new instance
+        /** @psalm-suppress MixedAssignment */
+        $this->view_renderer = $this->getContainerItem('new_view_renderer');
 
-        while( $parent_class !== __CLASS__ && !empty($parent_class) ) {
+        while( $parent_class !== self::class && ($parent_class !== '' && $parent_class !== false) ) {
 
             $parent_classes[] =
                 (new \ReflectionClass($parent_class))->getShortName();
@@ -373,41 +368,49 @@ class BaseController
         //It takes precedence over the view folder
         //for the base controller.
         $ds = DIRECTORY_SEPARATOR;
+        
+        /** @psalm-suppress UndefinedConstant */
         $path_2_view_files = SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds;
 
         while ( $parent_class = array_pop($parent_classes) ) {
 
             $parent_class_folder = \SlimMvcTools\Functions\Str\toDashes($parent_class);
 
+            /** @psalm-suppress MixedMethodCall */
             if(
                 !$this->view_renderer->hasPath($path_2_view_files . $parent_class_folder)
                 && file_exists($path_2_view_files . $parent_class_folder)
             ) {
+                /** @psalm-suppress MixedMethodCall */
                 $this->view_renderer->prependPath($path_2_view_files . $parent_class_folder);
             }
         }
 
         //finally add my view folder
+        /** @psalm-suppress MixedMethodCall */
         if(
-            !$this->view_renderer->hasPath($path_2_view_files . $this->controller_name_from_uri)
+            $this->controller_name_from_uri !== ''
+            && !$this->view_renderer->hasPath($path_2_view_files . $this->controller_name_from_uri)
             && file_exists($path_2_view_files . $this->controller_name_from_uri)
         ) {
+            /** @psalm-suppress MixedMethodCall */
             $this->view_renderer->prependPath($path_2_view_files . $this->controller_name_from_uri);
         }
 
         $self = $this;
-        $data['sMVC_MakeLink'] = function(string $path) use ($self): string {
-            
-            return $self->makeLink($path);
-        };
+        $data['sMVC_MakeLink'] = fn(string $path): string => $self->makeLink($path);
         
+        /** 
+         * @psalm-suppress MixedReturnStatement
+         * @psalm-suppress MixedMethodCall
+         */
         return $this->view_renderer->renderToString($file_name, $data);
     }
 
     /**
-     * @return \Psr\Http\Message\ResponseInterface|string
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function actionIndex() {
+    public function actionIndex(): string {
 
         //get the contents of the view first
         $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
@@ -421,12 +424,13 @@ class BaseController
      * @param bool $onlyPublicMethodsPrefixedWithAction true to include only public methods prefixed with `action`
      *                                                  or false to include all public methods
      * @return \Psr\Http\Message\ResponseInterface|string
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function actionRoutes($onlyPublicMethodsPrefixedWithAction=true) {
 
         $resp = $this->getResponseObjForLoginRedirectionIfNotLoggedIn();
 
-        if($resp !== false) {
+        if($resp instanceof \Psr\Http\Message\ResponseInterface) {
 
             return $resp;
         }
@@ -434,6 +438,7 @@ class BaseController
         ini_set('memory_limit', '256M');
         ini_set('max_execution_time', '0');
 
+        /** @psalm-suppress RedundantCastGivenDocblockType */
         $view_str = $this->renderView(
             'controller-classes-by-action-methods-report.php',
             ['onlyPublicMethodsPrefixedWithAction'=> ((bool)$onlyPublicMethodsPrefixedWithAction)]
@@ -444,6 +449,7 @@ class BaseController
 
     /**
      * @return \Psr\Http\Message\ResponseInterface|string
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function actionLogin() {
 
@@ -467,6 +473,7 @@ class BaseController
             //this is a POST request, process login
             $controller = $this->login_success_redirect_controller ?: 'base-controller';
 
+            /** @psalm-suppress UndefinedConstant */
             $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = (
                         $prepend_action 
@@ -476,10 +483,13 @@ class BaseController
             
             $success_redirect_path =
                 "{$controller}/{$action}{$this->login_success_redirect_action}";
-
-            $this->ensureVespulaAuthObjectIsSet();
+            
             $auth = $this->vespula_auth; //get the auth object
+            
+            /** @psalm-suppress MixedAssignment */
             $username = sMVC_GetSuperGlobal('post', 'username');
+            
+            /** @psalm-suppress MixedAssignment */
             $password = sMVC_GetSuperGlobal('post', 'password');
 
             $error_msg = '';
@@ -491,11 +501,11 @@ class BaseController
 
             if( empty($password) ) {
 
-                $error_msg .= (empty($error_msg))? '' : '<br>';
+                $error_msg .= (($error_msg === ''))? '' : '<br>';
                 $error_msg .= "The 'password' field is empty.";
             }
 
-            if( empty($error_msg) ) {
+            if( ($error_msg === '') ) {
 
                 $credentials = [
                     'username'=> filter_var($username, FILTER_SANITIZE_STRING),
@@ -519,9 +529,11 @@ class BaseController
                         //since we are successfully logged in, resume session if any
                         if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
+                        /** @psalm-suppress MixedArrayOffset */
                         if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
 
                             //there is an active session with a redirect url stored in it
+                            /** @psalm-suppress MixedAssignment */
                             $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
 
                             //since login is successful remove stored redirect url, 
@@ -533,6 +545,10 @@ class BaseController
 
                         $msg = 'Login Failed!' ;
                         
+                        /** 
+                         * @psalm-suppress UndefinedFunction
+                         * @psalm-suppress UndefinedConstant
+                         */
                         if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
                             
                             $msg .=  '<br>' . $auth->getAdapter()->getError();
@@ -549,41 +565,47 @@ class BaseController
                         'The LDAP DN search failed'
                     ];
                     
-                    $msg = "Login Failed!<br>Login server is busy right now."
-                         . "<br>Please try again later.";
+                    $msg = "Login Failed!<br>Login server is busy right now.<br>Please try again later.";
                     
                     if(\in_array($vaExc->getMessage(), $backendIssues)) {
                         
-                        $msg = "Login Failed!<br>Can't connect to login server right now."
-                             . "<br>Please try again later.";
+                        $msg = "Login Failed!<br>Can't connect to login server right now.<br>Please try again later.";
                     }
                     
                     if(\in_array($vaExc->getMessage(), $usernamePswdMismatchIssues)) {
                         
-                        $msg = "Login Failed!<br>Incorrect User Name and Password combination"
-                             . "<br>Please try again.";
+                        $msg = "Login Failed!<br>Incorrect User Name and Password combination.<br>Please try again.";
                     }
                     
-                    $this->container->has('logger')
-                        && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
-                        && $this->container->get('logger')
-                                ->error( 
-                                    \str_replace('<br>', PHP_EOL, $msg)
-                                    . Utils::getThrowableAsStr($vaExc)
-                                );
+                    if(
+                        $this->getContainer()->has('logger')
+                        && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
+                    ){
+                        /** @psalm-suppress MixedMethodCall */
+                        $this->getContainer()
+                             ->get('logger')
+                             ->error( 
+                                \str_replace('<br>', PHP_EOL, $msg)
+                                . Utils::getThrowableAsStr($vaExc)
+                             );
+                    }
                     
                 } catch(\Exception $basExc) {
                     
-                    $msg = "Login Failed!"
-                         . "<br>Please contact the site administrator.";
+                    $msg = "Login Failed!<br>Please contact the site administrator.";
                     
-                    $this->container->has('logger')
-                        && ( $this->container->get('logger') instanceof \Psr\Log\LoggerInterface )
-                        && $this->container->get('logger')
-                                ->error(
-                                    \str_replace('<br>', PHP_EOL, $msg)
-                                    . Utils::getThrowableAsStr($basExc)
-                                );
+                    if(
+                        $this->getContainer()->has('logger')
+                        && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
+                    ) {
+                        /** @psalm-suppress MixedMethodCall */
+                        $this->getContainer()
+                             ->get('logger')
+                             ->error(
+                                \str_replace('<br>', PHP_EOL, $msg)
+                                . Utils::getThrowableAsStr($basExc)
+                             );
+                    }
                 }
 
             } else {
@@ -591,6 +613,10 @@ class BaseController
                 $msg = $error_msg;
             }
 
+            /** 
+             * @psalm-suppress UndefinedConstant
+             * @psalm-suppress UndefinedFunction
+             */
             if( sMVC_GetCurrentAppEnvironment() === SMVC_APP_ENV_DEV ) {
 
                 $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
@@ -598,20 +624,27 @@ class BaseController
 
             if( $auth->isValid() ) {
 
+                /** @psalm-suppress MixedArgument */
                 if( $this->getAppBasePath().'' === '' || strpos($success_redirect_path, $this->getAppBasePath()) === false ) {
 
                     //prepend base path
+                    /** @psalm-suppress MixedArgument */
                     $success_redirect_path =
                         $this->getAppBasePath().'/'.ltrim($success_redirect_path, '/');
                 }
 
                 //re-direct
+                /** @psalm-suppress MixedArgument */
                 return $this->response->withStatus(302)->withHeader('Location', $success_redirect_path);
             } else {
 
                 //re-display login form with error messages
                 $data_4_login_view['error_message'] = $msg;
+                
+                /** @psalm-suppress MixedAssignment */
                 $data_4_login_view['username'] = $username;
+                
+                /** @psalm-suppress MixedAssignment */
                 $data_4_login_view['password'] = $password;
 
                 //get the contents of the view first
@@ -628,12 +661,10 @@ class BaseController
      *                                         redirected to actionLoginStatus(). When it
      *                                         is false, the user will be redirected to
      *                                         actionLogin()
-     * 
-     * @return \Psr\Http\Message\ResponseInterface|string
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function actionLogout($show_status_on_completion = false) {
-
-        $this->ensureVespulaAuthObjectIsSet();
+    public function actionLogout($show_status_on_completion = false): ResponseInterface {
+        
         $auth = $this->vespula_auth;
         $auth->logout(); //logout
 
@@ -643,38 +674,42 @@ class BaseController
             $show_status_on_completion = true;
         }
 
+        /** @psalm-suppress UndefinedConstant */
         $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
         $action = ($prepend_action) ? 'action-' : '';
         $actn = ($show_status_on_completion) ? $action.'login-status' : $action.'login';
 
         $controller = $this->controller_name_from_uri;
 
-        if( empty($controller) ) {
+        if( ($controller === '') ) {
 
             $controller = 'base-controller';
         }
 
         $redirect_path = $this->getAppBasePath() . "/{$controller}/{$actn}";
 
+        /** @psalm-suppress MixedArrayOffset */
         if(
             session_status() === PHP_SESSION_ACTIVE
             && isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT])
         ) {
             //there is an active session with a redirect url stored in it
+            /** @psalm-suppress MixedAssignment */
             $redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
         }
 
         //re-direct
+        /** @psalm-suppress MixedArgument */
         return $this->response->withStatus(302)->withHeader('Location', $redirect_path);
     }
-
-    /**
-     * @return \Psr\Http\Message\ResponseInterface|string
+    
+    /** 
+     * @psalm-suppress PossiblyUnusedMethod 
+     * @psalm-suppress UnusedVariable
      */
-    public function actionLoginStatus() {
-
+    public function actionLoginStatus(): string {
+        
         $msg = '';
-        $this->ensureVespulaAuthObjectIsSet();
         $auth = $this->vespula_auth;
 
         //Just get the current login status
@@ -705,6 +740,10 @@ class BaseController
                 break;
         }
 
+        /** 
+         * @psalm-suppress UndefinedConstant
+         * @psalm-suppress UndefinedFunction
+         */
         if( sMVC_GetCurrentAppEnvironment() === SMVC_APP_ENV_DEV ) {
 
             $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
@@ -717,9 +756,8 @@ class BaseController
     }
 
     public function isLoggedIn(): bool {
-
-        $this->ensureVespulaAuthObjectIsSet();
-        return ($this->vespula_auth->isValid() === true);
+        
+        return ($this->vespula_auth->isValid());
     }
 
     /**
@@ -734,7 +772,7 @@ class BaseController
      *
      * @return bool|\Psr\Http\Message\ResponseInterface
      */
-    protected function getResponseObjForLoginRedirectionIfNotLoggedIn() {
+    public function getResponseObjForLoginRedirectionIfNotLoggedIn() {
 
         if( !$this->isLoggedIn() ) {
 
@@ -742,11 +780,12 @@ class BaseController
 
             $controller = $this->controller_name_from_uri;
 
-            if( empty($controller) ) {
+            if( ($controller === '') ) {
 
                 $controller = 'base-controller';
             }
 
+            /** @psalm-suppress UndefinedConstant */
             $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = ($prepend_action) ? 'action-login' : 'login';
             $redr_path = $this->getAppBasePath() . "/{$controller}/$action";
@@ -759,11 +798,6 @@ class BaseController
 
     public function preAction(): ResponseInterface {
 
-        //Inject some dependencies into the controller
-        $this->setLayoutRenderer($this->getContainerItem('new_layout_renderer'));
-        $this->setViewRenderer($this->getContainerItem('new_view_renderer'));
-        $this->setVespulaAuthObject($this->getContainerItem('vespula_auth'));
-
         return $this->response;
     }
 
@@ -772,7 +806,7 @@ class BaseController
         return $response;
     }
 
-    protected function storeCurrentUrlForLoginRedirection(): self {
+    public function storeCurrentUrlForLoginRedirection(): self {
 
         if(
             in_array(
@@ -786,36 +820,50 @@ class BaseController
             || ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ) //ajax request
         ) { return $this; }
 
-        $uri = $this->request->getUri();
+        // Use the uri to grab the query string & the fragment part 
+        // (i.e. the part that starts with #)
+        // we will append them to the app-base-path + controller + action
+        $uri = $this->request->getUri(); 
         $base_path = $this->getAppBasePath();
         $fragment = $uri->getFragment();
         $query = $uri->getQuery();
-        $path = $uri->getPath();
+        
+        $path = $this->controller_name_from_uri;
+        
+        if($path !== '') {
+            
+            // There's no way we can have the action part without a preceeding 
+            // controller part in any uri path.
+            $path .= ($this->action_name_from_uri === '') ? '' : '/' .$this->action_name_from_uri;
+        }
 
         $path = $base_path . '/' . ltrim($path, '/');
-        $curr_url = $path. ( $query ? '?' . $query : '' )
-                         . ( $fragment ? '#' . $fragment : '' );
+        $curr_url = $path. ( ($query !== '') ? '?' . $query : '' )
+                         . ( ($fragment !== '') ? '#' . $fragment : '' );
 
         //start a new session if none exists
-        (session_status() !== PHP_SESSION_ACTIVE) && session_start();
+        if(session_status() !== PHP_SESSION_ACTIVE) {
+            
+            session_start();
+        }
 
         //store current url in session
+        /** @psalm-suppress MixedArrayOffset */
         $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
         
         return $this;
     }
 
     /**
-     * @param string $item_key_in_container
      * @return mixed
      *
-     * @throws \SlimMvcTools\Controllers\Exceptions\ExpectedContainerItemMissingException
+     * @throws \Slim\Exception\HttpInternalServerErrorException
      */
-    protected function getContainerItem($item_key_in_container) {
+    public function getContainerItem(string $item_key_in_container) {
 
-        if( $this->container->has($item_key_in_container) ) {
+        if( $this->getContainer()->has($item_key_in_container) ) {
 
-            return $this->container->get($item_key_in_container);
+            return $this->getContainer()->get($item_key_in_container);
 
         } else {
 
@@ -823,7 +871,7 @@ class BaseController
                  . " the container associated with `" . get_class($this) . "` ."
                  . PHP_EOL;
 
-            throw new ExpectedContainerItemMissingException($msg);
+            throw new \Slim\Exception\HttpInternalServerErrorException($this->request, $msg);
         }
     }
 
@@ -832,41 +880,65 @@ class BaseController
         return $this->container;
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function forceHttp400(string $message, ?ServerRequestInterface $request=null): void {
         
         throw new \Slim\Exception\HttpBadRequestException(($request ?? $this->request), $message);
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function forceHttp401(string $message, ?ServerRequestInterface $request=null): void {
         
         throw new \Slim\Exception\HttpUnauthorizedException(($request ?? $this->request), $message);
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function forceHttp403(string $message, ?ServerRequestInterface $request=null): void {
         
         throw new \Slim\Exception\HttpForbiddenException(($request ?? $this->request), $message);
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function forceHttp404(string $message, ?ServerRequestInterface $request=null): void {
         
         throw new \Slim\Exception\HttpNotFoundException(($request ?? $this->request), $message);
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function forceHttp405(string $message, ?ServerRequestInterface $request=null): void {
         
         throw new \Slim\Exception\HttpMethodNotAllowedException(($request ?? $this->request), $message);
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function forceHttp410(string $message, ?ServerRequestInterface $request=null): void {
         
         throw new \Slim\Exception\HttpGoneException(($request ?? $this->request), $message);
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function forceHttp500(string $message, ?ServerRequestInterface $request=null): void {
         
         throw new \Slim\Exception\HttpInternalServerErrorException(($request ?? $this->request), $message);
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function forceHttp501(string $message, ?ServerRequestInterface $request=null): void {
         
         throw new \Slim\Exception\HttpNotImplementedException(($request ?? $this->request), $message);

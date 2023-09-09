@@ -7,6 +7,7 @@ namespace SlimMvcTools;
  * Description of MvcRouteHandler
  *
  * @author rotimi
+ * @psalm-suppress UnusedClass
  */
 class MvcRouteHandler {
     
@@ -31,17 +32,25 @@ class MvcRouteHandler {
     public function __invoke(
         \Psr\Http\Message\ServerRequestInterface $req,
         \Psr\Http\Message\ResponseInterface $resp,
-        $args
-    ) {
+        array $args
+    ): \Psr\Http\Message\ResponseInterface {
         $container = $this->app->getContainer();
+        
+        if(!($container instanceof \Psr\Container\ContainerInterface)) {
+            
+            $msg = "`".__FILE__."` on line ".__LINE__.": Null container retrieved from Slim App object.";
+            throw new \Slim\Exception\HttpInternalServerErrorException($req, $msg);
+        }
 
         // strip trailing forward slash
+        /** @psalm-suppress MixedArgument */
         $params_str = isset($args['parameters'])? rtrim($args['parameters'], '/') : '';
 
         // convert to array of parameters
-        $params = empty($params_str) && mb_strlen($params_str, 'UTF-8') <= 0 ? [] : explode('/', $params_str);
+        $params = ($params_str === '') && mb_strlen($params_str, 'UTF-8') <= 0 ? [] : explode('/', $params_str);
         //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        /** @psalm-suppress MixedArgument */
         $action_method = 
             (isset($args['action']))
                 ? \SlimMvcTools\Functions\Str\dashesToCamel($args['action'])
@@ -56,16 +65,14 @@ class MvcRouteHandler {
         }
 
         $this->validateMethodName($req, $action_method);
-        
-        $action_from_uri = isset($args['action'])
-                            ? $args['action']
-                            : \SlimMvcTools\Functions\Str\toDashes($this->default_controller_action);
+        /** @psalm-suppress MixedAssignment */
+        $action_from_uri = $args['action'] ?? \SlimMvcTools\Functions\Str\toDashes($this->default_controller_action);
         
         $default_controller_parts = explode('\\', $this->default_controller_class);
-        $controller_from_uri = isset($args['controller'])
-                            ? $args['controller']
-                            : \SlimMvcTools\Functions\Str\toDashes(array_pop($default_controller_parts));
+        /** @psalm-suppress MixedAssignment */
+        $controller_from_uri = $args['controller'] ?? \SlimMvcTools\Functions\Str\toDashes(array_pop($default_controller_parts));
 
+        /** @psalm-suppress MixedArgument */
         $controller_obj = sMVC_CreateController($container, $controller_from_uri, $action_from_uri, $req, $resp);
 
         $this->assertMethodExistsOnControllerObj(
@@ -76,6 +83,7 @@ class MvcRouteHandler {
         $controller_obj->setResponse( $pre_action_response );
 
         // execute the controller's action
+        /** @psalm-suppress MixedAssignment */
         $actn_res = 
             ($params === []) 
                 ? $controller_obj->$action_method() // handle the following routes 

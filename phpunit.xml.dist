@@ -15,7 +15,15 @@
   </coverage>
   <testsuites>
     <testsuite name="slim-skeleton-mvc-tools">
-      <directory>./tests</directory>
+       <directory>./tests</directory> 
+<!--      
+      <file>./tests/BaseControllerTest.php</file>
+      <file>./tests/FrameworkHelpersTest.php</file>
+      <file>./tests/CreateControllerScriptTest.php</file>
+      <file>./tests/CliScriptHelperFunctionsTest.php</file>
+      <file>./tests/StrHelpersTest.php</file>
+      <file>./tests/UtilsTest.php</file>
+-->
     </testsuite>
   </testsuites>
   <logging>

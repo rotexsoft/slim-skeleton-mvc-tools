@@ -2,17 +2,17 @@
 declare(strict_types=1);
 
 namespace {
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // Polyfills for PHP 8.0+ string functions. 
     // Delete when PHP 8.1 becomes minimum version 
     ////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * @see https://www.php.net/manual/en/function.str-starts-with
      */
     if (!function_exists('str_starts_with')) {
-        function str_starts_with (string $haystack, string $needle)
+        function str_starts_with (string $haystack, string $needle): bool
         {
             return $needle === '' || strpos($haystack, $needle) === 0;
         }
@@ -22,7 +22,7 @@ namespace {
      * @see https://www.php.net/manual/en/function.str-contains
      */
     if (!function_exists('str_contains')) {
-        function str_contains (string $haystack, string $needle)
+        function str_contains (string $haystack, string $needle): bool
         {
             return $needle === '' || strpos($haystack, $needle) !== false;
         }
@@ -32,28 +32,28 @@ namespace {
      * @see https://www.php.net/manual/en/function.str-ends-with
      */
     if (!function_exists('str_ends_with')) {
-        function str_ends_with (string $haystack, string $needle)
+        function str_ends_with (string $haystack, string $needle): bool
         {
             return $needle === '' || substr($haystack, -strlen($needle)) === $needle;
         }
     }
 
     if (!function_exists('mb_str_starts_with')) {
-        function mb_str_starts_with (string $haystack, string $needle)
+        function mb_str_starts_with (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_strpos($haystack, $needle) === 0;
         }
     }
 
     if (!function_exists('mb_str_contains')) {
-        function mb_str_contains (string $haystack, string $needle)
+        function mb_str_contains (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_strpos($haystack, $needle) !== false;
         }
     }
 
     if (!function_exists('mb_str_ends_with')) {
-        function mb_str_ends_with (string $haystack, string $needle)
+        function mb_str_ends_with (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_substr($haystack, -mb_strlen($needle)) === $needle;
         }
@@ -142,8 +142,7 @@ namespace SlimMvcTools\Functions\Str {
     {
         $str = preg_replace('/[^a-z0-9 _-]/i', '', $str);
         $str = camelToDashes($str);
-        $str = preg_replace('/[ _-]+/', '-', $str);
-        return $str;
+        return preg_replace('/[ _-]+/', '-', $str);
     }
 
     /**
@@ -158,8 +157,7 @@ namespace SlimMvcTools\Functions\Str {
     function camelToUnder(string $str): string
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
-        $str = str_replace(' ', '_', ucwords($str));
-        return $str;
+        return str_replace(' ', '_', ucwords($str));
     }
 
     /**
@@ -197,11 +195,11 @@ namespace SlimMvcTools\Functions\Str {
         string $background_color = 'black'
     ): string {
         if( PHP_OS !== 'Linux') {
-            
+
             //just return the string as is
             return $string;
         }
-        
+
         $foreground_colors = [];
         $background_colors = [];
 
@@ -233,24 +231,22 @@ namespace SlimMvcTools\Functions\Str {
         $background_colors['light_gray'] = '47';
 
         $colored_string = "";
-        
+
         // add foreground color
         $colored_string .= 
             "\033[" . 
             (
-                isset($foreground_colors[$foreground_color])
-                ? $foreground_colors[$foreground_color]
-                : $foreground_colors['white']
+                $foreground_colors[$foreground_color]
+                ?? $foreground_colors['white']
             ) 
             . "m";
-            
+
         // add background color
         $colored_string .= 
             "\033[" .
             (
-                isset($background_colors[$background_color])
-                ? $background_colors[$background_color]
-                : $background_colors['black']
+                $background_colors[$background_color]
+                ?? $background_colors['black']
             )
             . "m";
 
@@ -259,5 +255,5 @@ namespace SlimMvcTools\Functions\Str {
 
         return $colored_string;
     }
-    
+
 } //namespace SlimMvcTools\Functions\Str

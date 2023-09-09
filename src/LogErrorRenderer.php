@@ -7,6 +7,7 @@ namespace SlimMvcTools;
  * Description of LogErrorRenderer
  *
  * @author rotimi
+ * @psalm-suppress UnusedClass
  */
 class LogErrorRenderer extends \Slim\Error\Renderers\PlainTextErrorRenderer {
 
@@ -37,7 +38,7 @@ class LogErrorRenderer extends \Slim\Error\Renderers\PlainTextErrorRenderer {
         $text = sprintf("Type: %s\n", get_class($exception));
 
         $code = $exception->getCode();
-        /** @var int|string $code */
+        
         $text .= sprintf("Code: %s\n", $code);
 
         $text .= sprintf("Message: %s\n", htmlentities($exception->getMessage()));
@@ -46,8 +47,6 @@ class LogErrorRenderer extends \Slim\Error\Renderers\PlainTextErrorRenderer {
 
         $text .= sprintf("Line: %s\n", $exception->getLine());
 
-        $text .= sprintf('Trace: %s', $exception->getTraceAsString());
-
-        return $text;
+        return $text .sprintf('Trace: %s', $exception->getTraceAsString());
     }
 }
