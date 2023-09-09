@@ -28,7 +28,9 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5.20",
-        "php-coveralls/php-coveralls": "^2.5.2"
+        "php-coveralls/php-coveralls": "^2.5.2",
+        "vimeo/psalm": "^5.15",
+        "rector/rector": "^0.18.2"
     },
     "autoload": {
         "classmap": ["src/"],
@@ -40,6 +42,10 @@
     },
     "bin": ["src/scripts/smvc-create-controller", "src/scripts/smvc-create-controller-wizard"],
     "scripts": {
-        "test": "vendor/bin/phpunit --coverage-text"
+        "test": "vendor/bin/phpunit --coverage-text",
+        "rector": "vendor/bin/rector process src --dry-run -vvv",
+        "psalm": "vendor/bin/psalm",
+        "psalm-clear-cache": "vendor/bin/psalm --clear-global-cache && vendor/bin/psalm --clear-cache",
+        "qa": "composer test && composer rector  && composer psalm-clear-cache && composer psalm"
     }
 }
