@@ -205,7 +205,7 @@ function processTemplateFile(string $target, string $dest, array $replaces) {
  * @throws \InvalidArgumentException
  * @throws \RuntimeException if this function is called in a script that is not run at the command line.
  */
-function createController($argc, array $argv) {
+function createController($argc, array $argv): void {
 
     //////////////////////////////////////////
     // START: Environment and Args Validation
@@ -257,91 +257,108 @@ function createController($argc, array $argv) {
     ) {
         displayHelp(basename($argv[0]));
 
-    } else if (
-       (
-            $argc === 5
-            && ( in_array('--controller-name', $argv) || in_array('-c', $argv) )
-            && ( in_array('--path-to-src-folder', $argv) || in_array('-p', $argv) )
-        )
-        ||
-       (
-            $argc >= 7
-            && ( in_array('--controller-name', $argv) || in_array('-c', $argv) )
-            && ( in_array('--path-to-src-folder', $argv) || in_array('-p', $argv) )
-            && ( in_array('--extends-controller', $argv) || in_array('-e', $argv) )
-        )
-    ) {
-        $templates_dir = dirname(__DIR__).$ds.'templates'.$ds;
-        $controller_name = getOptVal('--controller-name', $argv);
+    } else {
 
-        if($controller_name === '') {
+        if (
+           (
+                $argc === 5
+                && ( in_array('--controller-name', $argv) || in_array('-c', $argv) )
+                && ( in_array('--path-to-src-folder', $argv) || in_array('-p', $argv) )
+            )
+            ||
+           (
+                $argc >= 7
+                && ( in_array('--controller-name', $argv) || in_array('-c', $argv) )
+                && ( in_array('--path-to-src-folder', $argv) || in_array('-p', $argv) )
+                && ( in_array('--extends-controller', $argv) || in_array('-e', $argv) )
+            )
+        ) {
+            $templates_dir = dirname(__DIR__).$ds.'templates'.$ds;
+            $controller_name = getOptVal('--controller-name', $argv);
 
-            $controller_name = getOptVal('-c', $argv);
-        }
+            if($controller_name === '') {
 
-        $studly_controller_name = \SlimMvcTools\Functions\Str\dashesToStudly($controller_name);
-
-        $dashed_controller_name = mb_strtolower($controller_name, 'UTF-8');
-
-        if( !isValidClassName($studly_controller_name) ) {
-
-            printError("Invalid controller class name `$controller_name` supplied. Goodbye!!");
-            return;
-        }
-
-        $src_folder_path = getOptVal('--path-to-src-folder', $argv);
-
-        if($src_folder_path === '') {
-
-            $src_folder_path = getOptVal('-p', $argv);
-        }
-
-        $src_folder_path = normalizeFolderPathForOs($src_folder_path);
-
-        if( !file_exists($src_folder_path) || !is_dir($src_folder_path) ) {
-
-            printError("The src folder path `$src_folder_path` supplied is a non-existent directory. Goodbye!!");
-            return;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////
-        $default_controller_2_extend = '\\' . \SlimMvcTools\Controllers\BaseController::class;
-
-        $controller_2_extend = getOptVal('--extends-controller', $argv);
-
-        if($controller_2_extend === '') {
-
-            $controller_2_extend = getOptVal('-e', $argv);
-
-            if ($controller_2_extend !== '') {
-
-                if( !isValidExtendsClassName($controller_2_extend) ) {
-
-                    printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
-                    return;
-                }
-
-            } else {
-
-                //use default controller class to be extended
-                $controller_2_extend = $default_controller_2_extend;
+                $controller_name = getOptVal('-c', $argv);
             }
-        } elseif( !isValidExtendsClassName($controller_2_extend) ) {
 
-            printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
-            return;
-        }
+            $studly_controller_name = \SlimMvcTools\Functions\Str\dashesToStudly($controller_name);
 
-        ////////////////////////////////////////////////////////////////////////////
-        $namepace_declaration = '';
-        //omit namespace declaration by default
-        $namepace_4_controller = getOptVal('--namespace-4-controller', $argv);
+            $dashed_controller_name = mb_strtolower($controller_name, 'UTF-8');
 
-        if($namepace_4_controller === '') {
+            if( !isValidClassName($studly_controller_name) ) {
 
-            $namepace_4_controller = getOptVal('-n', $argv);
+                printError("Invalid controller class name `$controller_name` supplied. Goodbye!!");
+                return;
+            }
 
-            if($namepace_4_controller !== '') {
+            $src_folder_path = getOptVal('--path-to-src-folder', $argv);
+
+            if($src_folder_path === '') {
+
+                $src_folder_path = getOptVal('-p', $argv);
+            }
+
+            $src_folder_path = normalizeFolderPathForOs($src_folder_path);
+
+            if( !file_exists($src_folder_path) || !is_dir($src_folder_path) ) {
+
+                printError("The src folder path `$src_folder_path` supplied is a non-existent directory. Goodbye!!");
+                return;
+            }
+
+            ////////////////////////////////////////////////////////////////////////////
+            $default_controller_2_extend = '\\' . \SlimMvcTools\Controllers\BaseController::class;
+
+            $controller_2_extend = getOptVal('--extends-controller', $argv);
+
+            if($controller_2_extend === '') {
+
+                $controller_2_extend = getOptVal('-e', $argv);
+
+                if ($controller_2_extend !== '') {
+
+                    if( !isValidExtendsClassName($controller_2_extend) ) {
+
+                        printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
+                        return;
+                    }
+
+                } else {
+
+                    //use default controller class to be extended
+                    $controller_2_extend = $default_controller_2_extend;
+                }
+            } elseif( !isValidExtendsClassName($controller_2_extend) ) {
+
+                printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
+                return;
+            }
+
+            ////////////////////////////////////////////////////////////////////////////
+            $namepace_declaration = '';
+            //omit namespace declaration by default
+            $namepace_4_controller = getOptVal('--namespace-4-controller', $argv);
+
+            if($namepace_4_controller === '') {
+
+                $namepace_4_controller = getOptVal('-n', $argv);
+
+                if($namepace_4_controller !== '') {
+
+                    if( !isValidNamespaceName($namepace_4_controller) ) {
+
+                        printError("Invalid namespace `$namepace_4_controller` supplied. Goodbye!!");
+                        return;
+                    }
+
+                    //validation passed
+                    $namepace_4_controller = normalizeNameSpaceName($namepace_4_controller);
+                    $namepace_declaration = "namespace {$namepace_4_controller};";
+
+                } else {
+                    $namepace_4_controller = '';
+                }
+            } else {
 
                 if( !isValidNamespaceName($namepace_4_controller) ) {
 
@@ -352,118 +369,102 @@ function createController($argc, array $argv) {
                 //validation passed
                 $namepace_4_controller = normalizeNameSpaceName($namepace_4_controller);
                 $namepace_declaration = "namespace {$namepace_4_controller};";
-
-            } else {
-                $namepace_4_controller = '';
             }
-        } else {
 
-            if( !isValidNamespaceName($namepace_4_controller) ) {
+            //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
+            //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
 
-                printError("Invalid namespace `$namepace_4_controller` supplied. Goodbye!!");
+            //make the dir SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\SlimMvcTools\Functions\Str\toDashes($controller_name_from_cli)
+            //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
+            //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\SlimMvcTools\Functions\Str\toDashes($controller_name_from_cli)
+
+            $template_controller_file = $templates_dir.'controller-class-template.php.tpl';
+            $dest_controller_class_file_folder = $src_folder_path.'controllers'.$ds;
+            $dest_controller_class_file = $dest_controller_class_file_folder."{$studly_controller_name}.php";
+
+            if(
+                !file_exists($dest_controller_class_file_folder)
+                && !mkdir($dest_controller_class_file_folder, 0775, true)
+            ) {
+                printError("Failed to create `$dest_controller_class_file_folder`; the folder supposed to contain the controller named `$studly_controller_name`. Goodbye!!");
                 return;
             }
 
-            //validation passed
-            $namepace_4_controller = normalizeNameSpaceName($namepace_4_controller);
-            $namepace_declaration = "namespace {$namepace_4_controller};";
-        }
+            $template_view_file = $templates_dir.'index-view-template.php';
+            $dest_view_file_folder = $src_folder_path.'views'.$ds."{$dashed_controller_name}{$ds}";
+            $dest_view_file = "{$dest_view_file_folder}index.php";
 
-        //read template controller and substitute __TEMPLTATE_CONTROLLER__ with given controller name \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
-        //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'controllers'.$ds
+            if(
+                !file_exists($dest_view_file_folder)
+                && !mkdir($dest_view_file_folder, 0775, true)
+            ) {
+                printError("Failed to create `$dest_view_file_folder`; the folder supposed to contain views for the controller named `$studly_controller_name`. Goodbye!!");
+                return;
+            }
 
-        //make the dir SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\SlimMvcTools\Functions\Str\toDashes($controller_name_from_cli)
-        //read template controller index view and substitute __TEMPLTATE_CONTROLLER__ with given controller name \SlimMvcTools\Functions\Str\dashesToStudly($controller_name_from_cli)
-        //write processed controller file to SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'.$ds.\SlimMvcTools\Functions\Str\toDashes($controller_name_from_cli)
+            if( file_exists($dest_controller_class_file) ) {
 
-        $template_controller_file = $templates_dir.'controller-class-template.php.tpl';
-        $dest_controller_class_file_folder = $src_folder_path.'controllers'.$ds;
-        $dest_controller_class_file = $dest_controller_class_file_folder."{$studly_controller_name}.php";
+                printError("Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!");
+                return;
+            }
 
-        if(
-            !file_exists($dest_controller_class_file_folder)
-            && !mkdir($dest_controller_class_file_folder, 0775, true)
-        ) {
-            printError("Failed to create `$dest_controller_class_file_folder`; the folder supposed to contain the controller named `$studly_controller_name`. Goodbye!!");
-            return;
-        }
+            if( file_exists($dest_view_file) ) {
 
-        $template_view_file = $templates_dir.'index-view-template.php';
-        $dest_view_file_folder = $src_folder_path.'views'.$ds."{$dashed_controller_name}{$ds}";
-        $dest_view_file = "{$dest_view_file_folder}index.php";
+                printError("View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!");
+                return;
+            }
 
-        if(
-            !file_exists($dest_view_file_folder)
-            && !mkdir($dest_view_file_folder, 0775, true)
-        ) {
-            printError("Failed to create `$dest_view_file_folder`; the folder supposed to contain views for the controller named `$studly_controller_name`. Goodbye!!");
-            return;
-        }
+            printInfo("Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....");
 
-        if( file_exists($dest_controller_class_file) ) {
+            ////////////////////////////////////////////////////////////////////////////
+            $replaces = [
+                '__CONTROLLER_2_EXTEND__' => $controller_2_extend,
+                '__TEMPLTATE_CONTROLLER__' => $studly_controller_name,
+                'namespace __NAMESPACE_2_REPLACE__;' => $namepace_declaration,
+                "'__login_success_redirect_controller__'" => "'{$dashed_controller_name}'",
+            ];
 
-            printError("Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!");
-            return;
-        }
+            if( processTemplateFile($template_controller_file, $dest_controller_class_file, $replaces) === false ) {
 
-        if( file_exists($dest_view_file) ) {
-
-            printError("View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!");
-            return;
-        }
-
-        printInfo("Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....");
-
-        ////////////////////////////////////////////////////////////////////////////
-        $replaces = [
-            '__CONTROLLER_2_EXTEND__' => $controller_2_extend,
-            '__TEMPLTATE_CONTROLLER__' => $studly_controller_name,
-            'namespace __NAMESPACE_2_REPLACE__;' => $namepace_declaration,
-            "'__login_success_redirect_controller__'" => "'{$dashed_controller_name}'",
-        ];
-
-        if( processTemplateFile($template_controller_file, $dest_controller_class_file, $replaces) === false ) {
-
-            printError("Failed transforming template controller `$template_controller_file` to `$dest_controller_class_file`. Goodbye!!");
-
-        } else {
-
-            printInfo("Successfully created `{$dest_controller_class_file}` ....".PHP_EOL);
-        }
-
-        printInfo("Creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}` ....");
-
-        $replaces['__TEMPLTATE_CONTROLLER__'] = rtrim($namepace_4_controller, '\\').'\\'.$studly_controller_name;
-
-        if( processTemplateFile($template_view_file, $dest_view_file, $replaces) === false ) {
-
-            printError("Failed creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}`.");
-            printInfo("Deleting `{$dest_controller_class_file}` ....");
-
-            if( !unlink($dest_controller_class_file) ) {
-
-                printInfo("Failed to delete `{$dest_controller_class_file}`. Please delete it manually. Goodbye!!");
+                printError("Failed transforming template controller `$template_controller_file` to `$dest_controller_class_file`. Goodbye!!");
 
             } else {
 
-                printInfo("Goodbye!!");
+                printInfo("Successfully created `{$dest_controller_class_file}` ....".PHP_EOL);
             }
 
-            return;
+            printInfo("Creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}` ....");
+
+            $replaces['__TEMPLTATE_CONTROLLER__'] = rtrim($namepace_4_controller, '\\').'\\'.$studly_controller_name;
+
+            if( processTemplateFile($template_view_file, $dest_view_file, $replaces) === false ) {
+
+                printError("Failed creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}`.");
+                printInfo("Deleting `{$dest_controller_class_file}` ....");
+
+                if( !unlink($dest_controller_class_file) ) {
+
+                    printInfo("Failed to delete `{$dest_controller_class_file}`. Please delete it manually. Goodbye!!");
+
+                } else {
+
+                    printInfo("Goodbye!!");
+                }
+
+                return;
+
+            } else {
+
+                printInfo("Successfully created `{$dest_view_file}` ....".PHP_EOL);
+            }
+
+            printInfo("All done!!");
+            printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
 
         } else {
-
-            printInfo("Successfully created `{$dest_view_file}` ....".PHP_EOL);
+            /** @psalm-suppress MixedArgument */
+            displayHelp(basename($argv[0]));
         }
-
-        printInfo("All done!!");
-
-        printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
-        //we are done
-
-    } else {
-        /** @psalm-suppress MixedArgument */
-        displayHelp(basename($argv[0]));
     }
     //////////////////////////////////
     ///END: COMMAND PROCESSING
