@@ -115,7 +115,6 @@ function sMVC_DumpVar(...$vals): void {
         $pre_close = (PHP_SAPI === 'cli') ? '' : '</pre>';
         
         echo $pre_open . $var_to_string($val) . $pre_close 
-           . $line_breaker 
            . $line_breaker;
     }
 }
