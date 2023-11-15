@@ -183,7 +183,6 @@ class BaseController
         /** @psalm-suppress MixedAssignment */
         $this->view_renderer = $this->getContainerItem('new_view_renderer');
         
-
         $uri_path = ($req->getUri() instanceof \Psr\Http\Message\UriInterface)
                                                 ? $req->getUri()->getPath() : '';
         
@@ -238,30 +237,28 @@ class BaseController
             $this->current_uri_computed = sMVC_UriToString($recomputed_uri);
         }
         
-        if( ($this->controller_name_from_uri === '') || ($this->action_name_from_uri === '') ) {
-
+        if( 
+            (($this->controller_name_from_uri === '') || ($this->action_name_from_uri === ''))
+            && ( ($uri_path !== '') && ($uri_path !== '/') && (strpos($uri_path, '/') !== false) )
+        ) {
             // calculate $this->controller_name_from_uri and / or
             // $this->action_name_from_uri if necessary
+            if( $uri_path[0] === '/' ) {
 
-            if( ($uri_path !== '') && $uri_path !== '/' && strpos($uri_path, '/') !== false ) {
+                // remove leading slash /
+                $uri_path = substr($uri_path, 1);
+            }
 
-                if( $uri_path[0] === '/' ) {
+            $uri_path_parts = explode('/', $uri_path);
 
-                    // remove leading slash /
-                    $uri_path = substr($uri_path, 1);
-                }
+            if( count($uri_path_parts) >= 1 && ($this->controller_name_from_uri === '') ) {
 
-                $uri_path_parts = explode('/', $uri_path);
+                $this->controller_name_from_uri = $uri_path_parts[0];
+            }
 
-                if( count($uri_path_parts) >= 1 && ($this->controller_name_from_uri === '') ) {
+            if( count($uri_path_parts) >= 2 && ($this->action_name_from_uri === '') ) {
 
-                    $this->controller_name_from_uri = $uri_path_parts[0];
-                }
-
-                if( count($uri_path_parts) >= 2 && ($this->action_name_from_uri === '') ) {
-
-                    $this->action_name_from_uri = $uri_path_parts[1];
-                }
+                $this->action_name_from_uri = $uri_path_parts[1];
             }
         }
 
