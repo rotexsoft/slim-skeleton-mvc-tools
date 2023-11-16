@@ -229,9 +229,22 @@ class BaseController
             } elseif (str_contains($uri_path, $this->getAppBasePath())) {
                 
                 $recomputed_uri = 
-                    str_starts_with($this->getAppBasePath(), '/')
-                    ? $req->getUri()->withPath("{$this->getAppBasePath()}/{$this->controller_name_from_uri}/{$this->action_name_from_uri}")
-                    : $req->getUri()->withPath("/{$this->getAppBasePath()}/{$this->controller_name_from_uri}/{$this->action_name_from_uri}");
+                    (
+                        $this->controller_name_from_uri !== ''
+                        && $this->action_name_from_uri !== ''
+                    )
+                    ? 
+                    (
+                        str_starts_with($this->getAppBasePath(), '/')
+                        ? $req->getUri()->withPath("{$this->getAppBasePath()}/{$this->controller_name_from_uri}/{$this->action_name_from_uri}")
+                        : $req->getUri()->withPath("/{$this->getAppBasePath()}/{$this->controller_name_from_uri}/{$this->action_name_from_uri}")
+                    )
+                    :
+                    (
+                        str_starts_with($this->getAppBasePath(), '/')
+                        ? $req->getUri()->withPath("{$this->getAppBasePath()}/{$this->controller_name_from_uri}")
+                        : $req->getUri()->withPath("/{$this->getAppBasePath()}/{$this->controller_name_from_uri}")
+                    );
             }
             
             $this->current_uri_computed = sMVC_UriToString($recomputed_uri);
