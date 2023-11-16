@@ -64,14 +64,15 @@ SQL;
         return new \Vespula\Auth\Auth($adapter, $session);
     }
     
-    protected function getContainer(): \Psr\Container\ContainerInterface {
+    protected function getContainer(array $override_settings=[]): \Psr\Container\ContainerInterface {
         
         static $psr11Container;
         
-        if(!$psr11Container) {
+        if(!$psr11Container || $override_settings !== []) {
             
             $psr11Container = new Container();
-            $psr11Container['settings'] = [
+            
+            $settings = [
                 'displayErrorDetails' => false,
                 'logErrors' => false,
                 'logErrorDetails' => false,
@@ -89,6 +90,14 @@ SQL;
                 'html_renderer_class' => \SlimMvcTools\HtmlErrorRenderer::class,
                 'log_renderer_class'  => \SlimMvcTools\LogErrorRenderer::class,
             ];
+            
+            foreach ($override_settings as $key => $value) {
+                
+                $settings[$key] = $value;
+            }
+            
+            $psr11Container['settings'] = $settings;
+            
             $psr11Container['namespaces_for_controllers'] = [
                 '\\SlimMvcTools\\Controllers\\',
                 '\\SMVCTools\\Tests\\TestObjects\\',
@@ -119,5 +128,5 @@ SQL;
         }
         
         return $psr11Container;
-    }
+    } // protected function getContainer(array $override_settings=[]): \Psr\Container\ContainerInterface
 }
