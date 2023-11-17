@@ -217,7 +217,10 @@ class BaseController
             
             if($uri_path === '/') {
                 
+                ///////////////////////////////////////////////////
                 // no controller, no action, no explicit base path
+                ///////////////////////////////////////////////////
+                
                 $recomputed_uri = 
                     (
                         $this->controller_name_from_uri !== ''
@@ -227,6 +230,10 @@ class BaseController
                     : $req->getUri()->withPath("/{$this->controller_name_from_uri}");
                     
             } elseif (str_contains($uri_path, $this->getAppBasePath())) {
+                
+                /////////////////////////////////////////////
+                // base path is contained in the request uri
+                /////////////////////////////////////////////
                 
                 $recomputed_uri = 
                     (
@@ -254,11 +261,11 @@ class BaseController
             (($this->controller_name_from_uri === '') || ($this->action_name_from_uri === ''))
             && ( ($uri_path !== '') && ($uri_path !== '/') && (strpos($uri_path, '/') !== false) )
         ) {
-            // calculate $this->controller_name_from_uri and / or
+            // Calculate $this->controller_name_from_uri and / or
             // $this->action_name_from_uri if necessary
             if( $uri_path[0] === '/' ) {
 
-                // remove leading slash /
+                // Remove leading slash /
                 $uri_path = substr($uri_path, 1);
             }
 

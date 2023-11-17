@@ -141,7 +141,6 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // constructor
         //////////////////////////////////////////////////////////
         
-        
         //////////////////////////////////////////////////////////
         // Test that when no controller and no action are in the
         // request uri, that the controller & action passed to the 
@@ -159,6 +158,40 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             'http://google.com/controller-from-constructor/action-from-constructor', 
             $controller5->getCurrentUriComputed()
         );
+        
+        //////////////////////////////////////////////////////////
+        
+        // Make sure that uri's with no controller & no action but just
+        // forward slashes lead to an empty string value for both
+        // getActionNameFromUri() & getControllerNameFromUri()
+        
+        $req6 = $this->newRequest('http://google.com/');
+        $controller6 = new BaseController(
+            $psr11Container, '', '', $req6, $resp
+        );
+        self::assertEquals('', $controller6->getActionNameFromUri());
+        self::assertEquals('', $controller6->getControllerNameFromUri());
+        
+        $req7 = $this->newRequest('http://google.com//');
+        $controller7 = new BaseController(
+            $psr11Container, '', '', $req7, $resp
+        );
+        self::assertEquals('', $controller7->getActionNameFromUri());
+        self::assertEquals('', $controller7->getControllerNameFromUri());
+        
+        $req8 = $this->newRequest('http://google.com///');
+        $controller8 = new BaseController(
+            $psr11Container, '', '', $req8, $resp
+        );
+        self::assertEquals('', $controller8->getActionNameFromUri());
+        self::assertEquals('', $controller8->getControllerNameFromUri());
+        
+        $req9 = $this->newRequest('http://google.com////');
+        $controller9 = new BaseController(
+            $psr11Container, '', '', $req9, $resp
+        );
+        self::assertEquals('', $controller9->getActionNameFromUri());
+        self::assertEquals('', $controller9->getControllerNameFromUri());
     }
 
     public function testThat_getActionNameFromUri_WorksAsExpected() {
