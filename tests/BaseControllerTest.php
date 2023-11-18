@@ -208,7 +208,13 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller2 = new BaseController(
             $psr11Container, 'base-controller', 'da-action', $req, $resp
         );
-        self::assertEquals('da-action', $controller2->getActionNameFromUri());   
+        self::assertEquals('da-action', $controller2->getActionNameFromUri());
+        
+        $req2 = $this->newRequest('http://google.com/controller/da-action/');
+        $controller3 = new BaseController(
+            $psr11Container, '', '', $req2, $resp
+        );
+        self::assertEquals('da-action', $controller3->getActionNameFromUri());
     }
 
     public function testThat_getControllerNameFromUri_WorksAsExpected() {
@@ -225,7 +231,13 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller2 = new BaseController(
             $psr11Container, 'base-controller', 'da-action', $req, $resp
         );
-        self::assertEquals('base-controller', $controller2->getControllerNameFromUri());   
+        self::assertEquals('base-controller', $controller2->getControllerNameFromUri());
+        
+        $req2 = $this->newRequest('http://google.com/da-controller/da-action/');
+        $controller3 = new BaseController(
+            $psr11Container, '', '', $req2, $resp
+        );
+        self::assertEquals('da-controller', $controller3->getControllerNameFromUri());
     }
 
     public function testThat_getCurrentUri_WorksAsExpected() {
@@ -283,7 +295,6 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             'http://google.com/controller-from-constructor', 
             $controller2->getCurrentUriComputed()
         );
-        
         
         ////////////////////////////////////////////////////////////////////////
         // Tests with base path with leading slash
@@ -366,6 +377,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new BaseController(
             $psr11Container, '', '', $req, $resp
         );
+        self::assertSame($psr11Container->get('vespula_auth'), $controller->getVespulaAuthObject());
         
         $new_auth = $this->newVespulaAuth();
         $controller->setVespulaAuthObject($new_auth);
@@ -414,10 +426,10 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new BaseController(
             $psr11Container, '', '', $req, $resp
         );
+        self::assertSame($req, $controller->getRequest());
         
         $new_req = $this->newRequest();
         $controller->setRequest($new_req);
-        
         self::assertSame($new_req, $controller->getRequest());
     }
 
@@ -430,10 +442,10 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new BaseController(
             $psr11Container, '', '', $req, $resp
         );
+        self::assertSame($resp, $controller->getResponse());
         
         $new_resp = $this->newResponse();
         $controller->setResponse($new_resp);
-        
         self::assertSame($new_resp, $controller->getResponse());
     }
 
@@ -619,6 +631,32 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             file_get_contents("{$path}action-routes-output.txt"), 
             $result
         );
+    }
+    
+    
+    public function testThat_preAction_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );        
+        self::assertSame($resp, $controller->preAction());
+    }
+    
+    public function testThat_postAction_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $resp2 = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );        
+        self::assertSame($resp2, $controller->postAction($resp2));
     }
     
     public function testThat_getContainerItem_WorksAsExpected() {
