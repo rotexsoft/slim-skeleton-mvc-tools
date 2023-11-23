@@ -573,15 +573,15 @@ class BaseController
                         && !str_starts_with(mb_strtolower($this->login_success_redirect_action, 'UTF-8'), 'action')
                       ) 
                       ? 'action-' : '';
-            
+
             $success_redirect_path =
                 "{$controller}/{$action}{$this->login_success_redirect_action}";
-            
+
             $auth = $this->vespula_auth; //get the auth object
-            
+
             /** @psalm-suppress MixedAssignment */
             $username = sMVC_GetSuperGlobal('post', 'username');
-            
+
             /** @psalm-suppress MixedAssignment */
             $password = sMVC_GetSuperGlobal('post', 'password');
 
@@ -610,7 +610,7 @@ class BaseController
                                             //with a specific list of allowed 
                                             //special characters.
                 ];
-                
+
                 try {
 
                     $auth->login($credentials); //try to login
@@ -637,39 +637,39 @@ class BaseController
                     } else {
 
                         $msg = 'Login Failed!' ;
-                        
+
                         /** 
                          * @psalm-suppress UndefinedFunction
                          * @psalm-suppress UndefinedConstant
                          */
                         if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
-                            
+
                             $msg .=  '<br>' . $auth->getAdapter()->getError();
                         }
                     }
                 } catch (\Vespula\Auth\Exception $vaExc) {
-                    
+
                     $backendIssues = [
                         'EXCEPTION_LDAP_CONNECT_FAILED', 
                         'Could not bind to basedn',
                     ];
-                    
+
                     $usernamePswdMismatchIssues = [
                         'The LDAP DN search failed'
                     ];
-                    
+
                     $msg = "Login Failed!<br>Login server is busy right now.<br>Please try again later.";
-                    
+
                     if(\in_array($vaExc->getMessage(), $backendIssues)) {
-                        
+
                         $msg = "Login Failed!<br>Can't connect to login server right now.<br>Please try again later.";
                     }
-                    
+
                     if(\in_array($vaExc->getMessage(), $usernamePswdMismatchIssues)) {
-                        
+
                         $msg = "Login Failed!<br>Incorrect User Name and Password combination.<br>Please try again.";
                     }
-                    
+
                     if(
                         $this->getContainer()->has('logger')
                         && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
@@ -682,11 +682,11 @@ class BaseController
                                 . Utils::getThrowableAsStr($vaExc)
                              );
                     }
-                    
+
                 } catch(\Exception $basExc) {
-                    
+
                     $msg = "Login Failed!<br>Please contact the site administrator.";
-                    
+
                     if(
                         $this->getContainer()->has('logger')
                         && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
@@ -733,10 +733,10 @@ class BaseController
 
                 //re-display login form with error messages
                 $data_4_login_view['error_message'] = $msg;
-                
+
                 /** @psalm-suppress MixedAssignment */
                 $data_4_login_view['username'] = $username;
-                
+
                 /** @psalm-suppress MixedAssignment */
                 $data_4_login_view['password'] = $password;
 
@@ -745,7 +745,7 @@ class BaseController
 
                 return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
             }
-        }
+        } // if( strtoupper($request_obj->getMethod()) === 'GET' ) else {....}
     }
 
     /**
@@ -837,7 +837,7 @@ class BaseController
          * @psalm-suppress UndefinedConstant
          * @psalm-suppress UndefinedFunction
          */
-        if( sMVC_GetCurrentAppEnvironment() === SMVC_APP_ENV_DEV ) {
+        if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
 
             $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
         }
@@ -879,8 +879,7 @@ class BaseController
             }
 
             /** @psalm-suppress UndefinedConstant */
-            $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
-            $action = ($prepend_action) ? 'action-login' : 'login';
+            $action = (SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) ? 'login' : 'action-login';
             $redr_path = $this->getAppBasePath() . "/{$controller}/$action";
 
             return $this->response->withStatus(302)->withHeader('Location', $redr_path);

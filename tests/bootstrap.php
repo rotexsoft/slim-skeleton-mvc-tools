@@ -1,5 +1,4 @@
 <?php
-
 error_reporting(E_ALL | E_STRICT);
 session_start();
 
@@ -13,6 +12,16 @@ if(!defined('SMVC_APP_ROOT_PATH')){
 if(!defined('SMVC_APP_ENV_DEV')){
     
     define('SMVC_APP_ENV_DEV', 'dev');
+}
+
+if(!defined('SMVC_APP_ENV_STAGING')){
+    
+    define('SMVC_APP_ENV_STAGING', 'staging' );
+}
+
+if(!defined('SMVC_APP_ENV_TESTING')){
+    
+    define('SMVC_APP_ENV_TESTING', 'testing' );
 }
 
 if(!defined('SMVC_APP_ENV_PRODUCTION')){
