@@ -779,7 +779,7 @@ class BaseController
             $controller = 'base-controller';
         }
 
-        $redirect_path = $this->getAppBasePath() . "/{$controller}/{$actn}";
+        $redirect_path = $this->makeLink("/{$controller}/{$actn}");
 
         /** @psalm-suppress MixedArrayOffset */
         if(
