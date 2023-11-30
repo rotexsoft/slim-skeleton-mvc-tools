@@ -379,7 +379,23 @@ class BaseController
          * @psalm-suppress MixedArrayAccess
          * @psalm-suppress MixedReturnStatement
          */
-        return $this->getContainer()->get('settings')['app_base_path'];
+        return $this->getAppSetting('app_base_path');
+    }
+    
+    /**
+     * @return mixed
+     */
+    public function getAppSetting(string $setting_key) {
+ 
+       /** 
+         * @psalm-suppress MixedAssignment
+         */
+        $settings = $this->getContainerItem('settings');
+        
+       /** 
+         * @psalm-suppress MixedArrayAccess
+         */
+        return $settings[$setting_key] ?? null; 
     }
     
     public function makeLink(string $path): string {
@@ -546,14 +562,12 @@ class BaseController
      */
     public function actionLogin() {
 
-        $request_obj = $this->request;
-
         $data_4_login_view = [
             'controller_object' => $this, 'error_message' => '', 
             'username' => '', 'password' => ''
         ];
 
-        if( strtoupper($request_obj->getMethod()) === 'GET' ) {
+        if( strtoupper($this->request->getMethod()) === 'GET' ) {
 
             //show login form
             //get the contents of the view first
@@ -566,6 +580,11 @@ class BaseController
             //this is a POST request, process login
             $controller = $this->login_success_redirect_controller ?: 'base-controller';
 
+            // SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES === true
+            // means that links generated in this action do not need to be prefixed
+            // with action- since when users click on them, the framework will 
+            // automatically append action to the resolved method name
+            // see \SlimMvcTools\MvcRouteHandler::__invoke(...)
             /** @psalm-suppress UndefinedConstant */
             $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = (
@@ -575,7 +594,7 @@ class BaseController
                       ? 'action-' : '';
 
             $success_redirect_path =
-                "{$controller}/{$action}{$this->login_success_redirect_action}";
+                $this->makeLink("{$controller}/{$action}{$this->login_success_redirect_action}");
 
             $auth = $this->vespula_auth; //get the auth object
 
@@ -589,13 +608,13 @@ class BaseController
 
             if( empty($username) ) {
 
-                $error_msg .= "The 'username' field is empty.";
+                $error_msg .= $this->getAppSetting('base_controller_action_login_empty_username_msg');
             }
 
             if( empty($password) ) {
 
                 $error_msg .= (($error_msg === ''))? '' : '<br>';
-                $error_msg .= "The 'password' field is empty.";
+                $error_msg .= $this->getAppSetting('base_controller_action_login_empty_password_msg');
             }
 
             if( ($error_msg === '') ) {
@@ -610,96 +629,7 @@ class BaseController
                                             //with a specific list of allowed 
                                             //special characters.
                 ];
-
-                try {
-
-                    $auth->login($credentials); //try to login
-
-                    if( $auth->isValid() ) {
-
-                        $msg = "You are now logged into a new session.";
-
-                        //since we are successfully logged in, resume session if any
-                        if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
-
-                        /** @psalm-suppress MixedArrayOffset */
-                        if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
-
-                            //there is an active session with a redirect url stored in it
-                            /** @psalm-suppress MixedAssignment */
-                            $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
-
-                            //since login is successful remove stored redirect url, 
-                            //it has served its purpose & we'll be redirecting now.
-                            unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
-                        }
-
-                    } else {
-
-                        $msg = 'Login Failed!' ;
-
-                        /** 
-                         * @psalm-suppress UndefinedFunction
-                         * @psalm-suppress UndefinedConstant
-                         */
-                        if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
-
-                            $msg .=  '<br>' . $auth->getAdapter()->getError();
-                        }
-                    }
-                } catch (\Vespula\Auth\Exception $vaExc) {
-
-                    $backendIssues = [
-                        'EXCEPTION_LDAP_CONNECT_FAILED', 
-                        'Could not bind to basedn',
-                    ];
-
-                    $usernamePswdMismatchIssues = [
-                        'The LDAP DN search failed'
-                    ];
-
-                    $msg = "Login Failed!<br>Login server is busy right now.<br>Please try again later.";
-
-                    if(\in_array($vaExc->getMessage(), $backendIssues)) {
-
-                        $msg = "Login Failed!<br>Can't connect to login server right now.<br>Please try again later.";
-                    }
-
-                    if(\in_array($vaExc->getMessage(), $usernamePswdMismatchIssues)) {
-
-                        $msg = "Login Failed!<br>Incorrect User Name and Password combination.<br>Please try again.";
-                    }
-
-                    if(
-                        $this->getContainer()->has('logger')
-                        && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
-                    ){
-                        /** @psalm-suppress MixedMethodCall */
-                        $this->getContainer()
-                             ->get('logger')
-                             ->error( 
-                                \str_replace('<br>', PHP_EOL, $msg)
-                                . Utils::getThrowableAsStr($vaExc)
-                             );
-                    }
-
-                } catch(\Exception $basExc) {
-
-                    $msg = "Login Failed!<br>Please contact the site administrator.";
-
-                    if(
-                        $this->getContainer()->has('logger')
-                        && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
-                    ) {
-                        /** @psalm-suppress MixedMethodCall */
-                        $this->getContainer()
-                             ->get('logger')
-                             ->error(
-                                \str_replace('<br>', PHP_EOL, $msg)
-                                . Utils::getThrowableAsStr($basExc)
-                             );
-                    }
-                }
+                $msg = $this->doLogin($auth, $credentials, $success_redirect_path);
 
             } else {
 
@@ -717,18 +647,11 @@ class BaseController
 
             if( $auth->isValid() ) {
 
-                /** @psalm-suppress MixedArgument */
-                if( $this->getAppBasePath().'' === '' || strpos($success_redirect_path, $this->getAppBasePath()) === false ) {
-
-                    //prepend base path
-                    /** @psalm-suppress MixedArgument */
-                    $success_redirect_path =
-                        $this->getAppBasePath().'/'.ltrim($success_redirect_path, '/');
-                }
-
                 //re-direct
                 /** @psalm-suppress MixedArgument */
-                return $this->response->withStatus(302)->withHeader('Location', $success_redirect_path);
+                return $this->response
+                            ->withStatus(302)
+                            ->withHeader('Location', $success_redirect_path);
             } else {
 
                 //re-display login form with error messages
@@ -745,7 +668,113 @@ class BaseController
 
                 return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
             }
-        } // if( strtoupper($request_obj->getMethod()) === 'GET' ) else {....}
+        } // if( strtoupper($this->request->getMethod()) === 'GET' ) else {....}
+    }
+    
+    protected function doLogin(\Vespula\Auth\Auth $auth, array $credentials, string &$success_redirect_path): string {
+
+        $msg = '';
+
+        try {
+
+            $auth->login($credentials); //try to login
+
+            if( $auth->isValid() ) {
+
+                $msg = $this->getAppSetting('base_controller_do_login_auth_is_valid_msg');
+
+                //since we are successfully logged in, resume session if any
+                if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+
+                /** @psalm-suppress MixedArrayOffset */
+                if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
+
+                    //there is an active session with a redirect url stored in it
+                    /** @psalm-suppress MixedAssignment */
+                    $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
+
+                    //since login is successful remove stored redirect url, 
+                    //it has served its purpose & we'll be redirecting now.
+                    unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
+                }
+
+            } else {
+
+                $msg = $this->getAppSetting('base_controller_do_login_auth_not_is_valid_msg');
+
+                /** 
+                 * @psalm-suppress UndefinedFunction
+                 * @psalm-suppress UndefinedConstant
+                 */
+                if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
+
+                    $msg .=  '<br>' . $auth->getAdapter()->getError();
+                }
+            }
+        } catch (\Vespula\Auth\Exception $vaExc) {
+
+            $backendIssues = [
+                'EXCEPTION_LDAP_CONNECT_FAILED', 
+                'Could not bind to basedn',
+                'LDAP extension not loaded',
+                'Missing basedn in bind options',
+                'Missing binddn in bind options',
+                'Missing bindpw in bind options',
+                'Missing filter in bind options',
+                'Invalid data passed. Must be a filename or array of users',
+            ];
+
+            $usernamePswdMismatchIssues = [
+                'The LDAP DN search failed',
+                \Vespula\Auth\Adapter\Sql::ERROR_PASSWORD_COL,
+                \Vespula\Auth\Adapter\Sql::ERROR_USERNAME_COL,
+                'Invalid credentials array. Must have keys `username` and `password`.',
+            ];
+            
+            $msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_general_msg');
+
+            if(\in_array($vaExc->getMessage(), $backendIssues) || str_starts_with($vaExc->getMessage(), 'File not found ')) {
+                
+                $msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_back_end_msg');
+            }
+
+            if(\in_array($vaExc->getMessage(), $usernamePswdMismatchIssues)) {
+                
+                $msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_user_passwd_msg');
+            }
+
+            if(
+                $this->getContainer()->has('logger')
+                && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
+            ){
+                /** @psalm-suppress MixedMethodCall */
+                $this->getContainer()
+                     ->get('logger')
+                     ->error( 
+                        \str_replace('<br>', PHP_EOL, $msg)
+                        . Utils::getThrowableAsStr($vaExc)
+                     );
+            }
+
+        } catch(\Exception $basExc) {
+            
+            $msg = $this->getAppSetting('base_controller_do_login_auth_exception_msg');
+
+            if(
+                $this->getContainer()->has('logger')
+                && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
+            ) {
+                /** @psalm-suppress MixedMethodCall */
+                $this->getContainer()
+                     ->get('logger')
+                     ->error(
+                        \str_replace('<br>', PHP_EOL, $msg)
+                        . Utils::getThrowableAsStr($basExc)
+                     );
+            }
+        }
+        
+        return $msg;
     }
 
     /**
@@ -760,13 +789,18 @@ class BaseController
         
         $auth = $this->vespula_auth;
         $auth->logout(); //logout
-
+        
         if( !$auth->isAnon() ) {
 
             //logout failed. Definitely redirect to actionLoginStatus
             $show_status_on_completion = true;
         }
 
+        // SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES === true
+        // means that links generated in this action do not need to be prefixed
+        // with action- since when users click on them, the framework will 
+        // automatically append action to the resolved method name
+        // see \SlimMvcTools\MvcRouteHandler::__invoke(...)
         /** @psalm-suppress UndefinedConstant */
         $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
         $action = ($prepend_action) ? 'action-' : '';
@@ -810,26 +844,26 @@ class BaseController
 
             case $auth->isAnon():
 
-                $msg = "You are not logged in.";
+                $msg = $this->getAppSetting('base_controller_action_login_status_is_anon_msg');
                 break;
 
             case $auth->isIdle():
 
-                $msg = "Your session was idle for too long. Please log in again.";
+                $msg = $this->getAppSetting('base_controller_action_login_status_is_idle_msg');
                 break;
 
             case $auth->isExpired():
 
-                $msg = "Your session has expired. Please log in again.";
+                $msg = $this->getAppSetting('base_controller_action_login_status_is_expired_msg');
                 break;
 
             case $auth->isValid():
 
-                $msg = "You are still logged in.";
+                $msg = $this->getAppSetting('base_controller_action_login_status_is_valid_msg');
                 break;
 
             default:
-                $msg =  "You have an unknown status.";
+                $msg =  $this->getAppSetting('base_controller_action_login_status_unknown_msg');
                 break;
         }
 
@@ -878,9 +912,14 @@ class BaseController
                 $controller = 'base-controller';
             }
 
+            // SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES === true
+            // means that links generated in this action do not need to be prefixed
+            // with action- since when users click on them, the framework will 
+            // automatically append action to the resolved method name
+            // see \SlimMvcTools\MvcRouteHandler::__invoke(...)
             /** @psalm-suppress UndefinedConstant */
             $action = (SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) ? 'login' : 'action-login';
-            $redr_path = $this->getAppBasePath() . "/{$controller}/$action";
+            $redr_path = $this->makeLink("/{$controller}/$action");
 
             return $this->response->withStatus(302)->withHeader('Location', $redr_path);
         }
@@ -915,8 +954,7 @@ class BaseController
         // Use the uri to grab the query string & the fragment part 
         // (i.e. the part that starts with #)
         // we will append them to the app-base-path + controller + action
-        $uri = $this->request->getUri(); 
-        $base_path = $this->getAppBasePath();
+        $uri = $this->request->getUri();
         $fragment = $uri->getFragment();
         $query = $uri->getQuery();
         
@@ -928,10 +966,10 @@ class BaseController
             // controller part in any uri path.
             $path .= ($this->action_name_from_uri === '') ? '' : '/' .$this->action_name_from_uri;
         }
-
-        $path = $base_path . '/' . ltrim($path, '/');
-        $curr_url = $path. ( ($query !== '') ? '?' . $query : '' )
-                         . ( ($fragment !== '') ? '#' . $fragment : '' );
+        
+        $curr_url = $this->makeLink($path)
+                    . ( ($query !== '') ? '?' . $query : '' )
+                    . ( ($fragment !== '') ? '#' . $fragment : '' );
 
         //start a new session if none exists
         if(session_status() !== PHP_SESSION_ACTIVE) {

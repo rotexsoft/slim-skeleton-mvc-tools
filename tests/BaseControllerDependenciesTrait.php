@@ -26,7 +26,7 @@ trait BaseControllerDependenciesTrait {
         return $request;
     }
     
-    protected function newVespulaAuth(): \Vespula\Auth\Auth {
+    protected function newVespulaAuth(string $alternate_auth_class=''): \Vespula\Auth\Auth {
 
         $pdo = new \PDO(
                     'sqlite::memory:', 
@@ -61,7 +61,9 @@ SQL;
         $where = ''; //optional
         $adapter = new \Vespula\Auth\Adapter\Sql($pdo, $from, $cols, $where);
 
-        return new \Vespula\Auth\Auth($adapter, $session);
+        return ($alternate_auth_class === '')
+                ? new \Vespula\Auth\Auth($adapter, $session)
+                : new $alternate_auth_class($adapter, $session);
     }
     
     protected function getContainer(array $override_settings=[]): \Psr\Container\ContainerInterface {
@@ -89,6 +91,20 @@ SQL;
                 'error_handler_class' => \SlimMvcTools\ErrorHandler::class,
                 'html_renderer_class' => \SlimMvcTools\HtmlErrorRenderer::class,
                 'log_renderer_class'  => \SlimMvcTools\LogErrorRenderer::class,
+                
+                'base_controller_action_login_empty_username_msg' => "The 'username' field is empty.",
+                'base_controller_action_login_empty_password_msg' => "The 'password' field is empty.",
+                'base_controller_do_login_auth_is_valid_msg' => 'You are now logged into a new session.',
+                'base_controller_do_login_auth_not_is_valid_msg' => 'Login Failed!',
+                'base_controller_do_login_auth_v_auth_exception_general_msg' => 'Login Failed!<br>Please contact site administrator or try again later.',
+                'base_controller_do_login_auth_v_auth_exception_back_end_msg' => "Login Failed!<br>Can't connect to login server right now.<br>Please try again later.",
+                'base_controller_do_login_auth_v_auth_exception_user_passwd_msg' => 'Login Failed!<br>Incorrect User Name and Password combination.<br>Please try again.',
+                'base_controller_do_login_auth_exception_msg' => 'Login Failed!<br>Please contact the site administrator.',
+                'base_controller_action_login_status_is_anon_msg' => 'You are not logged in.',
+                'base_controller_action_login_status_is_idle_msg' => 'Your session was idle for too long. Please log in again.',
+                'base_controller_action_login_status_is_expired_msg' => 'Your session has expired. Please log in again.',
+                'base_controller_action_login_status_is_valid_msg' => 'You are still logged in.',
+                'base_controller_action_login_status_unknown_msg' => 'Unknown session status.',
             ];
             
             foreach ($override_settings as $key => $value) {

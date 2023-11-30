@@ -17,6 +17,11 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
     }
     
+    protected function tearDown(): void {
+        
+        parent::tearDown();
+    }
+    
     // This must be the first test in this file after the setUp() method so that
     // it gets executed first. It modifies $_SESSION, so it should be tested first.
     public function testThat_storeCurrentUrlForLoginRedirection_WorksAsExpected2() {
@@ -465,6 +470,23 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testThat_getAppSetting_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        self::assertEquals(
+            $psr11Container->get('settings')['app_base_path'], 
+            $controller->getAppSetting('app_base_path')
+        );
+        self::assertNull( $controller->getAppSetting('non_existent_setting_key') );
+    }
+
     public function testThat_makeLink_WorksAsExpected() {
         
         $req = $this->newRequest('http://google.com/');
@@ -633,6 +655,434 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
     }
     
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_actionLogin_WithRequestGetMethod_WorksAsExpected() {
+        
+        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Scenario: Calling actionLogin() when logged out and when request 
+        //           method is GET
+        ////////////////////////////////////////////////////////////////////////
+        $actionResult = $controller->actionLogin();
+        
+        $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+
+        $action_login = ($prepend_action) ? 'action-login' : 'login';
+        $login_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/$action_login");
+
+        $action_logout = ($prepend_action) ? 'action-logout' : 'logout';
+        $logout_action_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/$action_logout/0");
+        
+        self::assertStringNotContainsString('<p style="background-color: orange;">', $actionResult); // paragraph containing error message is not present
+        
+        self::assertStringContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionResult);
+        self::assertStringContainsString('<span>User Name: </span>', $actionResult);
+        self::assertStringContainsString('<input type="text" name="username" placeholder="User Name" value="">', $actionResult);
+        self::assertStringContainsString('<span>Password: </span>', $actionResult);
+        self::assertStringContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="">', $actionResult);
+        self::assertStringContainsString('<input type="submit" value="Login">', $actionResult);
+        self::assertStringContainsString('</form>', $actionResult);
+        
+        self::assertStringNotContainsString("<form action=\"{$logout_action_path}\" method=\"post\">", $actionResult); // logout form should not be present
+        self::assertStringNotContainsString('<input type="submit" value="Logout">', $actionResult); // logout button should not be present
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Scenario: Calling actionLogin() when logged in and when request 
+        //           method is GET
+        ////////////////////////////////////////////////////////////////////////
+        $credentials = [ 'username'=> 'admin', 'password'=> 'admin', ];
+        
+        $controller->getVespulaAuthObject()->login($credentials);
+        
+        $actionResult2 = $controller->actionLogin();
+        
+        self::assertTrue($controller->isLoggedIn());
+        
+        self::assertStringNotContainsString('<p style="background-color: orange;">', $actionResult2); // paragraph containing error message is not present
+        
+        self::assertStringNotContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionResult2);
+        self::assertStringNotContainsString('<span>User Name: </span>', $actionResult2);
+        self::assertStringNotContainsString('<input type="text" name="username" placeholder="User Name" value="">', $actionResult2);
+        self::assertStringNotContainsString('<span>Password: </span>', $actionResult2);
+        self::assertStringNotContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="">', $actionResult2);
+        self::assertStringNotContainsString('<input type="submit" value="Login">', $actionResult2);
+        
+        self::assertStringContainsString("<form action=\"{$logout_action_path}\" method=\"post\">", $actionResult2); // logout form should not be present
+        self::assertStringContainsString('<input type="submit" value="Logout">', $actionResult2); // logout button should not be present
+        
+        $controller->getVespulaAuthObject()->logout(); // logout
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_actionLogout_WorksAsExpected() {
+        
+        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        if(
+            session_status() === PHP_SESSION_ACTIVE
+            && isset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT])
+        ) {
+            unset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT]);
+        }
+        
+        $authClass = \SMVCTools\Tests\TestObjects\IsAnonAlwaysFalseAuth::class;
+        $controller->setVespulaAuthObject($this->newVespulaAuth($authClass));
+        
+        // Test that when false is supplied as the value for the $show_status_on_completion
+        // parameter of actionLogout & the controller's auth object returns false 
+        // when isAnon() is called on it after logout() is called on the auth object, 
+        // that the uri that the returned response object contains has either 
+        // login-status or action-login-status in the action segment of the 
+        // uri path.
+        // 
+        // No controller was specified in the request object's uri & no controller
+        // was passed to the controller object's constructor so the controller
+        // calculated will be the default base-controller. We unset the stored
+        // login redirect url in the session before callling actionLogout.
+        
+        $actionResult = $controller->actionLogout(false);
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionResult);
+        self::assertEquals(302, $actionResult->getStatusCode());
+        self::assertTrue($actionResult->hasHeader('Location'));
+        
+        if(SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) {
+            
+            self::assertEquals("{$controller->getAppBasePath()}/base-controller/login-status", $actionResult->getHeaderLine('Location'));
+            
+        } else {
+            
+            self::assertEquals("{$controller->getAppBasePath()}/base-controller/action-login-status", $actionResult->getHeaderLine('Location'));
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Test that when false is supplied as the value for the $show_status_on_completion
+        // parameter of actionLogout & the controller's auth object returns true when
+        // isAnon() is called on it after logout() is called on the auth object, 
+        // that the uri that the returned response object contains has either login 
+        // or action-login in the action segment of the uri path.
+        // 
+        // No controller was specified in the request object's uri & no controller
+        // was passed to the controller object's constructor so the controller
+        // calculated will be the default base-controller. We unset the stored
+        // login redirect url in the session before callling actionLogout.
+        
+        $controller2 = new BaseController(
+            $psr11Container, 'da-shizzle-for-rizzle-controller', '', $req, $resp
+        );
+        
+        if(
+            session_status() === PHP_SESSION_ACTIVE
+            && isset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT])
+        ) {
+            unset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT]);
+        }
+        
+        $actionResult2 = $controller2->actionLogout(false);
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionResult2);
+        self::assertEquals(302, $actionResult2->getStatusCode());
+        self::assertTrue($actionResult2->hasHeader('Location'));
+        
+        if(SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) {
+            
+            self::assertEquals("{$controller2->getAppBasePath()}/da-shizzle-for-rizzle-controller/login", $actionResult2->getHeaderLine('Location'));
+            
+        } else {
+            
+            self::assertEquals("{$controller2->getAppBasePath()}/da-shizzle-for-rizzle-controller/action-login", $actionResult2->getHeaderLine('Location'));
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Test that when true is supplied as the value for the $show_status_on_completion
+        // parameter of actionLogout & the controller's auth object returns true when
+        // isAnon() is called on it after logout() is called on the auth object, 
+        // that the uri that the returned response object contains has either 
+        // login or action-login in the action segment of the uri path.
+        // 
+        // No controller was specified in the request object's uri but the controller
+        // 'da-shizzle-for-rizzle-controller' was passed to the controller object's 
+        // constructor. We unset the stored login redirect url in the session before 
+        // callling actionLogout.
+        
+        $controller3 = new BaseController(
+            $psr11Container, 'da-shizzle-for-rizzle-controller', '', $req, $resp
+        );
+        
+        if(
+            session_status() === PHP_SESSION_ACTIVE
+            && isset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT])
+        ) {
+            unset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT]);
+        }
+        
+        $actionResult3 = $controller3->actionLogout(true);
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionResult3);
+        self::assertEquals(302, $actionResult3->getStatusCode());
+        self::assertTrue($actionResult3->hasHeader('Location'));
+        
+        if(SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) {
+            
+            self::assertEquals("{$controller3->getAppBasePath()}/da-shizzle-for-rizzle-controller/login-status", $actionResult3->getHeaderLine('Location'));
+            
+        } else {
+            
+            self::assertEquals("{$controller3->getAppBasePath()}/da-shizzle-for-rizzle-controller/action-login-status", $actionResult3->getHeaderLine('Location'));
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Test that when true is supplied as the value for the $show_status_on_completion
+        // parameter of actionLogout & the controller's auth object returns true when
+        // isAnon() is called on it after logout() is called on the auth object, 
+        // that the uri that the returned response object contains has the redirect
+        // url stored in session.
+        // 
+        // No controller was specified in the request object's uri but the controller
+        // 'da-shizzle-for-rizzle-controller' was passed to the controller object's 
+        // constructor. We DON'T unset the stored login redirect url in the session before 
+        // callling actionLogout.
+        
+        $controller4 = new BaseController(
+            $psr11Container, 'da-shizzle-for-rizzle-controller', '', $req, $resp
+        );
+        
+        $actionResult4 = $controller4->actionLogout(true);
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionResult4);
+        self::assertEquals(302, $actionResult4->getStatusCode());
+        self::assertTrue($actionResult4->hasHeader('Location'));
+        self::assertEquals(
+            $_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT], 
+            $actionResult4->getHeaderLine('Location')
+        ); // the uri that the returned response object contains has the redirect url stored in session
+        
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Test that when false is supplied as the value for the $show_status_on_completion
+        // parameter of actionLogout & the controller's auth object returns true when
+        // isAnon() is called on it after logout() is called on the auth object, 
+        // that the uri that the returned response object contains has the redirect
+        // url stored in session.
+        // 
+        // No controller was specified in the request object's uri but the controller
+        // 'da-shizzle-for-rizzle-controller' was passed to the controller object's 
+        // constructor. We DON'T unset the stored login redirect url in the session before 
+        // callling actionLogout.
+        
+        $controller5 = new BaseController(
+            $psr11Container, 'da-shizzle-for-rizzle-controller', '', $req, $resp
+        );
+        
+        $actionResult5 = $controller5->actionLogout(false);
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionResult5);
+        self::assertEquals(302, $actionResult5->getStatusCode());
+        self::assertTrue($actionResult5->hasHeader('Location'));
+        self::assertEquals(
+            $_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT], 
+            $actionResult5->getHeaderLine('Location')
+        ); // the uri that the returned response object contains has the redirect url stored in session
+    }
+    
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_actionLoginStatus_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );        
+        
+        $auth = $controller->getVespulaAuthObject();
+        $credentials = [ 'username'=> 'admin', 'password'=> 'admin', ];
+        $test_params = [
+            \Vespula\Auth\Auth::ANON => 'You are not logged in.',
+            \Vespula\Auth\Auth::IDLE => 'Your session was idle for too long. Please log in again.',
+            \Vespula\Auth\Auth::EXPIRED => 'Your session has expired. Please log in again.',
+            \Vespula\Auth\Auth::VALID => 'You are still logged in.',
+            'Unknown' => 'Unknown session status.',
+        ];
+        
+        foreach ($test_params as $auth_status => $status_message_in_rendered_view) {
+            
+            $auth->getSession()->setStatus($auth_status);
+            $action_result = $controller->actionLoginStatus();
+            self::assertStringContainsString($status_message_in_rendered_view, $action_result);
+            self::assertStringContainsString('<br>'.nl2br(sMVC_DumpAuthinfo($auth)), $action_result);
+        }
+        
+        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Login & check that the page returned contains expected html elements
+        ////////////////////////////////////////////////////////////////////////
+        $auth->login($credentials);
+        $action_result2 = $controller->actionLoginStatus();
+        
+        $login_action_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/login");
+        $logout_action_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/logout/1");
+        $login_status_action_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/login-status");
+        
+        self::assertStringNotContainsString("<p> <a href=\"{$login_action_path}\">Log in</a> </p>", $action_result2);
+        self::assertStringContainsString(
+            "<a href=\"{$login_status_action_path}\">Check Login Status</a>", 
+            $action_result2
+        );
+        self::assertStringContainsString(
+            "<form action=\"{$logout_action_path}\" method=\"post\">", 
+            $action_result2
+        );
+        self::assertStringContainsString(
+            '<input type="submit" value="Logout">', 
+            $action_result2
+        );
+        self::assertStringContainsString(
+            '</form>', 
+            $action_result2
+        );
+        self::assertStringContainsString(
+            'Layout: View: ', 
+            $action_result2
+        );
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Logout & check that the page returned contains expected html elements
+        ////////////////////////////////////////////////////////////////////////
+        $auth->logout();
+        $action_result3 = $controller->actionLoginStatus();
+        
+        self::assertStringContainsString("<p> <a href=\"{$login_action_path}\">Log in</a> </p>", $action_result3);
+        self::assertStringNotContainsString(
+            "<a href=\"{$login_status_action_path}\">Check Login Status</a>", 
+            $action_result3
+        );
+        self::assertStringNotContainsString(
+            "<form action=\"{$logout_action_path}\" method=\"post\">", 
+            $action_result3
+        );
+        self::assertStringNotContainsString(
+            '<input type="submit" value="Logout">', 
+            $action_result3
+        );
+        self::assertStringNotContainsString(
+            '</form>', 
+            $action_result3
+        );
+        self::assertStringContainsString(
+            'Layout: View: ', 
+            $action_result3
+        );
+    }
+    
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_isLoggedIn_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );        
+        
+        $auth = $controller->getVespulaAuthObject();
+        $credentials = [ 'username'=> 'admin', 'password'=> 'admin', ];
+        
+        $auth->login($credentials);
+        self::assertTrue($controller->isLoggedIn());
+        
+        $auth->logout();
+        self::assertFalse($controller->isLoggedIn());
+    }
+    
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_getResponseObjForLoginRedirectionIfNotLoggedIn_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new \SMVCTools\Tests\TestObjects\ChildController(
+            $psr11Container, 'da-controller', 'da-action', $req, $resp
+        );
+        $controller->is_logged_in = true;
+        self::assertFalse($controller->getResponseObjForLoginRedirectionIfNotLoggedIn());
+        
+        if( !defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES') ) {
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        $controller->is_logged_in = false;
+        $result = $controller->getResponseObjForLoginRedirectionIfNotLoggedIn();
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $result);
+        self::assertEquals(302, $result->getStatusCode());
+        self::assertTrue($result->hasHeader('Location'));
+        
+        if(SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) {
+            
+            self::assertEquals("{$controller->getAppBasePath()}/da-controller/login", $result->getHeaderLine('Location'));
+            
+        } else {
+            
+            self::assertEquals("{$controller->getAppBasePath()}/da-controller/action-login", $result->getHeaderLine('Location'));
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        // no controller no action specified in the URI & constructor
+        ////////////////////////////////////////////////////////////////////////
+        $controller2 = new BaseController( $psr11Container, '', '', $req, $resp);
+        $result2 = $controller2->getResponseObjForLoginRedirectionIfNotLoggedIn();
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $result2);
+        self::assertEquals(302, $result2->getStatusCode());
+        self::assertTrue($result2->hasHeader('Location'));
+        
+        if(SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) {
+            
+            self::assertEquals("{$controller2->getAppBasePath()}/base-controller/login", $result2->getHeaderLine('Location'));
+            
+        } else {
+            
+            self::assertEquals("{$controller2->getAppBasePath()}/base-controller/action-login", $result2->getHeaderLine('Location'));
+        }
+    }
     
     public function testThat_preAction_WorksAsExpected() {
         
