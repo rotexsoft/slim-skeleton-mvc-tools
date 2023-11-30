@@ -603,17 +603,17 @@ class BaseController
 
             /** @psalm-suppress MixedAssignment */
             $password = sMVC_GetSuperGlobal('post', 'password');
-
             $error_msg = '';
 
             if( empty($username) ) {
-
+                /** @psalm-suppress MixedOperand */
                 $error_msg .= $this->getAppSetting('base_controller_action_login_empty_username_msg');
             }
 
             if( empty($password) ) {
 
                 $error_msg .= (($error_msg === ''))? '' : '<br>';
+                /** @psalm-suppress MixedOperand */
                 $error_msg .= $this->getAppSetting('base_controller_action_login_empty_password_msg');
             }
 
@@ -671,17 +671,18 @@ class BaseController
         } // if( strtoupper($this->request->getMethod()) === 'GET' ) else {....}
     }
     
+    /** @psalm-suppress MixedInferredReturnType */
     protected function doLogin(\Vespula\Auth\Auth $auth, array $credentials, string &$success_redirect_path): string {
-
-        $msg = '';
-
+        
+        $_msg = '';
+        
         try {
-
             $auth->login($credentials); //try to login
 
             if( $auth->isValid() ) {
-
-                $msg = $this->getAppSetting('base_controller_do_login_auth_is_valid_msg');
+                
+                /** @psalm-suppress MixedAssignment */
+                $_msg = $this->getAppSetting('base_controller_do_login_auth_is_valid_msg');
 
                 //since we are successfully logged in, resume session if any
                 if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
@@ -699,16 +700,16 @@ class BaseController
                 }
 
             } else {
-
-                $msg = $this->getAppSetting('base_controller_do_login_auth_not_is_valid_msg');
+                /** @psalm-suppress MixedAssignment */
+                $_msg = $this->getAppSetting('base_controller_do_login_auth_not_is_valid_msg');
 
                 /** 
                  * @psalm-suppress UndefinedFunction
                  * @psalm-suppress UndefinedConstant
                  */
                 if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
-
-                    $msg .=  '<br>' . $auth->getAdapter()->getError();
+                    /** @psalm-suppress MixedOperand */
+                    $_msg .=  '<br>' . $auth->getAdapter()->getError();
                 }
             }
         } catch (\Vespula\Auth\Exception $vaExc) {
@@ -730,51 +731,59 @@ class BaseController
                 \Vespula\Auth\Adapter\Sql::ERROR_USERNAME_COL,
                 'Invalid credentials array. Must have keys `username` and `password`.',
             ];
-            
-            $msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_general_msg');
+            /** @psalm-suppress MixedAssignment */
+            $_msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_general_msg');
 
             if(\in_array($vaExc->getMessage(), $backendIssues) || str_starts_with($vaExc->getMessage(), 'File not found ')) {
-                
-                $msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_back_end_msg');
+                /** @psalm-suppress MixedAssignment */
+                $_msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_back_end_msg');
             }
 
             if(\in_array($vaExc->getMessage(), $usernamePswdMismatchIssues)) {
-                
-                $msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_user_passwd_msg');
+                /** @psalm-suppress MixedAssignment */
+                $_msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_user_passwd_msg');
             }
 
             if(
                 $this->getContainer()->has('logger')
                 && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
             ){
-                /** @psalm-suppress MixedMethodCall */
+                /** 
+                 * @psalm-suppress MixedArgument
+                 * @psalm-suppress MixedMethodCall
+                 * @psalm-suppress PossiblyInvalidOperand 
+                 */
                 $this->getContainer()
                      ->get('logger')
                      ->error( 
-                        \str_replace('<br>', PHP_EOL, $msg)
+                        \str_replace('<br>', PHP_EOL, $_msg)
                         . Utils::getThrowableAsStr($vaExc)
                      );
             }
 
         } catch(\Exception $basExc) {
             
-            $msg = $this->getAppSetting('base_controller_do_login_auth_exception_msg');
+            $_msg = $this->getAppSetting('base_controller_do_login_auth_exception_msg');
 
             if(
                 $this->getContainer()->has('logger')
                 && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
             ) {
-                /** @psalm-suppress MixedMethodCall */
+                /** 
+                 * @psalm-suppress MixedArgument
+                 * @psalm-suppress MixedMethodCall
+                 * @psalm-suppress PossiblyInvalidOperand 
+                 */
                 $this->getContainer()
                      ->get('logger')
                      ->error(
-                        \str_replace('<br>', PHP_EOL, $msg)
+                        \str_replace('<br>', PHP_EOL, $_msg)
                         . Utils::getThrowableAsStr($basExc)
                      );
             }
         }
-        
-        return $msg;
+        /** @psalm-suppress MixedReturnStatement */
+        return $_msg;
     }
 
     /**
@@ -843,26 +852,27 @@ class BaseController
         switch (true) {
 
             case $auth->isAnon():
-
+                /** @psalm-suppress MixedAssignment */
                 $msg = $this->getAppSetting('base_controller_action_login_status_is_anon_msg');
                 break;
 
             case $auth->isIdle():
-
+                /** @psalm-suppress MixedAssignment */
                 $msg = $this->getAppSetting('base_controller_action_login_status_is_idle_msg');
                 break;
 
             case $auth->isExpired():
-
+                /** @psalm-suppress MixedAssignment */
                 $msg = $this->getAppSetting('base_controller_action_login_status_is_expired_msg');
                 break;
 
             case $auth->isValid():
-
+                /** @psalm-suppress MixedAssignment */
                 $msg = $this->getAppSetting('base_controller_action_login_status_is_valid_msg');
                 break;
 
             default:
+                /** @psalm-suppress MixedAssignment */
                 $msg =  $this->getAppSetting('base_controller_action_login_status_unknown_msg');
                 break;
         }
@@ -872,7 +882,7 @@ class BaseController
          * @psalm-suppress UndefinedFunction
          */
         if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
-
+            /** @psalm-suppress MixedOperand */
             $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
         }
 
