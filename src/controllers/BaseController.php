@@ -47,12 +47,28 @@ class BaseController
      * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
      */
     protected string $login_success_redirect_action = 'login-status';
-
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getLoginSuccessRedirectAction(): string {
+        
+        return $this->login_success_redirect_action;
+    }
+    
     /**
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
      * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
      */
     protected string $login_success_redirect_controller = 'base-controller';
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getLoginSuccessRedirectController(): string {
+        
+        return $this->login_success_redirect_controller;
+    }
 
     /**
      * Request Object 
@@ -640,7 +656,7 @@ class BaseController
              * @psalm-suppress UndefinedConstant
              * @psalm-suppress UndefinedFunction
              */
-            if( sMVC_GetCurrentAppEnvironment() === SMVC_APP_ENV_DEV ) {
+            if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
 
                 $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
             }

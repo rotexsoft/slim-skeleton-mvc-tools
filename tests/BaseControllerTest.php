@@ -199,6 +199,40 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('', $controller9->getControllerNameFromUri());
     }
 
+    public function testThat_getLoginSuccessRedirectAction_WorksAsExpected() {
+        
+        $req = $this->newRequest();
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, 'base-controller', '', $req, $resp
+        );
+        self::assertEquals('login-status', $controller->getLoginSuccessRedirectAction());   
+        
+        $controller2 = new \SMVCTools\Tests\TestObjects\ChildController(
+            $psr11Container, 'child-controller', 'da-action', $req, $resp
+        );
+        self::assertEquals('login-status2', $controller2->getLoginSuccessRedirectAction());
+    }
+
+    public function testThat_getLoginSuccessRedirectController_WorksAsExpected() {
+        
+        $req = $this->newRequest();
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, 'base-controller', '', $req, $resp
+        );
+        self::assertEquals('base-controller', $controller->getLoginSuccessRedirectController());   
+        
+        $controller2 = new \SMVCTools\Tests\TestObjects\ChildController(
+            $psr11Container, 'child-controller', 'da-action', $req, $resp
+        );
+        self::assertEquals('child-controller', $controller2->getLoginSuccessRedirectController());
+    }
+
     public function testThat_getActionNameFromUri_WorksAsExpected() {
         
         $req = $this->newRequest();
@@ -654,7 +688,6 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $result
         );
     }
-    
 
     /**
      * @runInSeparateProcess
@@ -725,6 +758,351 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertStringContainsString('<input type="submit" value="Logout">', $actionResult2); // logout button should not be present
         
         $controller->getVespulaAuthObject()->logout(); // logout
+    }
+    
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_actionLogin_WithRequestPostMethod_WorksAsExpected() {
+        
+        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        $req = $this->newRequest('http://google.com/')->withMethod('POST');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+
+        $action_login = ($prepend_action) ? 'action-login' : 'login';
+        $login_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/$action_login");
+
+        $action_logout = ($prepend_action) ? 'action-logout' : 'logout';
+        $logout_action_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/$action_logout/0");
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Scenario: Empty Username & empty Password Should generate Error Message 
+        // that is injected to the login form, user will not be redirected.
+        // Login form is returned instead of a Response object containing 
+        // a redirect uri
+        ////////////////////////////////////////////////////////////////////////
+        
+        //$_POST['username'] = '';
+        //$_POST['password'] = '';
+        $actionLoginResult = $controller->actionLogin();
+
+        // Response Object with a redirect uri should not be returned in this scenario
+        self::assertNotInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult);
+        
+        // Login form with error messages should be returned in this scenario
+        self::assertIsString($actionLoginResult);
+        self::assertStringContainsString(
+            "Layout: View:", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "The 'username' field is empty.<br>The 'password' field is empty.<br>Login Status: ANON<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Logged in Person's Username: <br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Logged in User's Data: <br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Array<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "(<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            ")<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "</p>", 
+            $actionLoginResult
+        );
+        
+        self::assertStringContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionLoginResult);
+        self::assertStringContainsString('<span>User Name: </span>', $actionLoginResult);
+        self::assertStringContainsString('<input type="text" name="username" placeholder="User Name" value="">', $actionLoginResult);
+        self::assertStringContainsString('<span>Password: </span>', $actionLoginResult);
+        self::assertStringContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="">', $actionLoginResult);
+        self::assertStringContainsString('<input type="submit" value="Login">', $actionLoginResult);
+        self::assertStringContainsString('</form>', $actionLoginResult);
+        
+        self::assertStringNotContainsString("<form action=\"{$logout_action_path}\" method=\"post\">", $actionLoginResult); // logout form should not be present
+        self::assertStringNotContainsString('<input type="submit" value="Logout">', $actionLoginResult); // logout button should not be present
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_actionLogin_WithRequestPostMethod_WorksAsExpected2() {
+        
+        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        $req = $this->newRequest('http://google.com/')->withMethod('POST');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+
+        $action_login = ($prepend_action) ? 'action-login' : 'login';
+        $login_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/$action_login");
+
+        $action_logout = ($prepend_action) ? 'action-logout' : 'logout';
+        $logout_action_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/$action_logout/0");        
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Scenario: Non-empty Username & empty Password Should generate Error Message 
+        // that is injected to the login form, user will not be redirected.
+        // Login form is returned instead of a Response object containing 
+        // a redirect uri
+        ////////////////////////////////////////////////////////////////////////
+        $_POST['username'] = 'admin';
+        //$_POST['password'] = '';
+        $actionLoginResult = $controller->actionLogin();
+
+        // Response Object with a redirect uri should not be returned in this scenario
+        self::assertNotInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult);
+        
+        // Login form with error messages should be returned in this scenario
+        self::assertIsString($actionLoginResult);
+        self::assertStringContainsString(
+            "Layout: View:", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "The 'password' field is empty.<br>Login Status: ANON<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Logged in Person's Username: <br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Logged in User's Data: <br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Array<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "(<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            ")<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "</p>", 
+            $actionLoginResult
+        );
+        
+        self::assertStringContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionLoginResult);
+        self::assertStringContainsString('<span>User Name: </span>', $actionLoginResult);
+        self::assertStringContainsString('<input type="text" name="username" placeholder="User Name" value="admin">', $actionLoginResult);
+        self::assertStringContainsString('<span>Password: </span>', $actionLoginResult);
+        self::assertStringContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="">', $actionLoginResult);
+        self::assertStringContainsString('<input type="submit" value="Login">', $actionLoginResult);
+        self::assertStringContainsString('</form>', $actionLoginResult);
+        
+        self::assertStringNotContainsString("<form action=\"{$logout_action_path}\" method=\"post\">", $actionLoginResult); // logout form should not be present
+        self::assertStringNotContainsString('<input type="submit" value="Logout">', $actionLoginResult); // logout button should not be present
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_actionLogin_WithRequestPostMethod_WorksAsExpected3() {
+        
+        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        $req = $this->newRequest('http://google.com/')->withMethod('POST');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+
+        $action_login = ($prepend_action) ? 'action-login' : 'login';
+        $login_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/$action_login");
+
+        $action_logout = ($prepend_action) ? 'action-logout' : 'logout';
+        $logout_action_path = $controller->makeLink("/{$controller->getControllerNameFromUri()}/$action_logout/0");        
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Scenario: Empty Username & non-empty Password Should generate Error Message 
+        // that is injected to the login form, user will not be redirected.
+        // Login form is returned instead of a Response object containing 
+        // a redirect uri
+        ////////////////////////////////////////////////////////////////////////
+        //$_POST['username'] = '';
+        $_POST['password'] = 'admin';
+        $actionLoginResult = $controller->actionLogin();
+
+        // Response Object with a redirect uri should not be returned in this scenario
+        self::assertNotInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult);
+        
+        // Login form with error messages should be returned in this scenario
+        self::assertIsString($actionLoginResult);
+        self::assertStringContainsString(
+            "Layout: View:", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "The 'username' field is empty.<br>Login Status: ANON<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Logged in Person's Username: <br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Logged in User's Data: <br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "Array<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "(<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            ")<br />", 
+            $actionLoginResult
+        );
+        self::assertStringContainsString(
+            "</p>", 
+            $actionLoginResult
+        );
+        
+        self::assertStringContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionLoginResult);
+        self::assertStringContainsString('<span>User Name: </span>', $actionLoginResult);
+        self::assertStringContainsString('<input type="text" name="username" placeholder="User Name" value="">', $actionLoginResult);
+        self::assertStringContainsString('<span>Password: </span>', $actionLoginResult);
+        self::assertStringContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="admin">', $actionLoginResult);
+        self::assertStringContainsString('<input type="submit" value="Login">', $actionLoginResult);
+        self::assertStringContainsString('</form>', $actionLoginResult);
+        
+        self::assertStringNotContainsString("<form action=\"{$logout_action_path}\" method=\"post\">", $actionLoginResult); // logout form should not be present
+        self::assertStringNotContainsString('<input type="submit" value="Logout">', $actionLoginResult); // logout button should not be present
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_actionLogin_WithRequestPostMethod_WorksAsExpected4() {
+        
+        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        $req = $this->newRequest('http://google.com/')->withMethod('POST');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        $controller = new BaseController(
+            $psr11Container, 'da-contorller', 'da-action', $req, $resp
+        );    
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Scenario: Valid Username & Password lead to a successful login and
+        // user will be redirected.
+        // 
+        // Response object containing a redirect uri (which is the uri stored in
+        // session when the controller was created) is returned instead of a  
+        // Login form
+        ////////////////////////////////////////////////////////////////////////
+        $_POST['username'] = 'admin';
+        $_POST['password'] = 'admin';
+        $actionLoginResult = $controller->actionLogin();
+        $expectedRedirectPath = $controller->makeLink(
+            "/{$controller->getControllerNameFromUri()}/{$controller->getActionNameFromUri()}"
+        );
+
+        // Response Object with a redirect uri should not be returned in this scenario
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult);
+        self::assertEquals(302, $actionLoginResult->getStatusCode());
+        self::assertEquals($expectedRedirectPath, $actionLoginResult->getHeaderLine('Location'));
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Response object containing a redirect uri (we remove the uri stored 
+        // in session when the controller was created, so that redirect uri will
+        // contain the controller and action values stored in the 
+        // `login_success_redirect_controller` & `login_success_redirect_action`
+        // properties of the controller object) is returned instead of a  
+        // Login form
+        ////////////////////////////////////////////////////////////////////////
+        unset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT]);
+        $actionLoginResult2 = $controller->actionLogin();
+
+
+        $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+        $action = (
+                    $prepend_action 
+                    && !str_starts_with(mb_strtolower($controller->getLoginSuccessRedirectAction(), 'UTF-8'), 'action')
+                  ) 
+                  ? 'action-' : '';
+        $expectedRedirectPath2 = $controller->makeLink(
+            "/{$controller->getLoginSuccessRedirectController()}/{$action}{$controller->getLoginSuccessRedirectAction()}"
+        );
+        
+        // Response Object with a redirect uri should not be returned in this scenario
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult2);
+        self::assertEquals(302, $actionLoginResult2->getStatusCode());
+        self::assertEquals($expectedRedirectPath2, $actionLoginResult2->getHeaderLine('Location'));
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Repeat this scenario with a non-BaseController
+        ////////////////////////////////////////////////////////////////////////
+        $controller2 = new \SMVCTools\Tests\TestObjects\ChildController(
+            $psr11Container, 'da-contorller2', 'da-action2', $req, $resp
+        );
+        unset($_SESSION[\SMVCTools\Tests\TestObjects\ChildController::SESSN_PARAM_LOGIN_REDIRECT]);
+        $actionLoginResult3 = $controller2->actionLogin();
+        
+        $action2 = (
+                    $prepend_action 
+                    && !str_starts_with(mb_strtolower($controller2->getLoginSuccessRedirectAction(), 'UTF-8'), 'action')
+                  ) 
+                  ? 'action-' : '';
+        $expectedRedirectPath3 = $controller2->makeLink(
+            "/{$controller2->getLoginSuccessRedirectController()}/{$action2}{$controller2->getLoginSuccessRedirectAction()}"
+        );
+        
+        // Response Object with a redirect uri should not be returned in this scenario
+        self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult3);
+        self::assertEquals(302, $actionLoginResult3->getStatusCode());
+        self::assertEquals($expectedRedirectPath3, $actionLoginResult3->getHeaderLine('Location'));
     }
 
     /**
