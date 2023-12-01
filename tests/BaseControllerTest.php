@@ -760,7 +760,6 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller->getVespulaAuthObject()->logout(); // logout
     }
     
-
     /**
      * @runInSeparateProcess
      */
