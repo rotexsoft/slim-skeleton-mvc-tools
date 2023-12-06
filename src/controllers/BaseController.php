@@ -693,27 +693,44 @@ class BaseController
         $_msg = '';
         
         try {
+            
+            $potential_success_redirect_path = '';
+            
+            /** @psalm-suppress MixedArrayOffset */
+            if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
+
+                ////////////////////////////////////////////////////////////////
+                // There is an active session with a redirect url stored in it
+                //
+                // NOTE: we capture this value here because \Vespula\Auth\Auth->login()
+                // calls session_regenerate_id(true) under the hood which will delete
+                // old session data including this value we are capturing here.
+                /** @psalm-suppress MixedAssignment */
+                $potential_success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
+            }
+            
             $auth->login($credentials); //try to login
 
-            if( $auth->isValid() ) {
+            if( $auth->isValid() ) { // login successful
                 
                 /** @psalm-suppress MixedAssignment */
                 $_msg = $this->getAppSetting('base_controller_do_login_auth_is_valid_msg');
-
-                //since we are successfully logged in, resume session if any
-                if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
-
+                
+                /** @psalm-suppress MixedAssignment */
+                $success_redirect_path = 
+                    ($potential_success_redirect_path !== '') 
+                        ? $potential_success_redirect_path : $success_redirect_path;
+                
                 /** @psalm-suppress MixedArrayOffset */
                 if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
-
-                    //there is an active session with a redirect url stored in it
-                    /** @psalm-suppress MixedAssignment */
-                    $success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
 
                     //since login is successful remove stored redirect url, 
                     //it has served its purpose & we'll be redirecting now.
                     unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
                 }
+
+                //since we are successfully logged in, resume session if any
+                if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
             } else {
                 /** @psalm-suppress MixedAssignment */
