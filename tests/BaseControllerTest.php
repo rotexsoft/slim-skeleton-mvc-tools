@@ -1074,6 +1074,8 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $expectedRedirectPath2 = $controller->makeLink(
             "/{$controller->getLoginSuccessRedirectController()}/{$action}{$controller->getLoginSuccessRedirectAction()}"
         );
+            
+        $controller->actionLogout(); // logout, clean up
         
         // Response Object with a redirect uri should not be returned in this scenario
         self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult2);
@@ -1102,8 +1104,136 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult3);
         self::assertEquals(302, $actionLoginResult3->getStatusCode());
         self::assertEquals($expectedRedirectPath3, $actionLoginResult3->getHeaderLine('Location'));
+        
+        $controller2->actionLogout(); // logout, clean up
     }
 
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_doLogin_WorksAsExpected() {
+        
+        if( !defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES') ) {
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new \SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin(
+            $psr11Container, 'da-controller', 'da-action', $req, $resp
+        );
+
+        $success_redirect_path = '/random-path';
+        $expected_redirect_path = 
+            $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT];
+        $credentials = [ 'username'=> 'admin', 'password'=> 'admin', ];
+        $result = $controller->doLoginPublic(
+            $controller->getVespulaAuthObject(), $credentials, $success_redirect_path
+        );
+
+        ////////////////////////////////////////////////////////////////////////
+        // $success_redirect_path should have the value stored in
+        // $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT]
+        ////////////////////////////////////////////////////////////////////////
+        self::assertEquals(
+            $expected_redirect_path, 
+            $success_redirect_path
+        );
+        
+        ////////////////////////////////////////////////////
+        // Check that successful login message was returned
+        // and that the controller is in a logged in state
+        ////////////////////////////////////////////////////
+        self::assertEquals(
+            $controller->getAppSetting('base_controller_do_login_auth_is_valid_msg'),
+            $result
+        );
+        self::assertTrue($controller->isLoggedIn());
+        
+        //////////
+        // logout
+        //////////
+        $controller->getVespulaAuthObject()->logout();
+        
+        //////////////////////////////////////////////
+        // Controller should be in a logged out state
+        //////////////////////////////////////////////
+        self::assertFalse($controller->isLoggedIn());
+        
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Try logging in again, this time $success_redirect_path should not
+        // be changed because $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT]
+        // was unset in the previous login above
+        ////////////////////////////////////////////////////////////////////////
+        $success_redirect_path2 = '/random-path';
+        $original_success_redirect_path = $success_redirect_path2;
+        $result2 = $controller->doLoginPublic(
+            $controller->getVespulaAuthObject(), $credentials, $success_redirect_path
+        );
+        
+        ////////////////////////////////////////////////////////////////////////
+        // $success_redirect_path should not have been changed by doLogin 
+        ////////////////////////////////////////////////////////////////////////
+        self::assertEquals(
+            $original_success_redirect_path, 
+            $success_redirect_path2
+        );
+        
+        ////////////////////////////////////////////////////
+        // Check that successful login message was returned
+        // and that the controller is in a logged in state
+        ////////////////////////////////////////////////////
+        self::assertEquals(
+            $controller->getAppSetting('base_controller_do_login_auth_is_valid_msg'),
+            $result2
+        );
+        self::assertTrue($controller->isLoggedIn());
+        
+        //////////
+        // logout
+        //////////
+        $controller->getVespulaAuthObject()->logout();
+        
+        //////////////////////////////////////////////
+        // Controller should be in a logged out state
+        //////////////////////////////////////////////
+        self::assertFalse($controller->isLoggedIn());
+        
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Try to login with a username and password not in the database
+        $bad_credentials = [ 'username'=> 'non-existent-user', 'password'=> 'non-existent-password', ];
+        $result3 = $controller->doLoginPublic(
+            $controller->getVespulaAuthObject(), $bad_credentials, $success_redirect_path
+        );
+        
+        ///////////////////////////////////////////////////////
+        // Check that unsuccessful login message was returned
+        // and that the controller is in a logged out state
+        //////////////////////////////////////////////////////
+        self::assertStringContainsString(
+            $controller->getAppSetting('base_controller_do_login_auth_not_is_valid_msg'),
+            $result3
+        );
+        self::assertStringContainsString(
+            '<br>',
+            $result3
+        );
+        self::assertStringContainsString(
+            \Vespula\Auth\Adapter\Sql::ERROR_NO_ROWS,
+            $result3
+        );
+        self::assertFalse($controller->isLoggedIn());
+    }
+    
     /**
      * @runInSeparateProcess
      */
