@@ -1127,6 +1127,9 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $psr11Container, 'da-controller', 'da-action', $req, $resp
         );
 
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
         $success_redirect_path = '/random-path';
         $expected_redirect_path = 
             $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT];

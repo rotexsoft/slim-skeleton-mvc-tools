@@ -636,7 +636,7 @@ class BaseController
             if( ($error_msg === '') ) {
 
                 $credentials = [
-                    'username'=> filter_var($username, FILTER_SANITIZE_STRING),
+                    'username'=> filter_var($username, FILTER_UNSAFE_RAW),
                     'password'=> $password, //Not sanitizing this. Sanitizing or
                                             //validating passwords should be app
                                             //specific & done during user creation. 
