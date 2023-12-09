@@ -1235,6 +1235,183 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $result3
         );
         self::assertFalse($controller->isLoggedIn());
+        
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Call doLogin with an Auth object that always throws a 
+        // \Vespula\Auth\Exception whose message string
+        // is not in $backendIssues & $usernamePswdMismatchIssues
+        // everytime the login method is called on it.
+        
+        $exceptionThrowingAuth = $this->newVespulaAuth(
+            \SMVCTools\Tests\TestObjects\AlwaysThrowExceptionOnLoginAuth::class
+        );
+        $originalAuth = $controller->getVespulaAuthObject();
+        $controller->setVespulaAuthObject($exceptionThrowingAuth);
+        
+        //reset the logger first so that only log messages related to the next 
+        //call of doLogin are present in the log object.
+        $controller->getContainerItem('logger')->reset();
+        
+        $result4 = $controller->doLoginPublic(
+            $controller->getVespulaAuthObject(), $bad_credentials, $success_redirect_path
+        );
+        
+        // Right error message was returned
+        self::assertEquals(
+            $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_general_msg'),
+            $result4
+        );
+        
+        // logger contains expected error message
+        self::assertTrue(
+            $this->stringIsContainedInAtLeastOneArrayItem(
+                $controller->getContainerItem('logger')->getLogEntries(),
+                \str_replace(
+                    '<br>',
+                    PHP_EOL,
+                    $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_general_msg')
+                )
+            )
+        );
+        
+        // we should not be logged in
+        self::assertFalse($controller->isLoggedIn());
+        
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Call doLogin with an Auth object that always throws a 
+        // \Vespula\Auth\Exception whose message string
+        // is in $backendIssues everytime the login method is called on it.
+        
+        $exceptionThrowingAuth->setExceptionMessage('EXCEPTION_LDAP_CONNECT_FAILED');
+        
+        //reset the logger first so that only log messages related to the next 
+        //call of doLogin are present in the log object.
+        $controller->getContainerItem('logger')->reset();
+        
+        $result5 = $controller->doLoginPublic(
+            $controller->getVespulaAuthObject(), $bad_credentials, $success_redirect_path
+        );
+        
+        // Right error message was returned
+        self::assertEquals(
+            $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_back_end_msg'),
+            $result5
+        );
+        
+        // logger contains expected error message
+        self::assertTrue(
+            $this->stringIsContainedInAtLeastOneArrayItem(
+                $controller->getContainerItem('logger')->getLogEntries(),
+                \str_replace(
+                    '<br>',
+                    PHP_EOL,
+                    $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_back_end_msg')
+                )
+            )
+        );
+        
+        // we should not be logged in
+        self::assertFalse($controller->isLoggedIn());
+        
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Call doLogin with a credentials array not having any username or
+        // password keys, leading to a \Vespula\Auth\Exception being thrown
+        
+        $controller->setVespulaAuthObject($originalAuth);
+        
+        //reset the logger first so that only log messages related to the next 
+        //call of doLogin are present in the log object.
+        $controller->getContainerItem('logger')->reset();
+        
+        $credentials_with_no_uname_or_passwd = [];
+        
+        $result6 = $controller->doLoginPublic(
+            $controller->getVespulaAuthObject(), 
+            $credentials_with_no_uname_or_passwd, 
+            $success_redirect_path
+        );
+        
+        // Right error message was returned
+        self::assertEquals(
+            $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_user_passwd_msg'),
+            $result6
+        );
+        
+        // logger contains expected error message
+        self::assertTrue(
+            $this->stringIsContainedInAtLeastOneArrayItem(
+                $controller->getContainerItem('logger')->getLogEntries(),
+                \str_replace(
+                    '<br>',
+                    PHP_EOL,
+                    $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_user_passwd_msg')
+                )
+            )
+        );
+        
+        // we should not be logged in
+        self::assertFalse($controller->isLoggedIn());
+        
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+        // Call doLogin with an Auth object that throws a general 
+        // \Exception whose message string.
+        
+        $exceptionThrowingAuth->setExceptionMessage('Booo Booo!');
+        $exceptionThrowingAuth->setExceptionClass(\Exception::class);
+        $controller->setVespulaAuthObject($exceptionThrowingAuth);
+        
+        //reset the logger first so that only log messages related to the next 
+        //call of doLogin are present in the log object.
+        $controller->getContainerItem('logger')->reset();
+        
+        $result7 = $controller->doLoginPublic(
+            $controller->getVespulaAuthObject(), $bad_credentials, $success_redirect_path
+        );
+        
+        // Right error message was returned
+        self::assertEquals(
+            $controller->getAppSetting('base_controller_do_login_auth_exception_msg'),
+            $result7
+        );
+        
+        // logger contains expected error message
+        self::assertTrue(
+            $this->stringIsContainedInAtLeastOneArrayItem(
+                $controller->getContainerItem('logger')->getLogEntries(),
+                \str_replace(
+                    '<br>',
+                    PHP_EOL,
+                    $controller->getAppSetting('base_controller_do_login_auth_exception_msg')
+                )
+            )
+        );
+        
+        // we should not be logged in
+        self::assertFalse($controller->isLoggedIn());
+    }
+    
+    protected function stringIsContainedInAtLeastOneArrayItem(array $haystacks, string $needle): bool {
+        
+        $contains = false;
+        
+        foreach ($haystacks as $haystack) {
+            
+            if(str_contains($haystack, $needle)) {
+                
+                $contains = true;
+                break;
+            }
+        }
+        
+        return $contains;
     }
     
     /**

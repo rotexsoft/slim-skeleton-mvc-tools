@@ -119,6 +119,8 @@ SQL;
                 '\\SMVCTools\\Tests\\TestObjects\\',
             ];
             $psr11Container['vespula_auth'] = fn() => $this->newVespulaAuth();
+            
+            $psr11Container['logger'] = fn() => new \SMVCTools\Tests\TestObjects\InMemoryLogger();
 
             //Object for rendering layout files
             $psr11Container['new_layout_renderer'] = $psr11Container->factory(function () {

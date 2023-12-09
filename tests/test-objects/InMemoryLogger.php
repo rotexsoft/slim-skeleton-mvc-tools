@@ -31,4 +31,14 @@ class InMemoryLogger extends \Psr\Log\AbstractLogger {
         
         $this->log_entries[] = "[LEVEL: {$level}] [MESSAGE: {$message}]";
     }
+    
+    public function reset():void {
+        
+        $this->log_entries = [];
+    }
+    
+    public function getLogEntries(): array {
+        
+        return $this->log_entries;
+    }
 }
