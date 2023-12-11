@@ -34,17 +34,18 @@ class BaseController
      * An auth object used by the following methods of this class:
      *  - isLoggedIn
      *  - actionLogin
+     *      - doLogin
      *  - actionLogout
      *  - actionLoginStatus
      *
-     * These methods will throw a \SlimMvcTools\Controllers\Exceptions\IncorrectlySetPropertyException
+     * These methods will throw a \Slim\Exception\HttpInternalServerErrorException
      * if this object was not set before the method call.
      */
     protected \Vespula\Auth\Auth $vespula_auth;
 
     /**
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
-     * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
+     * if $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT] is not set.
      */
     protected string $login_success_redirect_action = 'login-status';
     
@@ -58,7 +59,7 @@ class BaseController
     
     /**
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
-     * if $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] is not set.
+     * if $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT] is not set.
      */
     protected string $login_success_redirect_controller = 'base-controller';
     
@@ -697,7 +698,7 @@ class BaseController
             $potential_success_redirect_path = '';
             
             /** @psalm-suppress MixedArrayOffset */
-            if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
+            if( isset($_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT]) ) {
 
                 ////////////////////////////////////////////////////////////////
                 // There is an active session with a redirect url stored in it
@@ -706,7 +707,7 @@ class BaseController
                 // calls session_regenerate_id(true) under the hood which will delete
                 // old session data including this value we are capturing here.
                 /** @psalm-suppress MixedAssignment */
-                $potential_success_redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
+                $potential_success_redirect_path = $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT];
             }
             
             $auth->login($credentials); //try to login
@@ -722,11 +723,11 @@ class BaseController
                         ? $potential_success_redirect_path : $success_redirect_path;
                 
                 /** @psalm-suppress MixedArrayOffset */
-                if( isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]) ) {
+                if( isset($_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT]) ) {
 
                     //since login is successful remove stored redirect url, 
                     //it has served its purpose & we'll be redirecting now.
-                    unset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT]);
+                    unset($_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT]);
                 }
 
                 //since we are successfully logged in, resume session if any
@@ -860,11 +861,11 @@ class BaseController
         /** @psalm-suppress MixedArrayOffset */
         if(
             session_status() === PHP_SESSION_ACTIVE
-            && isset($_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT])
+            && isset($_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT])
         ) {
             //there is an active session with a redirect url stored in it
             /** @psalm-suppress MixedAssignment */
-            $redirect_path = $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT];
+            $redirect_path = $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT];
         }
 
         //re-direct
@@ -1022,7 +1023,7 @@ class BaseController
 
         //store current url in session
         /** @psalm-suppress MixedArrayOffset */
-        $_SESSION[static::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
+        $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT] = $curr_url;
         
         return $this;
     }
