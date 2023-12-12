@@ -5,6 +5,7 @@ namespace SlimMvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
     \Psr\Http\Message\ResponseInterface,
+    \SlimMvcTools\ContainerKeys,
     \SlimMvcTools\Utils;
 
 /**
@@ -172,18 +173,6 @@ class BaseController
     //////////////////////////////////
     public const SESSN_PARAM_LOGIN_REDIRECT = 'login_redirect_path';
     
-    ////////////////////////////////////////////////////////
-    // Keys for container items needed in this controller
-    ////////////////////////////////////////////////////////
-    public const LAYOUT_RENDERER_CONTAINER_KEY = 'new_layout_renderer';
-    public const VIEW_RENDERER_CONTAINER_KEY = 'new_view_renderer';
-    
-    // 'logger'
-    // 'vespula_auth'
-    // 'settings'
-    
-    
-    
     /**
      * 
      * @psalm-suppress PossiblyUnusedMethod
@@ -204,19 +193,19 @@ class BaseController
         $this->controller_name_from_uri = ($controller_name_from_uri !== '') ? $controller_name_from_uri : $this->controller_name_from_uri;
         
         /** @psalm-suppress MixedAssignment */
-        $this->vespula_auth = $this->getContainerItem('vespula_auth');
+        $this->vespula_auth = $this->getContainerItem(ContainerKeys::VESPULA_AUTH);
         
         /** 
          * @psalm-suppress MixedArgument
          * @psalm-suppress MixedAssignment
          */
-        $this->layout_renderer = $this->getContainerItem(static::LAYOUT_RENDERER_CONTAINER_KEY);
+        $this->layout_renderer = $this->getContainerItem(ContainerKeys::LAYOUT_RENDERER);
         
         /** 
          * @psalm-suppress MixedArgument
          * @psalm-suppress MixedAssignment
          */
-        $this->view_renderer = $this->getContainerItem(static::VIEW_RENDERER_CONTAINER_KEY);
+        $this->view_renderer = $this->getContainerItem(ContainerKeys::VIEW_RENDERER);
         
         $uri_path = ($req->getUri() instanceof \Psr\Http\Message\UriInterface)
                                                 ? $req->getUri()->getPath() : '';
@@ -425,7 +414,7 @@ class BaseController
        /** 
          * @psalm-suppress MixedAssignment
          */
-        $settings = $this->getContainerItem('settings');
+        $settings = $this->getContainerItem(ContainerKeys::APP_SETTINGS);
         
        /** 
          * @psalm-suppress MixedArrayAccess
@@ -465,7 +454,7 @@ class BaseController
          * @psalm-suppress MixedArgument
          * @psalm-suppress MixedAssignment
          */
-        $this->layout_renderer = $this->getContainerItem(static::LAYOUT_RENDERER_CONTAINER_KEY); // get new instance for each call to this method renderLayout
+        $this->layout_renderer = $this->getContainerItem(ContainerKeys::LAYOUT_RENDERER); // get new instance for each call to this method renderLayout
         
         /** 
          * @psalm-suppress MixedReturnStatement
@@ -502,7 +491,7 @@ class BaseController
          * @psalm-suppress MixedArgument
          * @psalm-suppress MixedAssignment
          */
-        $this->view_renderer = $this->getContainerItem(static::VIEW_RENDERER_CONTAINER_KEY);  // get new instance for each call to this method renderView
+        $this->view_renderer = $this->getContainerItem(ContainerKeys::VIEW_RENDERER);  // get new instance for each call to this method renderView
 
         while( $parent_class !== self::class && ($parent_class !== '' && $parent_class !== false) ) {
 
@@ -800,9 +789,10 @@ class BaseController
                 $_msg = $this->getAppSetting('base_controller_do_login_auth_v_auth_exception_user_passwd_msg');
             }
 
+            /** @psalm-suppress MixedArgument */
             if(
-                $this->getContainer()->has('logger')
-                && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
+                $this->getContainer()->has(ContainerKeys::LOGGER)
+                && ( $this->getContainer()->get(ContainerKeys::LOGGER) instanceof \Psr\Log\LoggerInterface )
             ){
                 /** 
                  * @psalm-suppress MixedArgument
@@ -810,7 +800,7 @@ class BaseController
                  * @psalm-suppress PossiblyInvalidOperand 
                  */
                 $this->getContainer()
-                     ->get('logger')
+                     ->get(ContainerKeys::LOGGER)
                      ->error( 
                         \str_replace('<br>', PHP_EOL, $_msg)
                         . Utils::getThrowableAsStr($vaExc)
@@ -822,8 +812,8 @@ class BaseController
             $_msg = $this->getAppSetting('base_controller_do_login_auth_exception_msg');
 
             if(
-                $this->getContainer()->has('logger')
-                && ( $this->getContainer()->get('logger') instanceof \Psr\Log\LoggerInterface )
+                $this->getContainer()->has(ContainerKeys::LOGGER)
+                && ( $this->getContainer()->get(ContainerKeys::LOGGER) instanceof \Psr\Log\LoggerInterface )
             ) {
                 /** 
                  * @psalm-suppress MixedArgument
@@ -831,7 +821,7 @@ class BaseController
                  * @psalm-suppress PossiblyInvalidOperand 
                  */
                 $this->getContainer()
-                     ->get('logger')
+                     ->get(ContainerKeys::LOGGER)
                      ->error(
                         \str_replace('<br>', PHP_EOL, $_msg)
                         . Utils::getThrowableAsStr($basExc)

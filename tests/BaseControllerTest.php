@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
 
-use \SlimMvcTools\Controllers\BaseController;
+use \SlimMvcTools\Controllers\BaseController,
+    \SlimMvcTools\ContainerKeys;
 
 /**
  * Description of BaseControllerTest
@@ -301,7 +302,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $resp = $this->newResponse();
         $psr11Container = $this->getContainer();
         
-        // container with ['settings']['app_base_path'] with no leading slash
+        // container with [ContainerKeys::APP_SETTINGS]['app_base_path'] with no leading slash
         $psr11Container2 = $this->getContainer(['app_base_path' => 'da-path2',]);
         
         //////////////////////////////////////////////////////////
@@ -345,13 +346,13 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // constructor are computed into controller's 
         // current_uri_computed property
         //////////////////////////////////////////////////////////
-        $req3 = $this->newRequest('http://google.com' . $psr11Container->get('settings')['app_base_path'] );
+        $req3 = $this->newRequest('http://google.com' . $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'] );
         $controller3 = new BaseController(
             $psr11Container, 'controller-from-constructor', 
             'action-from-constructor', $req3, $resp
         );
         self::assertEquals(
-            'http://google.com'. $psr11Container->get('settings')['app_base_path'] .'/controller-from-constructor/action-from-constructor', 
+            'http://google.com'. $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'] .'/controller-from-constructor/action-from-constructor', 
             $controller3->getCurrentUriComputed()
         );
         
@@ -361,12 +362,12 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // to the constructor are computed into controller's 
         // current_uri_computed property
         //////////////////////////////////////////////////////////
-        $req4 = $this->newRequest('http://google.com' . $psr11Container->get('settings')['app_base_path'] );
+        $req4 = $this->newRequest('http://google.com' . $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'] );
         $controller4 = new BaseController(
             $psr11Container, 'controller-from-constructor', '', $req4, $resp
         );
         self::assertEquals(
-            'http://google.com'. $psr11Container->get('settings')['app_base_path'] .'/controller-from-constructor', 
+            'http://google.com'. $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'] .'/controller-from-constructor', 
             $controller4->getCurrentUriComputed()
         );
         
@@ -381,13 +382,13 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // current_uri_computed property
         //////////////////////////////////////////////////////////
         
-        $req5 = $this->newRequest('http://google.com/' . $psr11Container2->get('settings')['app_base_path'] );
+        $req5 = $this->newRequest('http://google.com/' . $psr11Container2->get(ContainerKeys::APP_SETTINGS)['app_base_path'] );
         $controller5 = new BaseController(
             $psr11Container2, 'controller-from-constructor', 
             'action-from-constructor', $req5, $resp
         );
         self::assertEquals(
-            'http://google.com/'. $psr11Container2->get('settings')['app_base_path'] .'/controller-from-constructor/action-from-constructor', 
+            'http://google.com/'. $psr11Container2->get(ContainerKeys::APP_SETTINGS)['app_base_path'] .'/controller-from-constructor/action-from-constructor', 
             $controller5->getCurrentUriComputed()
         );
         
@@ -397,12 +398,12 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // to the constructor are computed into controller's 
         // current_uri_computed property
         //////////////////////////////////////////////////////////
-        $req6 = $this->newRequest('http://google.com/' . $psr11Container2->get('settings')['app_base_path'] );
+        $req6 = $this->newRequest('http://google.com/' . $psr11Container2->get(ContainerKeys::APP_SETTINGS)['app_base_path'] );
         $controller6 = new BaseController(
             $psr11Container2, 'controller-from-constructor', '', $req6, $resp
         );
         self::assertEquals(
-            'http://google.com/'. $psr11Container2->get('settings')['app_base_path'] .'/controller-from-constructor', 
+            'http://google.com/'. $psr11Container2->get(ContainerKeys::APP_SETTINGS)['app_base_path'] .'/controller-from-constructor', 
             $controller6->getCurrentUriComputed()
         );
     }
@@ -416,7 +417,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new BaseController(
             $psr11Container, '', '', $req, $resp
         );
-        self::assertSame($psr11Container->get('vespula_auth'), $controller->getVespulaAuthObject());
+        self::assertSame($psr11Container->get(ContainerKeys::VESPULA_AUTH), $controller->getVespulaAuthObject());
         
         $new_auth = $this->newVespulaAuth();
         $controller->setVespulaAuthObject($new_auth);
@@ -434,7 +435,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $psr11Container, '', '', $req, $resp
         );
         
-        $new_renderer = $this->getContainer()[BaseController::LAYOUT_RENDERER_CONTAINER_KEY];
+        $new_renderer = $this->getContainer()[\SlimMvcTools\ContainerKeys::LAYOUT_RENDERER];
         $controller->setLayoutRenderer($new_renderer);
         
         self::assertSame($new_renderer, $controller->getLayoutRenderer());
@@ -450,7 +451,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $psr11Container, '', '', $req, $resp
         );
         
-        $new_renderer = $this->getContainer()[BaseController::VIEW_RENDERER_CONTAINER_KEY];
+        $new_renderer = $this->getContainer()[\SlimMvcTools\ContainerKeys::VIEW_RENDERER];
         $controller->setViewRenderer($new_renderer);
         
         self::assertSame($new_renderer, $controller->getViewRenderer());
@@ -499,7 +500,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
         
         self::assertEquals(
-            $psr11Container->get('settings')['app_base_path'], 
+            $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'], 
             $controller->getAppBasePath()
         );
     }
@@ -515,7 +516,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
         
         self::assertEquals(
-            $psr11Container->get('settings')['app_base_path'], 
+            $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'], 
             $controller->getAppSetting('app_base_path')
         );
         self::assertNull( $controller->getAppSetting('non_existent_setting_key') );
@@ -1252,7 +1253,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         //reset the logger first so that only log messages related to the next 
         //call of doLogin are present in the log object.
-        $controller->getContainerItem('logger')->reset();
+        $controller->getContainerItem(ContainerKeys::LOGGER)->reset();
         
         $result4 = $controller->doLoginPublic(
             $controller->getVespulaAuthObject(), $bad_credentials, $success_redirect_path
@@ -1267,7 +1268,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // logger contains expected error message
         self::assertTrue(
             $this->stringIsContainedInAtLeastOneArrayItem(
-                $controller->getContainerItem('logger')->getLogEntries(),
+                $controller->getContainerItem(ContainerKeys::LOGGER)->getLogEntries(),
                 \str_replace(
                     '<br>',
                     PHP_EOL,
@@ -1290,7 +1291,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         //reset the logger first so that only log messages related to the next 
         //call of doLogin are present in the log object.
-        $controller->getContainerItem('logger')->reset();
+        $controller->getContainerItem(ContainerKeys::LOGGER)->reset();
         
         $result5 = $controller->doLoginPublic(
             $controller->getVespulaAuthObject(), $bad_credentials, $success_redirect_path
@@ -1305,7 +1306,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // logger contains expected error message
         self::assertTrue(
             $this->stringIsContainedInAtLeastOneArrayItem(
-                $controller->getContainerItem('logger')->getLogEntries(),
+                $controller->getContainerItem(ContainerKeys::LOGGER)->getLogEntries(),
                 \str_replace(
                     '<br>',
                     PHP_EOL,
@@ -1327,7 +1328,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         //reset the logger first so that only log messages related to the next 
         //call of doLogin are present in the log object.
-        $controller->getContainerItem('logger')->reset();
+        $controller->getContainerItem(ContainerKeys::LOGGER)->reset();
         
         $credentials_with_no_uname_or_passwd = [];
         
@@ -1346,7 +1347,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // logger contains expected error message
         self::assertTrue(
             $this->stringIsContainedInAtLeastOneArrayItem(
-                $controller->getContainerItem('logger')->getLogEntries(),
+                $controller->getContainerItem(ContainerKeys::LOGGER)->getLogEntries(),
                 \str_replace(
                     '<br>',
                     PHP_EOL,
@@ -1370,7 +1371,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         //reset the logger first so that only log messages related to the next 
         //call of doLogin are present in the log object.
-        $controller->getContainerItem('logger')->reset();
+        $controller->getContainerItem(ContainerKeys::LOGGER)->reset();
         
         $result7 = $controller->doLoginPublic(
             $controller->getVespulaAuthObject(), $bad_credentials, $success_redirect_path
@@ -1385,7 +1386,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // logger contains expected error message
         self::assertTrue(
             $this->stringIsContainedInAtLeastOneArrayItem(
-                $controller->getContainerItem('logger')->getLogEntries(),
+                $controller->getContainerItem(ContainerKeys::LOGGER)->getLogEntries(),
                 \str_replace(
                     '<br>',
                     PHP_EOL,
@@ -1805,10 +1806,9 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new BaseController(
             $psr11Container, '', '', $req, $resp
         );        
-        self::assertSame($psr11Container->get('settings'), $controller->getContainerItem('settings'));
-        self::assertSame($psr11Container->get('namespaces_for_controllers'), $controller->getContainerItem('namespaces_for_controllers'));
+        self::assertSame($psr11Container->get(ContainerKeys::APP_SETTINGS), $controller->getContainerItem(ContainerKeys::APP_SETTINGS));
+        self::assertSame($psr11Container->get(ContainerKeys::NAMESPACES_4_CONTROLLERS), $controller->getContainerItem(ContainerKeys::NAMESPACES_4_CONTROLLERS));
         
-
         try {
             $controller->getContainerItem('non-existent-item');
             $this->fail(\Slim\Exception\HttpInternalServerErrorException::class . ' was not thrown');

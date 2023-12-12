@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use \SlimMvcTools\ContainerKeys;
+
 /**
  * Creates & returns a controller object that is an instance of 
  * \SlimMvcTools\Controllers\BaseController or its sub-classes
@@ -33,10 +35,10 @@ function sMVC_CreateController(
 
     if( !class_exists($controller_class_name) ) {
         
-        if( $container->has('namespaces_for_controllers') ) {
+        if( $container->has(ContainerKeys::NAMESPACES_4_CONTROLLERS) ) {
             
             /** @psalm-suppress MixedAssignment */
-            $namespaces_4_controllers = $container->get('namespaces_for_controllers');
+            $namespaces_4_controllers = $container->get(ContainerKeys::NAMESPACES_4_CONTROLLERS);
 
             //try to prepend name space
             /** @psalm-suppress MixedAssignment */

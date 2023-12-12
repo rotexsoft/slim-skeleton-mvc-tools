@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
 
-use \SlimMvcTools\Container;
+use \SlimMvcTools\Container,
+    \SlimMvcTools\ContainerKeys;
 
 /**
  *
@@ -112,22 +113,22 @@ SQL;
                 $settings[$key] = $value;
             }
             
-            $psr11Container['settings'] = $settings;
+            $psr11Container[ContainerKeys::APP_SETTINGS] = $settings;
             
-            $psr11Container['namespaces_for_controllers'] = [
+            $psr11Container[ContainerKeys::NAMESPACES_4_CONTROLLERS] = [
                 '\\SlimMvcTools\\Controllers\\',
                 '\\SMVCTools\\Tests\\TestObjects\\',
             ];
-            $psr11Container['vespula_auth'] = fn() => $this->newVespulaAuth();
+            $psr11Container[ContainerKeys::VESPULA_AUTH] = fn() => $this->newVespulaAuth();
             
-            $psr11Container['logger'] = fn() => new \SMVCTools\Tests\TestObjects\InMemoryLogger();
+            $psr11Container[ContainerKeys::LOGGER] = fn() => new \SMVCTools\Tests\TestObjects\InMemoryLogger();
 
             //Object for rendering layout files
-            $psr11Container[\SlimMvcTools\Controllers\BaseController::LAYOUT_RENDERER_CONTAINER_KEY] = 
+            $psr11Container[ContainerKeys::LAYOUT_RENDERER] = 
                 $psr11Container->factory(function () {
 
                     // return a new instance on each access to 
-                    // $psr11Container[\SlimMvcTools\Controllers\BaseController::LAYOUT_RENDERER_CONTAINER_KEY]
+                    // $psr11Container[ContainerKeys::LAYOUT_RENDERER]
                     $ds = DIRECTORY_SEPARATOR;
                     $path_2_layout_files = __DIR__ . DIRECTORY_SEPARATOR . 'test-template-output';
                     $layout_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_layout_files]);
@@ -136,11 +137,11 @@ SQL;
                 });
 
             //Object for rendering view files
-            $psr11Container[\SlimMvcTools\Controllers\BaseController::VIEW_RENDERER_CONTAINER_KEY] = 
+            $psr11Container[ContainerKeys::VIEW_RENDERER] = 
                 $psr11Container->factory(function () {
 
                     // Return a new instance on each access to 
-                    // $psr11Container[\SlimMvcTools\Controllers\BaseController::VIEW_RENDERER_CONTAINER_KEY]
+                    // $psr11Container[ContainerKeys::VIEW_RENDERER]
                     $ds = DIRECTORY_SEPARATOR;
                     $path_2_view_files = __DIR__ . DIRECTORY_SEPARATOR . 'fake-smvc-app-root' ."{$ds}src{$ds}views{$ds}base";
                     $view_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_view_files]);
