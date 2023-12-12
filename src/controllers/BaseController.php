@@ -9,8 +9,9 @@ use \Psr\Http\Message\ServerRequestInterface,
     \SlimMvcTools\Utils;
 
 /**
- *
- * Description of BaseController
+ * A base controller class that should be extended to build mvc controllers
+ * in https://github.com/rotexsoft/slim-skeleton-mvc-app applications. 
+ * There is a command-line tool for building such controllers.
  *
  * @author Rotimi Adegbamigbe
  */
