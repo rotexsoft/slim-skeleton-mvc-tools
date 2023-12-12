@@ -123,15 +123,17 @@ SQL;
             $psr11Container['logger'] = fn() => new \SMVCTools\Tests\TestObjects\InMemoryLogger();
 
             //Object for rendering layout files
-            $psr11Container['new_layout_renderer'] = $psr11Container->factory(function () {
+            $psr11Container[\SlimMvcTools\Controllers\BaseController::LAYOUT_RENDERER_CONTAINER_KEY] = 
+                $psr11Container->factory(function () {
 
-                //return a new instance on each access to $psr11Container['new_layout_renderer']
-                $ds = DIRECTORY_SEPARATOR;
-                $path_2_layout_files = __DIR__ . DIRECTORY_SEPARATOR . 'test-template-output';
-                $layout_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_layout_files]);
+                    // return a new instance on each access to 
+                    // $psr11Container[\SlimMvcTools\Controllers\BaseController::LAYOUT_RENDERER_CONTAINER_KEY]
+                    $ds = DIRECTORY_SEPARATOR;
+                    $path_2_layout_files = __DIR__ . DIRECTORY_SEPARATOR . 'test-template-output';
+                    $layout_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_layout_files]);
 
-                return $layout_renderer;
-            });
+                    return $layout_renderer;
+                });
 
             //Object for rendering view files
             $psr11Container['new_view_renderer'] = $psr11Container->factory(function () {

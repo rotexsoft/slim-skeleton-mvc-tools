@@ -172,6 +172,12 @@ class BaseController
     //////////////////////////////////
     public const SESSN_PARAM_LOGIN_REDIRECT = 'login_redirect_path';
     
+    ////////////////////////////////////////////////////////
+    // Keys for container items needed in this controller
+    ////////////////////////////////////////////////////////
+    public const LAYOUT_RENDERER_CONTAINER_KEY = 'new_layout_renderer';
+    
+    
     /**
      * 
      * @psalm-suppress PossiblyUnusedMethod
@@ -194,8 +200,11 @@ class BaseController
         /** @psalm-suppress MixedAssignment */
         $this->vespula_auth = $this->getContainerItem('vespula_auth');
         
-        /** @psalm-suppress MixedAssignment */
-        $this->layout_renderer = $this->getContainerItem('new_layout_renderer');
+        /** 
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MixedAssignment
+         */
+        $this->layout_renderer = $this->getContainerItem(static::LAYOUT_RENDERER_CONTAINER_KEY);
         
         /** @psalm-suppress MixedAssignment */
         $this->view_renderer = $this->getContainerItem('new_view_renderer');
@@ -443,9 +452,11 @@ class BaseController
         $self = $this;
         $data['sMVC_MakeLink'] = fn(string $path): string => $self->makeLink($path);
         
-        // get new instance
-        /** @psalm-suppress MixedAssignment */
-        $this->layout_renderer = $this->getContainerItem('new_layout_renderer');
+        /** 
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MixedAssignment
+         */
+        $this->layout_renderer = $this->getContainerItem(static::LAYOUT_RENDERER_CONTAINER_KEY); // get new instance for each call to this method renderLayout
         
         /** 
          * @psalm-suppress MixedReturnStatement
@@ -478,9 +489,8 @@ class BaseController
         $parent_classes = [];
         $parent_class = get_parent_class($this);
         
-        // get new instance
         /** @psalm-suppress MixedAssignment */
-        $this->view_renderer = $this->getContainerItem('new_view_renderer');
+        $this->view_renderer = $this->getContainerItem('new_view_renderer');  // get new instance for each call to this method renderView
 
         while( $parent_class !== self::class && ($parent_class !== '' && $parent_class !== false) ) {
 
