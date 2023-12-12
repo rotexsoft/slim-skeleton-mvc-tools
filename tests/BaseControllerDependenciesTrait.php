@@ -136,15 +136,17 @@ SQL;
                 });
 
             //Object for rendering view files
-            $psr11Container['new_view_renderer'] = $psr11Container->factory(function () {
+            $psr11Container[\SlimMvcTools\Controllers\BaseController::VIEW_RENDERER_CONTAINER_KEY] = 
+                $psr11Container->factory(function () {
 
-                //return a new instance on each access to $psr11Container['new_view_renderer']
-                $ds = DIRECTORY_SEPARATOR;
-                $path_2_view_files = __DIR__ . DIRECTORY_SEPARATOR . 'fake-smvc-app-root' ."{$ds}src{$ds}views{$ds}base";
-                $view_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_view_files]);
+                    // Return a new instance on each access to 
+                    // $psr11Container[\SlimMvcTools\Controllers\BaseController::VIEW_RENDERER_CONTAINER_KEY]
+                    $ds = DIRECTORY_SEPARATOR;
+                    $path_2_view_files = __DIR__ . DIRECTORY_SEPARATOR . 'fake-smvc-app-root' ."{$ds}src{$ds}views{$ds}base";
+                    $view_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_view_files]);
 
-                return $view_renderer;
-            });
+                    return $view_renderer;
+                });
         }
         
         return $psr11Container;

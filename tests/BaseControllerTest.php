@@ -450,7 +450,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $psr11Container, '', '', $req, $resp
         );
         
-        $new_renderer = $this->getContainer()['new_view_renderer'];
+        $new_renderer = $this->getContainer()[BaseController::VIEW_RENDERER_CONTAINER_KEY];
         $controller->setViewRenderer($new_renderer);
         
         self::assertSame($new_renderer, $controller->getViewRenderer());

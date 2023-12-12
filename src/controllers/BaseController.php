@@ -176,6 +176,12 @@ class BaseController
     // Keys for container items needed in this controller
     ////////////////////////////////////////////////////////
     public const LAYOUT_RENDERER_CONTAINER_KEY = 'new_layout_renderer';
+    public const VIEW_RENDERER_CONTAINER_KEY = 'new_view_renderer';
+    
+    // 'logger'
+    // 'vespula_auth'
+    // 'settings'
+    
     
     
     /**
@@ -206,8 +212,11 @@ class BaseController
          */
         $this->layout_renderer = $this->getContainerItem(static::LAYOUT_RENDERER_CONTAINER_KEY);
         
-        /** @psalm-suppress MixedAssignment */
-        $this->view_renderer = $this->getContainerItem('new_view_renderer');
+        /** 
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MixedAssignment
+         */
+        $this->view_renderer = $this->getContainerItem(static::VIEW_RENDERER_CONTAINER_KEY);
         
         $uri_path = ($req->getUri() instanceof \Psr\Http\Message\UriInterface)
                                                 ? $req->getUri()->getPath() : '';
@@ -489,8 +498,11 @@ class BaseController
         $parent_classes = [];
         $parent_class = get_parent_class($this);
         
-        /** @psalm-suppress MixedAssignment */
-        $this->view_renderer = $this->getContainerItem('new_view_renderer');  // get new instance for each call to this method renderView
+        /** 
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MixedAssignment
+         */
+        $this->view_renderer = $this->getContainerItem(static::VIEW_RENDERER_CONTAINER_KEY);  // get new instance for each call to this method renderView
 
         while( $parent_class !== self::class && ($parent_class !== '' && $parent_class !== false) ) {
 
