@@ -39,9 +39,6 @@ class BaseController
      *      - doLogin
      *  - actionLogout
      *  - actionLoginStatus
-     *
-     * These methods will throw a \Slim\Exception\HttpInternalServerErrorException
-     * if this object was not set before the method call.
      */
     protected \Vespula\Auth\Auth $vespula_auth;
 
@@ -175,7 +172,6 @@ class BaseController
     public const SESSN_PARAM_LOGIN_REDIRECT = 'login_redirect_path';
     
     /**
-     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function __construct(
@@ -283,7 +279,7 @@ class BaseController
         }
         
         if( 
-            (($this->controller_name_from_uri === '') || ($this->action_name_from_uri === ''))
+            ( ($this->controller_name_from_uri === '') || ($this->action_name_from_uri === '') )
             && ( ($uri_path !== '') && ($uri_path !== '/') && (strpos($uri_path, '/') !== false) )
         ) {
             // Calculate $this->controller_name_from_uri and / or
@@ -444,7 +440,6 @@ class BaseController
      *                    file (i.e. the file named $file_name).
      * 
      * @psalm-suppress MixedInferredReturnType
-     *
      */
     public function renderLayout( string $file_name, array $data = ['content'=>'Content should be placed here!'] ): string {
 
@@ -465,7 +460,6 @@ class BaseController
     }
 
     /**
-     *
      * Executes a PHP file and returns its output as a string. This file is
      * supposed to contain the output markup (usually html) for the current
      * controller action method being executed.
@@ -725,7 +719,24 @@ class BaseController
             $auth->login($credentials); //try to login
 
             if( $auth->isValid() ) { // login successful
-                
+
+                /** @psalm-suppress MixedArgument */
+                if(
+                    $this->getContainer()->has(ContainerKeys::LOGGER)
+                    && ( $this->getContainer()->get(ContainerKeys::LOGGER) instanceof \Psr\Log\LoggerInterface )
+                ){
+                    /** 
+                     * @psalm-suppress MixedArgument
+                     * @psalm-suppress MixedMethodCall
+                     * @psalm-suppress PossiblyInvalidOperand 
+                     */
+                    $this->getContainer()
+                         ->get(ContainerKeys::LOGGER)
+                         ->info( 
+                            "User `{$auth->getUsername()}` successfully logged in." . PHP_EOL .PHP_EOL
+                         );
+                }
+
                 /** @psalm-suppress MixedAssignment */
                 $_msg = $this->getAppSetting('base_controller_do_login_auth_is_valid_msg');
                 
@@ -844,12 +855,32 @@ class BaseController
     public function actionLogout($show_status_on_completion = false): ResponseInterface {
         
         $auth = $this->vespula_auth;
+        $logged_in_user = $this->isLoggedIn() ? $auth->getUsername() : '';
+        
         $auth->logout(); //logout
         
         if( !$auth->isAnon() ) {
 
             //logout failed. Definitely redirect to actionLoginStatus
             $show_status_on_completion = true;
+            
+        } elseif ($logged_in_user !== '') {
+            
+            if(
+                $this->getContainer()->has(ContainerKeys::LOGGER)
+                && ( $this->getContainer()->get(ContainerKeys::LOGGER) instanceof \Psr\Log\LoggerInterface )
+            ){
+                /** 
+                 * @psalm-suppress MixedArgument
+                 * @psalm-suppress MixedMethodCall
+                 * @psalm-suppress PossiblyInvalidOperand 
+                 */
+                $this->getContainer()
+                     ->get(ContainerKeys::LOGGER)
+                     ->info( 
+                        "User `{$logged_in_user}` successfully logged out" . PHP_EOL .PHP_EOL
+                     );
+            }
         }
 
         // SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES === true

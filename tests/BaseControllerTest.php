@@ -1135,6 +1135,11 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $expected_redirect_path = 
             $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT];
         $credentials = [ 'username'=> 'admin', 'password'=> 'admin', ];
+        
+        //reset the logger first so that only log messages related to the next 
+        //call of doLogin are present in the log object.
+        $controller->getContainerItem(ContainerKeys::LOGGER)->reset();
+        
         $result = $controller->doLoginPublic(
             $controller->getVespulaAuthObject(), $credentials, $success_redirect_path
         );
@@ -1151,12 +1156,22 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         ////////////////////////////////////////////////////
         // Check that successful login message was returned
         // and that the controller is in a logged in state
+        // and that successful login message was logged via
+        // the logger
         ////////////////////////////////////////////////////
         self::assertEquals(
             $controller->getAppSetting('base_controller_do_login_auth_is_valid_msg'),
             $result
         );
         self::assertTrue($controller->isLoggedIn());
+        
+        // logger contains expected successfully logged in message
+        self::assertTrue(
+            $this->stringIsContainedInAtLeastOneArrayItem(
+                $controller->getContainerItem(ContainerKeys::LOGGER)->getLogEntries(),
+                "User `admin` successfully logged in." . PHP_EOL .PHP_EOL
+            )
+        );
         
         //////////
         // logout
@@ -1524,6 +1539,13 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $psr11Container, 'da-shizzle-for-rizzle-controller', '', $req, $resp
         );
         
+        $_POST['username'] = 'admin';
+        $_POST['password'] = 'admin';
+        $controller3->setRequest($controller3->getRequest()->withMethod('POST'));
+        $controller3->actionLogin();
+        
+        self::assertTrue($controller3->isLoggedIn());
+        
         if(
             session_status() === PHP_SESSION_ACTIVE
             && isset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT])
@@ -1531,7 +1553,22 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             unset($_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT]);
         }
         
+        // reset the logger first so that only log messages related to the next 
+        // call of actionLogout are present in the log object.
+        $controller3->getContainerItem(ContainerKeys::LOGGER)->reset();
+        
+        $controller3->setRequest($controller3->getRequest()->withMethod('GET'));
         $actionResult3 = $controller3->actionLogout(true);
+        self::assertFalse($controller3->isLoggedIn());
+        
+        // logger contains expected successfully logged out message
+        self::assertTrue(
+            $this->stringIsContainedInAtLeastOneArrayItem(
+                $controller3->getContainerItem(ContainerKeys::LOGGER)->getLogEntries(),
+                "User `admin` successfully logged out" . PHP_EOL .PHP_EOL
+            )
+        );
+        
         self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionResult3);
         self::assertEquals(302, $actionResult3->getStatusCode());
         self::assertTrue($actionResult3->hasHeader('Location'));
