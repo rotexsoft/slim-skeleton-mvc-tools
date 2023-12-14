@@ -192,7 +192,12 @@ class FrameworkHelpersTest extends \PHPUnit\Framework\TestCase
                     $this->newRequest()->getUri(),
                     'baa', 'yoo'
                 );
-        self::assertEquals('http://tnyholm.se/blah?var=1&baa=yoo', sMVC_UriToString($result));
+        
+        $result2 = sMVC_AddQueryStrParamToUri(
+                    $result,
+                    'boo', 'baa'
+                );
+        self::assertEquals('http://tnyholm.se/blah?var=1&baa=yoo&boo=baa', sMVC_UriToString($result2));
     }
     
     public function testThat_sMVC_DisplayAndLogFrameworkFileNotFoundError_WorksAsExpected() {
