@@ -178,16 +178,15 @@ namespace SlimMvcTools\Functions\Str {
 
     /**
      * @param string $string string to be colored
-     * @param string $foreground_color any of 
-     *                                          'black', 'dark_gray', 'blue', 
-     *                                          'light_blue', 'green', 'light_green', 
-     *                                          'cyan', 'light_cyan', 'red', 'light_red', 
-     *                                          'purple', 'light_purple', 'brown', 'yellow', 
+     * @param string $foreground_color any of
+     *                                          'black', 'dark_gray', 'blue',
+     *                                          'light_blue', 'green', 'light_green',
+     *                                          'cyan', 'light_cyan', 'red', 'light_red',
+     *                                          'purple', 'light_purple', 'brown', 'yellow',
      *                                          'light_gray' and 'white'
-     * @param string $background_color any of 
-     *                                         'black', 'red', 'green', 'yellow', 'blue', 
-     *                                         'magenta', 'cyan' and 'light_gray' 
-     * @return string
+     * @param string $background_color any of
+     *                                         'black', 'red', 'green', 'yellow', 'blue',
+     *                                         'magenta', 'cyan' and 'light_gray'
      */
     function color_4_console(
         string $string, 

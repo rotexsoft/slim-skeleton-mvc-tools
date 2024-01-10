@@ -79,7 +79,6 @@ function sMVC_CreateController(
 }
 
 /**
- * @param \Vespula\Auth\Auth $auth
  * @return string containing current authentication status info
  */
 function sMVC_DumpAuthinfo(\Vespula\Auth\Auth $auth): string {
@@ -269,13 +268,9 @@ function sMVC_UriToString(\Psr\Http\Message\UriInterface $uri): string {
 /**
  * Adds a query string parameter key/value pair to a uri object.
  * 
- * Given a uri object $uri1 representing http://someserver.com/controller/action?param1=val1 
+ * Given a uri object $uri1 representing http://someserver.com/controller/action?param1=val1
  * sMVC_addQueryStrParamToUri($uri1, 'param2', 'val2') will return a new uri object representing
  * http://someserver.com/controller/action?param1=val1&param2=val2
- * 
- * @param \Psr\Http\Message\UriInterface $uri
- * @param string $param_name
- * @param string $param_value 
  */
 function sMVC_AddQueryStrParamToUri(
     \Psr\Http\Message\UriInterface $uri, string $param_name, string $param_value
