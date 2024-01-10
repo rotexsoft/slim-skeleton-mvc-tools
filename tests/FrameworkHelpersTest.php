@@ -197,6 +197,7 @@ class FrameworkHelpersTest extends \PHPUnit\Framework\TestCase
                     $result,
                     'boo', 'baa'
                 );
+        self::assertEquals('http://tnyholm.se/blah?var=1&baa=yoo', sMVC_UriToString($result));
         self::assertEquals('http://tnyholm.se/blah?var=1&baa=yoo&boo=baa', sMVC_UriToString($result2));
     }
     
