@@ -42,6 +42,7 @@ tests/test-template-output/logs/*
 !tests/fake-smvc-app-root/src/views/base/index.php
 !tests/fake-smvc-app-root/src/views/child-controller/index.php
 !tests/fake-smvc-app-root/src/views/grand-child-controller/index.php
+!tests/fake-smvc-app-root/src/views/controller-with-no-controller-class/index.php
 
 tests/test-create-controller-output/*
 !tests/test-create-controller-output/.gitkeep

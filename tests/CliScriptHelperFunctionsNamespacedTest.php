@@ -105,7 +105,7 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
         }
     }
     
-    public function testThatCreateControllerScriptWorksAsExpectedWhenDestinationControllerClassAndViewFilesFoldersCannotBeCreated() {
+    public function testThatCreateControllerWorksAsExpectedWhenDestinationControllerClassFolderCannotBeCreated() {
         
         $argvs = [
             [
@@ -165,5 +165,132 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
         
         $mock->disable();
         $mock2->disable();
+    }
+    
+    public function testThatCreateControllerWorksAsExpectedWhenDestinationViewFilesFoldersCannotBeCreated() {
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-posts',
+                '--path-to-src-folder', __DIR__,
+                '--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-posts',
+                '-p', __DIR__,
+                '-e', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+        ];
+        
+        $builder = new \phpmock\MockBuilder();
+        $builder->setNamespace(__NAMESPACE__)
+                ->setName("file_exists")
+                ->setFunction(
+                    function (string $filename): bool {
+                        return str_contains($filename, 'views') ? false : \file_exists($filename);
+                    }
+                );
+
+        $mock = $builder->build();
+        $mock->enable();
+        
+        $builder2 = new \phpmock\MockBuilder();
+        $builder2->setNamespace(__NAMESPACE__)
+                ->setName("mkdir")
+                ->setFunction(
+                    function (
+                        string $directory,
+                        int $permissions = 0777,
+                        bool $recursive = false,
+                        $context = null
+                    ): bool {
+                        return str_contains($directory, 'views') ? false : \mkdir($directory, $permissions, $recursive, $context);
+                    }
+                );
+
+        $mock2 = $builder2->build();
+        $mock2->enable();
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            
+            $expected_message = 'Failed to create `' . __DIR__ . DIRECTORY_SEPARATOR . 'views' 
+                    . DIRECTORY_SEPARATOR . 'blog-posts' . DIRECTORY_SEPARATOR
+                    . '`; the folder supposed to contain views for the controller named `BlogPosts`. Goodbye!!';
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals($expected_message, $return_val->getReturnMessage());
+        }
+        
+        $mock->disable();
+        $mock2->disable();
+    }
+    
+    public function testThatCreateControllerWorksAsExpectedWhenDestinationControllerClassExists() {
+        
+        $src_path = SMVC_APP_ROOT_PATH . DIRECTORY_SEPARATOR . 'src';
+        $dest_controller_class_file = $src_path . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR . 'ChildController.php';
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'child-controller',
+                '--path-to-src-folder', $src_path,
+                '--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'child-controller',
+                '-p', $src_path,
+                '-e', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+        ];
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            
+            $expected_message = "Controller class `ChildController` already exists in `{$dest_controller_class_file}`. Goodbye!!";
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals($expected_message, $return_val->getReturnMessage());
+        }
+    }
+    
+    public function testThatCreateControllerWorksAsExpectedWhenDestinationViewIndexDotPhpFileExists() {
+        
+        $src_path = SMVC_APP_ROOT_PATH . DIRECTORY_SEPARATOR . 'src';
+        $dest_view_file = 
+            $src_path . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR 
+                      . 'controller-with-no-controller-class' . DIRECTORY_SEPARATOR . 'index.php';
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'controller-with-no-controller-class',
+                '--path-to-src-folder', $src_path,
+                '--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'controller-with-no-controller-class',
+                '-p', $src_path,
+                '-e', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+        ];
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            
+            $expected_message = "View file `$dest_view_file` already exists for Controller class `ControllerWithNoControllerClass`. Goodbye!!";
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals($expected_message, $return_val->getReturnMessage());
+        }
     }
 }
