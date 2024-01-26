@@ -1,9 +1,58 @@
 <?php
+namespace SlimMvcTools\Functions\CliHelpers;
+
 include_once __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."functions".DIRECTORY_SEPARATOR."str-helpers.php";
 
-function displayHelp(string $cur_script): void {
+interface CliExitCodes {
+    public const SUCCESS_EXIT   = 0; // printInfo should be used for related messages
+    public const FAILURE_EXIT   = 1; // printError should be used for related messages
+    public const EXCEPTION_EXIT = 2; // printError should be used for related messages
+}
+
+class CreateControllerReturnValue {
     
-    $help = <<<HELP
+    /**
+     * Must be any one of 
+     *  CliExitCodes::SUCCESS_EXIT, 
+     *  CliExitCodes::EXCEPTION_EXIT or
+     *  CliExitCodes::FAILURE_EXIT
+     */
+    private int $returnCode;
+    
+    /**
+     * Description of the operation just performed by createController
+     */
+    private string $returnMessage;
+    
+    public function __construct(
+        int $returnCode,
+        string $returnMessage
+    ) {
+        $this->returnCode = $returnCode;
+        $this->returnMessage = $returnMessage;
+    }
+    
+    /** 
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getReturnCode(): int {
+        
+        return $this->returnCode;
+    }
+    
+    /** 
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getReturnMessage(): string {
+        
+        return $this->returnMessage;
+    }
+}
+    
+
+function displayHelp(string $cur_script): string {
+    
+    return <<<HELP
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim-skeleton-mvc-app derived projects.
 
 Usage:
@@ -34,7 +83,6 @@ Options:
   -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 
 HELP;
-    printInfo( $help);
 }
 
 /**
@@ -43,17 +91,22 @@ HELP;
  *                    values.
  *                    For example, $args[0] is the key to $args[1], $args[2] is the key to $args[3], etc.
  */
-function getOptVal(string $opt, array $args): string {
+function getOptVal(string $opt, array $args): ?string {
 
     $search_key = $opt;
 
     $opts_index = array_search($search_key, $args, true);
+    
+    if($opts_index === false) { // option doesn't exist
 
+        return null;
+    }
+    
     /** 
      * @psalm-suppress InvalidOperand
      * @psalm-suppress MixedArrayOffset
      */
-    if( $opts_index === false || !isset($args[++$opts_index]) ) {
+    if(!isset($args[++$opts_index]) ) { // option didn't have a corresponding value
 
         return '';
     }
@@ -124,9 +177,19 @@ function printInfo(string $str, bool $append_new_line = true): void {
     if( $append_new_line ) { echo PHP_EOL; }
 }
 
-function normalizeNameSpaceName(string $namespace_name): string {
+function printType(int $print_type, string $str, bool $append_new_line = true) : void {
+    
+    if($print_type === CliExitCodes::SUCCESS_EXIT) {
+        
+        printInfo($str, $append_new_line);
+        
+    } else {
+        
+        printError($str, $append_new_line);
+    }
+}
 
-    $namespace_name = ''.$namespace_name;
+function normalizeNameSpaceName(string $namespace_name): string {
 
     if(strlen($namespace_name) > 1 && $namespace_name[0] === '\\') {
 
@@ -200,12 +263,12 @@ function processTemplateFile(string $target, string $dest, array $replaces) {
  * @param int|string $argc number of arguments
  * @param string[] $argv
  *
- * @return void
- *
  * @throws \InvalidArgumentException
  * @throws \RuntimeException if this function is called in a script that is not run at the command line.
+ * 
+ * @psalm-suppress RiskyTruthyFalsyComparison
  */
-function createController($argc, array $argv): void {
+function createController($argc, array $argv): CreateControllerReturnValue {
 
     //////////////////////////////////////////
     // START: Environment and Args Validation
@@ -249,13 +312,16 @@ function createController($argc, array $argv): void {
     $ds = DIRECTORY_SEPARATOR;
 
     if (
-        $argc < 5
-        || in_array('--help', $argv)
+        in_array('--help', $argv)
         || in_array('-help', $argv)
         || in_array('-h', $argv)
         || in_array('-?', $argv)
+        || $argc < 5
     ) {
-        displayHelp(basename($argv[0]));
+        return new CreateControllerReturnValue(
+            CliExitCodes::SUCCESS_EXIT,
+            displayHelp(basename($argv[0])) 
+        );
 
     } else {
 
@@ -274,96 +340,68 @@ function createController($argc, array $argv): void {
             )
         ) {
             $templates_dir = dirname(__DIR__).$ds.'templates'.$ds;
-            $controller_name = getOptVal('--controller-name', $argv);
-
-            if($controller_name === '') {
-
-                $controller_name = getOptVal('-c', $argv);
-            }
-
+            $controller_name = getOptVal('--controller-name', $argv) ?: (getOptVal('-c', $argv) ?: '');
             $studly_controller_name = \SlimMvcTools\Functions\Str\dashesToStudly($controller_name);
-
             $dashed_controller_name = mb_strtolower($controller_name, 'UTF-8');
 
             if( !isValidClassName($studly_controller_name) ) {
 
-                printError("Invalid controller class name `$controller_name` supplied. Goodbye!!");
-                return;
+                return new CreateControllerReturnValue(
+                    CliExitCodes::FAILURE_EXIT,
+                    "Invalid controller class name `$controller_name` supplied. Goodbye!!"
+                );
             }
 
-            $src_folder_path = getOptVal('--path-to-src-folder', $argv);
+            $src_folder_path = normalizeFolderPathForOs(
+                getOptVal('--path-to-src-folder', $argv)
+                    ?: (getOptVal('-p', $argv) ?: '')
+            );
 
-            if($src_folder_path === '') {
+            if( !is_dir($src_folder_path) ) {
 
-                $src_folder_path = getOptVal('-p', $argv);
-            }
-
-            $src_folder_path = normalizeFolderPathForOs($src_folder_path);
-
-            if( !file_exists($src_folder_path) || !is_dir($src_folder_path) ) {
-
-                printError("The src folder path `$src_folder_path` supplied is a non-existent directory. Goodbye!!");
-                return;
+                return new CreateControllerReturnValue(
+                    CliExitCodes::FAILURE_EXIT,
+                    "The src folder path `$src_folder_path` supplied is a non-existent directory. Goodbye!!"
+                );
             }
 
             ////////////////////////////////////////////////////////////////////////////
             $default_controller_2_extend = '\\' . \SlimMvcTools\Controllers\BaseController::class;
 
-            $controller_2_extend = getOptVal('--extends-controller', $argv);
+            $controller_2_extend = getOptVal('--extends-controller', $argv)
+                                        ?: (getOptVal('-e', $argv) ?: '');
 
-            if($controller_2_extend === '') {
+            if ($controller_2_extend !== '') {
 
-                $controller_2_extend = getOptVal('-e', $argv);
+                if( !isValidExtendsClassName($controller_2_extend) ) {
 
-                if ($controller_2_extend !== '') {
-
-                    if( !isValidExtendsClassName($controller_2_extend) ) {
-
-                        printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
-                        return;
-                    }
-
-                } else {
-
-                    //use default controller class to be extended
-                    $controller_2_extend = $default_controller_2_extend;
+                    return new CreateControllerReturnValue(
+                        CliExitCodes::FAILURE_EXIT,
+                        "Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!"
+                    );
                 }
-            } elseif( !isValidExtendsClassName($controller_2_extend) ) {
 
-                printError("Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!");
-                return;
+            } else {
+
+                //use default controller class to be extended
+                $controller_2_extend = $default_controller_2_extend;
             }
+
 
             ////////////////////////////////////////////////////////////////////////////
             $namepace_declaration = '';
             //omit namespace declaration by default
-            $namepace_4_controller = getOptVal('--namespace-4-controller', $argv);
+            $namepace_4_controller = 
+                getOptVal('--namespace-4-controller', $argv) ?: (getOptVal('-n', $argv) ?: '');
 
-            if($namepace_4_controller === '') {
-
-                $namepace_4_controller = getOptVal('-n', $argv);
-
-                if($namepace_4_controller !== '') {
-
-                    if( !isValidNamespaceName($namepace_4_controller) ) {
-
-                        printError("Invalid namespace `$namepace_4_controller` supplied. Goodbye!!");
-                        return;
-                    }
-
-                    //validation passed
-                    $namepace_4_controller = normalizeNameSpaceName($namepace_4_controller);
-                    $namepace_declaration = "namespace {$namepace_4_controller};";
-
-                } else {
-                    $namepace_4_controller = '';
-                }
-            } else {
+            if($namepace_4_controller !== '') {
 
                 if( !isValidNamespaceName($namepace_4_controller) ) {
 
-                    printError("Invalid namespace `$namepace_4_controller` supplied. Goodbye!!");
-                    return;
+                    return new CreateControllerReturnValue(
+                        CliExitCodes::FAILURE_EXIT,
+                        "Invalid namespace `$namepace_4_controller` supplied. Goodbye!!"
+                    );
                 }
 
                 //validation passed
@@ -386,8 +424,10 @@ function createController($argc, array $argv): void {
                 !file_exists($dest_controller_class_file_folder)
                 && !mkdir($dest_controller_class_file_folder, 0775, true)
             ) {
-                printError("Failed to create `$dest_controller_class_file_folder`; the folder supposed to contain the controller named `$studly_controller_name`. Goodbye!!");
-                return;
+                return new CreateControllerReturnValue(
+                    CliExitCodes::FAILURE_EXIT,
+                    "Failed to create `$dest_controller_class_file_folder`; the folder supposed to contain the controller named `$studly_controller_name`. Goodbye!!"
+                );
             }
 
             $template_view_file = $templates_dir.'index-view-template.php';
@@ -398,23 +438,29 @@ function createController($argc, array $argv): void {
                 !file_exists($dest_view_file_folder)
                 && !mkdir($dest_view_file_folder, 0775, true)
             ) {
-                printError("Failed to create `$dest_view_file_folder`; the folder supposed to contain views for the controller named `$studly_controller_name`. Goodbye!!");
-                return;
+                return new CreateControllerReturnValue(
+                    CliExitCodes::FAILURE_EXIT,
+                    "Failed to create `$dest_view_file_folder`; the folder supposed to contain views for the controller named `$studly_controller_name`. Goodbye!!"
+                );
             }
 
             if( file_exists($dest_controller_class_file) ) {
 
-                printError("Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!");
-                return;
+                return new CreateControllerReturnValue(
+                    CliExitCodes::FAILURE_EXIT,
+                    "Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!"
+                );
             }
 
             if( file_exists($dest_view_file) ) {
 
-                printError("View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!");
-                return;
+                return new CreateControllerReturnValue(
+                    CliExitCodes::FAILURE_EXIT,
+                    "View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!"
+                );
             }
 
-            printInfo("Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....");
+            $success_messages = "Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....";
 
             ////////////////////////////////////////////////////////////////////////////
             $replaces = [
@@ -426,44 +472,59 @@ function createController($argc, array $argv): void {
 
             if( processTemplateFile($template_controller_file, $dest_controller_class_file, $replaces) === false ) {
 
-                printError("Failed transforming template controller `$template_controller_file` to `$dest_controller_class_file`. Goodbye!!");
+                return new CreateControllerReturnValue(
+                    CliExitCodes::FAILURE_EXIT,
+                    "Failed transforming template controller `$template_controller_file` to `$dest_controller_class_file`. Goodbye!!"
+                );
 
             } else {
 
-                printInfo("Successfully created `{$dest_controller_class_file}` ....".PHP_EOL);
+                $success_messages .= PHP_EOL . "Successfully created `{$dest_controller_class_file}` ....".PHP_EOL;
             }
 
-            printInfo("Creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}` ....");
+            $success_messages .= PHP_EOL . "Creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}` ....";
 
             $replaces['__TEMPLTATE_CONTROLLER__'] = rtrim($namepace_4_controller, '\\').'\\'.$studly_controller_name;
 
             if( processTemplateFile($template_view_file, $dest_view_file, $replaces) === false ) {
 
-                printError("Failed creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}`.");
-                printInfo("Deleting `{$dest_controller_class_file}` ....");
+                $error_messages = "Failed creating index view for `{$studly_controller_name}::actionIndex()` in `{$dest_view_file}`.";
+                $error_messages .= PHP_EOL ."Deleting `{$dest_controller_class_file}` ....";
 
                 if( !unlink($dest_controller_class_file) ) {
 
-                    printInfo("Failed to delete `{$dest_controller_class_file}`. Please delete it manually. Goodbye!!");
-
-                } else {
-
-                    printInfo("Goodbye!!");
+                    $error_messages .= PHP_EOL . "Failed to delete `{$dest_controller_class_file}`. Please delete it manually.";
                 }
 
-                return;
+                $error_messages .= PHP_EOL . "Goodbye!!";
+
+                return new CreateControllerReturnValue(
+                    CliExitCodes::FAILURE_EXIT,
+                    $error_messages
+                );
 
             } else {
 
-                printInfo("Successfully created `{$dest_view_file}` ....".PHP_EOL);
+                $success_messages .= PHP_EOL . "Successfully created `{$dest_view_file}` ....".PHP_EOL;
             }
 
-            printInfo("All done!!");
-            printInfo("Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.");
+            $success_messages .= PHP_EOL . "All done!!";
+            $success_messages .= PHP_EOL . "Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.";
+
+            return new CreateControllerReturnValue(
+                CliExitCodes::SUCCESS_EXIT, 
+                $success_messages
+            );
 
         } else {
             /** @psalm-suppress MixedArgument */
-            displayHelp(basename($argv[0]));
+            return new CreateControllerReturnValue(
+                CliExitCodes::FAILURE_EXIT,
+                'Incorrect arguments / parameters were supplied. Please run '
+                 . PHP_EOL . PHP_EOL . basename($argv[0]) . ' -h' . PHP_EOL
+                 . PHP_EOL . 'for the details on how to properly run '
+                 . basename($argv[0])
+            );
         }
     }
     //////////////////////////////////

@@ -891,7 +891,7 @@ class BaseController
         /** @psalm-suppress UndefinedConstant */
         $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
         $action = ($prepend_action) ? 'action-' : '';
-        $actn = ($show_status_on_completion) ? $action.'login-status' : $action.'login';
+        $actn = ((bool)$show_status_on_completion) ? $action.'login-status' : $action.'login';
 
         $controller = $this->controller_name_from_uri;
 

@@ -43,5 +43,8 @@ tests/test-template-output/logs/*
 !tests/fake-smvc-app-root/src/views/child-controller/index.php
 !tests/fake-smvc-app-root/src/views/grand-child-controller/index.php
 
+tests/test-create-controller-output/*
+!tests/test-create-controller-output/.gitkeep
+
 # files below are generated when tests are run
 tests/test-template-output/FooBar.php

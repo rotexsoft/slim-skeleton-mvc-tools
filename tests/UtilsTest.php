@@ -19,29 +19,29 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $e4 = new \Exception('Base Thrown', 987, $e3);
         
         $ex_as_str = Utils::getThrowableAsStr($e4);
-        $this->assertStringContainsString(PHP_EOL, $ex_as_str);
-        $this->assertStringContainsString('987', $ex_as_str);
-        $this->assertStringContainsString('187', $ex_as_str);
-        $this->assertStringContainsString('LogicException', $ex_as_str);
-        $this->assertStringContainsString('Base Thrown', $ex_as_str);
-        $this->assertStringContainsString('777', $ex_as_str);
-        $this->assertStringContainsString('BadFunctionCallException', $ex_as_str);
-        $this->assertStringContainsString('Ancestor Thrown', $ex_as_str);
-        $this->assertStringContainsString('911', $ex_as_str);
-        $this->assertStringContainsString('BadMethodCallException', $ex_as_str);
-        $this->assertStringContainsString('Descendant Thrown', $ex_as_str);
+        self::assertStringContainsString(PHP_EOL, $ex_as_str);
+        self::assertStringContainsString('987', $ex_as_str);
+        self::assertStringContainsString('187', $ex_as_str);
+        self::assertStringContainsString('LogicException', $ex_as_str);
+        self::assertStringContainsString('Base Thrown', $ex_as_str);
+        self::assertStringContainsString('777', $ex_as_str);
+        self::assertStringContainsString('BadFunctionCallException', $ex_as_str);
+        self::assertStringContainsString('Ancestor Thrown', $ex_as_str);
+        self::assertStringContainsString('911', $ex_as_str);
+        self::assertStringContainsString('BadMethodCallException', $ex_as_str);
+        self::assertStringContainsString('Descendant Thrown', $ex_as_str);
         
         $ex_as_str2 = Utils::getThrowableAsStr($e4, '<br>');
-        $this->assertStringContainsString('<br>', $ex_as_str2);
-        $this->assertStringContainsString('987', $ex_as_str2);
-        $this->assertStringContainsString('187', $ex_as_str2);
-        $this->assertStringContainsString('LogicException', $ex_as_str2);
-        $this->assertStringContainsString('Base Thrown', $ex_as_str2);
-        $this->assertStringContainsString('777', $ex_as_str2);
-        $this->assertStringContainsString('BadFunctionCallException', $ex_as_str2);
-        $this->assertStringContainsString('Ancestor Thrown', $ex_as_str2);
-        $this->assertStringContainsString('911', $ex_as_str2);
-        $this->assertStringContainsString('BadMethodCallException', $ex_as_str2);
-        $this->assertStringContainsString('Descendant Thrown', $ex_as_str2);
+        self::assertStringContainsString('<br>', $ex_as_str2);
+        self::assertStringContainsString('987', $ex_as_str2);
+        self::assertStringContainsString('187', $ex_as_str2);
+        self::assertStringContainsString('LogicException', $ex_as_str2);
+        self::assertStringContainsString('Base Thrown', $ex_as_str2);
+        self::assertStringContainsString('777', $ex_as_str2);
+        self::assertStringContainsString('BadFunctionCallException', $ex_as_str2);
+        self::assertStringContainsString('Ancestor Thrown', $ex_as_str2);
+        self::assertStringContainsString('911', $ex_as_str2);
+        self::assertStringContainsString('BadMethodCallException', $ex_as_str2);
+        self::assertStringContainsString('Descendant Thrown', $ex_as_str2);
     }
 }

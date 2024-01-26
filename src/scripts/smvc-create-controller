@@ -2,15 +2,23 @@
 <?php
 include_once __DIR__.DIRECTORY_SEPARATOR."cli-script-helper-functions.php";
 
-if( !isPhpRunningInCliMode() ) {
+if( !\SlimMvcTools\Functions\CliHelpers\isPhpRunningInCliMode() ) {
 
     echo 'Error: This script should only be run via the command line!!';
+    exit(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT);
     
 } else {
 
     try {
+        $result = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
         
-        createController($argc, $argv);
+        \SlimMvcTools\Functions\CliHelpers\printType(
+            $result->getReturnCode(), 
+            $result->getReturnMessage(),
+            true
+        );
+        
+        exit($result->getReturnCode());
 
     } catch(\Exception $e) {
 
@@ -19,6 +27,7 @@ if( !isPhpRunningInCliMode() ) {
             . PHP_EOL . 'Exception Trace:' . PHP_EOL . $e->getTraceAsString()
             . PHP_EOL . PHP_EOL . 'Please submit a bug report to https://github.com/rotexsoft/slim-skeleton-mvc-tools/issues if symptoms persist.' . PHP_EOL;
 
-        printError($msg);
+        \SlimMvcTools\Functions\CliHelpers\printError($msg);
+        exit(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::EXCEPTION_EXIT);
     }
 }

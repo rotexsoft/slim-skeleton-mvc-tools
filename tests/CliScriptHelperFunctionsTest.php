@@ -1,6 +1,6 @@
 <?php
 $ds = DIRECTORY_SEPARATOR;
-include __DIR__."{$ds}..{$ds}src{$ds}scripts{$ds}cli-script-helper-functions.php";
+include_once __DIR__."{$ds}..{$ds}src{$ds}scripts{$ds}cli-script-helper-functions.php";
 
 /**
  * This class tests .\src\scripts\cli-script-helper-functions.php
@@ -18,8 +18,8 @@ class CliScriptHelperFunctionsTest extends \PHPUnit\Framework\TestCase
     }
 
     public function testThatDisplayHelpWorksAsExpected() {
-
-        $output = $this->execFuncAndReturnBufferedOutput('displayHelp', ['smvc-create-controller']);
+        
+        $output = \SlimMvcTools\Functions\CliHelpers\displayHelp('smvc-create-controller');
 
         $expected_substr = <<<INPUT
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim-skeleton-mvc-app derived projects.
@@ -51,29 +51,62 @@ Options:
 
   -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 INPUT;
-        $this->assertStringContainsString($expected_substr, $output);
+        self::assertStringContainsString($expected_substr, $output);
     }
 
     public function testThatPrintErrorWorksAsExpected() {
 
-        $output1 = $this->execFuncAndReturnBufferedOutput('printError', ['test string', false]);
-        $output2 = $this->execFuncAndReturnBufferedOutput('printError', ['test string', true]);
+        $output1 = $this->execFuncAndReturnBufferedOutput('\\SlimMvcTools\\Functions\\CliHelpers\\printError', ['test string', false]);
+        $output2 = $this->execFuncAndReturnBufferedOutput('\\SlimMvcTools\\Functions\\CliHelpers\\printError', ['test string', true]);
 
-        $this->assertStringStartsWith("\033[0;31m\033[40m", $output1);
-        $this->assertStringStartsWith("\033[0;31m\033[40m", $output2);
-        $this->assertStringEndsWith("\033[0m", $output1);
-        $this->assertStringEndsWith(PHP_EOL, $output2);
+        self::assertStringStartsWith("\033[0;31m\033[40m", $output1);
+        self::assertStringStartsWith("\033[0;31m\033[40m", $output2);
+        self::assertStringEndsWith("\033[0m", $output1);
+        self::assertStringEndsWith(PHP_EOL, $output2);
     }
 
     public function testThatPrintInfoWorksAsExpected() {
 
-        $output1 = $this->execFuncAndReturnBufferedOutput('printInfo', ['test string', false]);
-        $output2 = $this->execFuncAndReturnBufferedOutput('printInfo', ['test string', true]);
+        $output1 = $this->execFuncAndReturnBufferedOutput('\\SlimMvcTools\\Functions\\CliHelpers\\printInfo', ['test string', false]);
+        $output2 = $this->execFuncAndReturnBufferedOutput('\\SlimMvcTools\\Functions\\CliHelpers\\printInfo', ['test string', true]);
 
-        $this->assertStringStartsWith("\033[0;32m\033[40m", $output1);
-        $this->assertStringStartsWith("\033[0;32m\033[40m", $output2);
-        $this->assertStringEndsWith("\033[0m", $output1);
-        $this->assertStringEndsWith(PHP_EOL, $output2);
+        self::assertStringStartsWith("\033[0;32m\033[40m", $output1);
+        self::assertStringStartsWith("\033[0;32m\033[40m", $output2);
+        self::assertStringEndsWith("\033[0m", $output1);
+        self::assertStringEndsWith(PHP_EOL, $output2);
+    }
+
+    public function testThatPrintTypeWorksAsExpected() {
+
+        $output1 = $this->execFuncAndReturnBufferedOutput(
+            '\\SlimMvcTools\\Functions\\CliHelpers\\printType', 
+            [\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, 'test string', false]
+        );
+        $output2 = $this->execFuncAndReturnBufferedOutput(
+            '\\SlimMvcTools\\Functions\\CliHelpers\\printType', 
+            [\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, 'test string', true]
+        );
+
+        self::assertStringStartsWith("\033[0;32m\033[40m", $output1);
+        self::assertStringStartsWith("\033[0;32m\033[40m", $output2);
+        self::assertStringEndsWith("\033[0m", $output1);
+        self::assertStringEndsWith(PHP_EOL, $output2);
+        
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        $output3 = $this->execFuncAndReturnBufferedOutput(
+            '\\SlimMvcTools\\Functions\\CliHelpers\\printType', 
+            [\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, 'test string', false]
+        );
+        $output4 = $this->execFuncAndReturnBufferedOutput(
+            '\\SlimMvcTools\\Functions\\CliHelpers\\printType', 
+            [\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, 'test string', true]
+        );
+
+        self::assertStringStartsWith("\033[0;31m\033[40m", $output3);
+        self::assertStringStartsWith("\033[0;31m\033[40m", $output4);
+        self::assertStringEndsWith("\033[0m", $output3);
+        self::assertStringEndsWith(PHP_EOL, $output4);
     }
 
     public function testThatGetOptValWorksAsExpected() {
@@ -85,11 +118,11 @@ INPUT;
                         '-d'
                     ];
 
-        $this->assertEquals('c`s-val', getOptVal('-c', $opts_vals));
-        $this->assertEquals('e`s-val', getOptVal('-e', $opts_vals));
-        $this->assertEquals('n`s-val', getOptVal('-n', $opts_vals));
-        $this->assertEquals(false, getOptVal('-d', $opts_vals));
-        $this->assertEquals(false, getOptVal('-x', $opts_vals));
+        self::assertEquals('c`s-val', \SlimMvcTools\Functions\CliHelpers\getOptVal('-c', $opts_vals));
+        self::assertEquals('e`s-val', \SlimMvcTools\Functions\CliHelpers\getOptVal('-e', $opts_vals));
+        self::assertEquals('n`s-val', \SlimMvcTools\Functions\CliHelpers\getOptVal('-n', $opts_vals));
+        self::assertEquals('', \SlimMvcTools\Functions\CliHelpers\getOptVal('-d', $opts_vals)); // option without a corresponding value
+        self::assertNull(\SlimMvcTools\Functions\CliHelpers\getOptVal('-x', $opts_vals)); // option doesn't exist
     }
 
     public function testThatNormalizeFolderPathForOsWorksAsExpected() {
@@ -97,46 +130,55 @@ INPUT;
         $path1 = __DIR__.'/';
         $path2 = __DIR__.'\\';
         $expected_normalized_path = __DIR__.DIRECTORY_SEPARATOR;
-        $this->assertEquals($expected_normalized_path, normalizeFolderPathForOs($path1));
-        $this->assertEquals($expected_normalized_path, normalizeFolderPathForOs($path2));
+        self::assertEquals($expected_normalized_path, \SlimMvcTools\Functions\CliHelpers\normalizeFolderPathForOs($path1));
+        self::assertEquals($expected_normalized_path, \SlimMvcTools\Functions\CliHelpers\normalizeFolderPathForOs($path2));
+    }
+
+    public function testThatNormalizeNameSpaceNameWorksAsExpected() {
+        
+        $ns1 = '\\Name\\Space\\Class';
+        $ns2 = 'Name\\Space\\Class';
+        $expected_normalized_ns = 'Name\\Space\\Class';
+        self::assertEquals($expected_normalized_ns, \SlimMvcTools\Functions\CliHelpers\normalizeNameSpaceName($ns1));
+        self::assertEquals($expected_normalized_ns, \SlimMvcTools\Functions\CliHelpers\normalizeNameSpaceName($ns2));
     }
 
     public function testThatIsValidNamespaceNameWorksAsExpected() {
 
-        $this->assertEquals(true, isValidNamespaceName('Name\\Space'));
-        $this->assertEquals(true, isValidNamespaceName('\\Name\\Space'));
-        $this->assertEquals(false, isValidNamespaceName('Name\\Space\\'));
-        $this->assertEquals(false, isValidNamespaceName('\\Name\\Space\\'));
-        $this->assertEquals(false, isValidNamespaceName('-Name\\Space'));
-        $this->assertEquals(false, isValidNamespaceName('Name\\-Space'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidNamespaceName('Name\\Space'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidNamespaceName('\\Name\\Space'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidNamespaceName('Name\\Space\\'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidNamespaceName('\\Name\\Space\\'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidNamespaceName('-Name\\Space'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidNamespaceName('Name\\-Space'));
     }
 
     public function testThatIsValidExtendsClassNameWorksAsExpected() {
 
-        $this->assertEquals(true, isValidExtendsClassName('Name\\Space\\Class'));
-        $this->assertEquals(true, isValidExtendsClassName('\\Name\\Space\\Class'));
-        $this->assertEquals(false, isValidExtendsClassName('NameSpace\\Class\\'));
-        $this->assertEquals(false, isValidExtendsClassName('\\NameSpace\\Class\\'));
-        $this->assertEquals(false, isValidExtendsClassName('-NameSpace\\Class'));
-        $this->assertEquals(false, isValidExtendsClassName('NameSpace\\-Class'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('Name\\Space\\Class'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\Name\\Space\\Class'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('NameSpace\\Class\\'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\NameSpace\\Class\\'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('-NameSpace\\Class'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('NameSpace\\-Class'));
     }
 
     public function testThatIsValidClassNameWorksAsExpected() {
 
-        $this->assertEquals(true, isValidClassName('SomeClass'));
-        $this->assertEquals(true, isValidClassName('Some1Class'));
-        $this->assertEquals(true, isValidClassName('SomeClass1'));
-        $this->assertEquals(true, isValidClassName('Some_Class'));
-        $this->assertEquals(true, isValidClassName('Some1_Class'));
-        $this->assertEquals(true, isValidClassName('Some_1Class'));
-        $this->assertEquals(true, isValidClassName('Some_Class1'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidClassName('SomeClass'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidClassName('Some1Class'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidClassName('SomeClass1'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidClassName('Some_Class'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidClassName('Some1_Class'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidClassName('Some_1Class'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidClassName('Some_Class1'));
 
-        $this->assertEquals(false, isValidClassName('1SomeClass'));
-        $this->assertEquals(false, isValidClassName('1Some_Class'));
-        $this->assertEquals(false, isValidClassName('Some\\Class\\'));
-        $this->assertEquals(false, isValidClassName('Some-Class'));
-        $this->assertEquals(false, isValidClassName('-SomeClass'));
-        $this->assertEquals(false, isValidClassName('SomeClass-'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidClassName('1SomeClass'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidClassName('1Some_Class'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidClassName('Some\\Class\\'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidClassName('Some-Class'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidClassName('-SomeClass'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidClassName('SomeClass-'));
     }
 
     public function testThatProcessTemplateFileWorksAsExpected() {
@@ -151,20 +193,20 @@ INPUT;
         //Make sure processTemplateFile does not return false when the file is valid
         $template_controller_file = dirname(__DIR__).  $this->ds .'src'.  $this->ds . 'templates' . $this->ds .'controller-class-template.php.tpl';
         $dest_controller_class_file = __DIR__.  $this->ds . 'test-template-output' . $this->ds .'FooBar.php';
-        $this->assertNotEquals(false, processTemplateFile($template_controller_file, $dest_controller_class_file, $replaces));
+        self::assertNotFalse(\SlimMvcTools\Functions\CliHelpers\processTemplateFile($template_controller_file, $dest_controller_class_file, $replaces));
 
         //Make sure processTemplateFile does not return false when the file is valid
         $replaces['__TEMPLTATE_CONTROLLER__'] = "Test\\Space\\FooBar";
         $template_view_file = dirname(__DIR__).  $this->ds .'src'.  $this->ds . 'templates' . $this->ds .'index-view-template.php';
         $dest_view_file = __DIR__.  $this->ds . 'test-template-output' . $this->ds .'index.php';
-        $this->assertNotEquals(false, processTemplateFile($template_view_file, $dest_view_file, $replaces));
+        self::assertNotFalse(\SlimMvcTools\Functions\CliHelpers\processTemplateFile($template_view_file, $dest_view_file, $replaces));
 
         //Make sure processTemplateFile returns false when any of the files is non existent
-        $this->assertEquals(false, @processTemplateFile('bad file', $dest_view_file, $replaces));
-        $this->assertEquals(false, @processTemplateFile('bad file3', 'bad file4', $replaces));
+        self::assertFalse(@\SlimMvcTools\Functions\CliHelpers\processTemplateFile('bad file', $dest_view_file, $replaces));
+        self::assertFalse(@\SlimMvcTools\Functions\CliHelpers\processTemplateFile('bad file3', 'bad file4', $replaces));
 
         //false when there is no perm to write destination file (Works in Linux)
-        $this->assertEquals(false, @processTemplateFile($template_view_file, '/root/bad-perm-file.txt', $replaces));
+        self::assertFalse(@\SlimMvcTools\Functions\CliHelpers\processTemplateFile($template_view_file, '/root/bad-perm-file.txt', $replaces));
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,24 +214,215 @@ INPUT;
         $expected_controller_class_file = __DIR__ . $this->ds . 'test-template-output' . $this->ds .'ExpectedFooBar.php';
         $expected_controller_file_contents_as_str = file_get_contents($expected_controller_class_file);
         $controller_file_contents_as_str = file_get_contents($dest_controller_class_file);
-        $this->assertEquals($expected_controller_file_contents_as_str, $controller_file_contents_as_str);
+        self::assertEquals($expected_controller_file_contents_as_str, $controller_file_contents_as_str);
 
         //Ensure the processed view file template contains the expected output
         $expected_view_file = __DIR__ . $this->ds . 'test-template-output' . $this->ds .'expected-index.php';
         $expected_view_file_contents_as_str = file_get_contents($expected_view_file);
         $view_file_contents_as_str = file_get_contents($dest_view_file);
-        $this->assertEquals($expected_view_file_contents_as_str, $view_file_contents_as_str);
+        self::assertEquals($expected_view_file_contents_as_str, $view_file_contents_as_str);
 
         //check file perms: should be 775
-        $this->assertEquals("100755", sprintf('%o', fileperms($dest_controller_class_file)));
-        $this->assertEquals("100755", sprintf('%o', fileperms($dest_view_file)));
+        self::assertEquals("100755", sprintf('%o', fileperms($dest_controller_class_file)));
+        self::assertEquals("100755", sprintf('%o', fileperms($dest_view_file)));
 
         //clean up
         unlink($dest_controller_class_file);
         unlink($dest_view_file);
     }
 
-    public function testThatCreateControllerScriptWorksAsExpectedWithValidArgsAndValidArgVals() {
+    public function testThatCreateControllerScriptWorksAsExpectedWithInvalidControllerClassName() {
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', '-1bad-comtroller-name',
+                '--path-to-src-folder', './src',
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', '-1bad-comtroller-name',
+                '-p', './src',
+            ],
+            
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', '-1bad-comtroller-name',
+                '--path-to-src-folder', './src',
+                '--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', '-1bad-comtroller-name',
+                '-p', './src',
+                '-e', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+        ];
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            $expected_message = 'Invalid controller class name `-1bad-comtroller-name` supplied. Goodbye!!';
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals($expected_message, $return_val->getReturnMessage());
+        }
+    }
+
+    public function testThatCreateControllerScriptWorksAsExpectedWithInvalidPathToSrcFolder() {
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-posts',
+                '--path-to-src-folder', '/non-existent/src/path',
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-posts',
+                '-p', '/non-existent/src/path',
+            ],
+            
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-posts',
+                '--path-to-src-folder', '/non-existent/src/path',
+                '--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-posts',
+                '-p', '/non-existent/src/path',
+                '-e', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+        ];
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            $expected_message = 'The src folder path `/non-existent/src/path/` supplied is a non-existent directory. Goodbye!!';
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals($expected_message, $return_val->getReturnMessage());
+        }
+    }
+
+    public function testThatCreateControllerScriptWorksAsExpectedWithInvalidControllerToExtend() {
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-posts',
+                '--path-to-src-folder', __DIR__,
+                '--extends-controller', '1BadControllerToExtendsClassName',
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-posts',
+                '-p', __DIR__,
+                '-e', '1BadControllerToExtendsClassName',
+            ],
+        ];
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            $expected_message = 'Invalid controller class name `1BadControllerToExtendsClassName` for extension supplied. Goodbye!!';
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals($expected_message, $return_val->getReturnMessage());
+        }
+    }
+
+    public function testThatCreateControllerScriptWorksAsExpectedWithInvalidNamespaceName() {
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-posts',
+                '--path-to-src-folder', __DIR__,
+                '--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+                '--namespace-4-controller', '1BadNameSpaceName',
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-posts',
+                '-p', __DIR__,
+                '-e', \SlimMvcTools\Controllers\BaseController::class,
+                '-n', '1BadNameSpaceName',
+            ],
+        ];
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            $expected_message = 'Invalid namespace `1BadNameSpaceName` supplied. Goodbye!!';
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals($expected_message, $return_val->getReturnMessage());
+        }
+    }
+
+    public function testThatCreateControllerScriptWorksAsExpectedWith5ArgsAndMissingExpectedFlags() {
+        
+        $argv = [
+            'smvc-create-controller', //script name is always at index 0
+            '--unknown-flag-1',
+            '--unknown-flag-2',
+            '--unknown-flag-3',
+            '--unknown-flag-4',
+        ];
+        $this->callAndAssertCreateControllerWitArgvContainingUnknownFlags($argv);
+    }
+
+    public function testThatCreateControllerScriptWorksAsExpectedWith7ArgsAndMissingExpectedFlags() {
+        
+        $argv = [
+            'smvc-create-controller', //script name is always at index 0
+            '--unknown-flag-1',
+            '--unknown-flag-2',
+            '--unknown-flag-3',
+            '--unknown-flag-4',
+            '--unknown-flag-5',
+            '--unknown-flag-6',
+        ];
+        $this->callAndAssertCreateControllerWitArgvContainingUnknownFlags($argv);
+    }
+
+    public function testThatCreateControllerScriptWorksAsExpectedWithMoreThan7ArgsAndMissingExpectedFlags() {
+        
+        $argv = [
+            'smvc-create-controller', //script name is always at index 0
+            '--unknown-flag-1',
+            '--unknown-flag-2',
+            '--unknown-flag-3',
+            '--unknown-flag-4',
+            '--unknown-flag-5',
+            '--unknown-flag-6',
+            '--unknown-flag-7',
+        ];
+        $this->callAndAssertCreateControllerWitArgvContainingUnknownFlags($argv);
+    }
+    
+    protected function callAndAssertCreateControllerWitArgvContainingUnknownFlags(array $argv): void {
+        
+        $argc = count($argv);
+        $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+        
+        $expected_message = 'Incorrect arguments / parameters were supplied. Please run '
+            . PHP_EOL . PHP_EOL . basename($argv[0]) . ' -h' . PHP_EOL
+            . PHP_EOL . 'for the details on how to properly run smvc-create-controller';
+        
+         self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+         self::assertEquals($expected_message, $return_val->getReturnMessage());
+    }
+
+
+    public function testThatCreateControllerWorksAsExpectedWhenLessThan5ArgsOrHelpRelatedFlagsArePassedToIt() {
 
         $expected_output_showing_help_page = <<<INPUT
 This is a script intended for creating a controller class and a default index view file in rotexsoft/slim-skeleton-mvc-app derived projects.
@@ -221,93 +454,32 @@ Options:
 
   -p, --path-to-src-folder      The absolute path to the `src` folder. Eg. `/var/www/html/my-app/src`. This option REQUIRES at least the `-c` (or `--controller-name`) option to work.
 INPUT;
-        //createController(1, ['smvc-create-controller']);
-        $argc = 1;
-        $argv = ['smvc-create-controller']; //script name is always at index 0
-        $captured_script_output = $this->execFuncAndReturnBufferedOutput('createController', [$argc, $argv], true);
+        $argvs = [
+            ['smvc-create-controller'], //script name is always at index 0
+            ['smvc-create-controller', '--help'], //script name is always at index 0
+            ['smvc-create-controller', '-help'], //script name is always at index 0
+            ['smvc-create-controller', '-h'], //script name is always at index 0
+            ['smvc-create-controller', '-?'], //script name is always at index 0
+        ];
+        
+        foreach($argvs as $argv) {
+        
+            /////////////////
+            // pure int argc
+            /////////////////
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            
+            /////////////////
+            // stringy argc
+            /////////////////
+            $return_val2 = \SlimMvcTools\Functions\CliHelpers\createController($argc . '', $argv);
 
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-/*
-        //run script with -? arg
-        $captured_script_output = `php {$this->script_2_test} -?`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -h arg
-        $captured_script_output = `php {$this->script_2_test} -h`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -help arg
-        $captured_script_output = `php {$this->script_2_test} -help`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --help arg
-        $captured_script_output = `php {$this->script_2_test} --help`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -c arg
-        $captured_script_output = `php {$this->script_2_test} -c`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -c arg with value
-        $captured_script_output = `php {$this->script_2_test} -c SomeController`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --controller-name arg
-        $captured_script_output = `php {$this->script_2_test} --controller-name`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --controller-name arg with value
-        $captured_script_output = `php {$this->script_2_test} --controller-name SomeController`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -p arg
-        $captured_script_output = `php {$this->script_2_test} -p`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -p arg with value
-        $captured_script_output = `php {$this->script_2_test} -p /path/to/your/apps/source-files`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --path-to-src-folder arg
-        $captured_script_output = `php {$this->script_2_test} --path-to-src-folder`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --path-to-src-folder arg with value
-        $captured_script_output = `php {$this->script_2_test} --path-to-src-folder /path/to/your/apps/source-files`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -e arg
-        $captured_script_output = `php {$this->script_2_test} -e`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -e arg with value
-        $captured_script_output = `php {$this->script_2_test} -e SomeController2Extend`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --extends-controller arg
-        $captured_script_output = `php {$this->script_2_test} --extends-controller`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --extends-controller arg with value
-        $captured_script_output = `php {$this->script_2_test} --extends-controller SomeController2Extend`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -n arg
-        $captured_script_output = `php {$this->script_2_test} -n`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with -n arg with value
-        $captured_script_output = `php {$this->script_2_test} -n SomeNameSpace\ForNewController`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --namespace-4-controller arg
-        $captured_script_output = `php {$this->script_2_test} --namespace-4-controller`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-
-        //run script with --namespace-4-controller arg with value
-        $captured_script_output = `php {$this->script_2_test} --namespace-4-controller SomeNameSpace\ForNewController`;
-        $this->assertStringContainsString($expected_output_showing_help_page, $captured_script_output);
-*/
+            self::assertStringContainsString($expected_output_showing_help_page, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_output_showing_help_page, $return_val2->getReturnMessage());
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, $return_val->getReturnCode());
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, $return_val2->getReturnCode());
+        }
     }
 
     protected function execFuncAndReturnBufferedOutput($func_name, array $args=[], $strip_bin_markers=false) {
