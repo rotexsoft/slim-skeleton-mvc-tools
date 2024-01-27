@@ -219,23 +219,24 @@ function normalizeFolderPathForOs(string $path): string {
  * A method that will read a file, run a strtr to replace placeholders with
  * values from our replace array and write it back to the file in $dest.
  *
- * @param string $target the filename of the source
- * @param string $dest the filename of the target
+ * @param string $template_file_path the filename of the source
+ * @param string $destination_file_path the filename of the target
  * @param array $replaces the replaces to be applied to this target
  *
  * @return int|boolean the number of bytes that were written to the file located at $dest,
  *                     or FALSE on failure.
  */
-function processTemplateFile(string $target, string $dest, array $replaces) {
-    
-    $retval = file_get_contents($target);
+function processTemplateFile(
+    string $template_file_path, string $destination_file_path, array $replaces
+) {
+    $retval = file_get_contents($template_file_path);
 
     if($retval !== false) {
 
         $file_contents = $retval;
 
         $retval = file_put_contents(
-                        $dest,
+                        $destination_file_path,
                         strtr(
                             $file_contents,
                             $replaces
@@ -244,16 +245,12 @@ function processTemplateFile(string $target, string $dest, array $replaces) {
 
         if( $retval !== false ) {
 
-            chmod($dest, 0755);
+            chmod($destination_file_path, 0755);
 
         } else {
 
-            @unlink($dest);
+            @unlink($destination_file_path);
         }
-
-    } else {
-
-        @unlink($target);
     }
 
     return $retval;
