@@ -13,6 +13,8 @@ include_once __DIR__."{$ds}..{$ds}src{$ds}scripts{$ds}cli-script-helper-function
  * @author rotimi
  */
 class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase {
+    
+    use \FileIoUtilsTrait;
 
     protected function setUp():void { parent::setUp(); }
     
@@ -291,6 +293,283 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
             
             self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
             self::assertEquals($expected_message, $return_val->getReturnMessage());
+        }
+    }
+    
+    public function testThatCreateControllerWorksAsExpectedWhenProcessTemplateFileReturnsFalseWhenCreatingAControllerClassFile() {
+        
+        $src_path = dirname(SMVC_APP_ROOT_PATH . PHP_EOL) . DIRECTORY_SEPARATOR 
+                    . 'test-create-controller-output' . DIRECTORY_SEPARATOR . 'src';
+        
+        $dest_controller_class_file = 
+            $src_path . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR 
+                      . 'BlogComments.php';
+        
+        $template_controller_file = dirname(SMVC_APP_ROOT_PATH, 2) . DIRECTORY_SEPARATOR
+            . 'src' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR 
+            . 'controller-class-template.php.tpl';
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-comments',
+                '--path-to-src-folder', $src_path,
+                '--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-comments',
+                '-p', $src_path,
+                '-e', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+        ];
+        
+        $builder = new \phpmock\MockBuilder();
+        $builder->setNamespace(__NAMESPACE__)
+                ->setName("file_get_contents")
+                ->setFunction(
+                    function (
+                        string $filename,
+                        bool $use_include_path = false,
+                        $context = null,
+                        int $offset = 0,
+                        int $length = 0
+                    ) {
+                        return str_contains($filename, 'controller-class-template.php.tpl') 
+                                ? false 
+                                : \file_get_contents($filename, $use_include_path, $context, $offset, $length);
+                    }
+                );
+
+        $mock = $builder->build();
+        $mock->enable();
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            
+            $expected_message = "Failed transforming template controller `$template_controller_file` to `$dest_controller_class_file`. Goodbye!!";
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals($expected_message, $return_val->getReturnMessage());
+            
+            // clean-up
+            $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'controllers');
+            $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'views');
+        }
+        
+        $mock->disable();
+    }
+    
+    public function testThatCreateControllerWorksAsExpectedWhenProcessTemplateFileReturnsFalseWhenCreatingAnIndexViewFile() {
+        
+        $src_path = dirname(SMVC_APP_ROOT_PATH . PHP_EOL) . DIRECTORY_SEPARATOR 
+                    . 'test-create-controller-output' . DIRECTORY_SEPARATOR . 'src';
+        
+        $dest_view_file = 
+            $src_path . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR 
+                      . 'blog-comments' . DIRECTORY_SEPARATOR . 'index.php';
+        
+        $dest_controller_class_file = 
+            $src_path . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR 
+                      . 'BlogComments.php';
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-comments',
+                '--path-to-src-folder', $src_path,
+                '--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-comments',
+                '-p', $src_path,
+                '-e', \SlimMvcTools\Controllers\BaseController::class,
+            ],
+        ];
+        
+        $builder = new \phpmock\MockBuilder();
+        $builder->setNamespace(__NAMESPACE__)
+                ->setName("file_get_contents")
+                ->setFunction(
+                    function (
+                        string $filename,
+                        bool $use_include_path = false,
+                        $context = null,
+                        int $offset = 0,
+                        int $length = 0
+                    ) {
+                        return str_contains($filename, 'index-view-template.php') 
+                                ? false 
+                                : \file_get_contents($filename, $use_include_path, $context, $offset, $length);
+                    }
+                );
+
+        $mock = $builder->build();
+        $mock->enable();
+        
+        $builder2 = new \phpmock\MockBuilder();
+        $builder2->setNamespace(__NAMESPACE__)
+                ->setName("unlink")
+                ->setFunction(
+                    function (string $filename, $context = null) {
+                        return str_contains($filename, 'BlogComments.php') 
+                                ? false 
+                                : \unlink($filename, $context);
+                    }
+                );
+
+        $mock2 = $builder2->build();
+        $mock2->enable();
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            
+            $expected_message = "Failed creating index view for `BlogComments::actionIndex()` in `{$dest_view_file}`.";
+            $expected_message2 = "Deleting `{$dest_controller_class_file}` ....";
+            $expected_message3 = PHP_EOL . "Failed to delete `{$dest_controller_class_file}`. Please delete it manually.";
+            $expected_message4 = PHP_EOL . "Goodbye!!";
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertStringContainsString($expected_message, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message2, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message3, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message4, $return_val->getReturnMessage());
+
+            // clean-up
+            $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'controllers');
+            $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'views');
+        }
+        
+        $mock->disable();
+        $mock2->disable();
+    }
+    
+    public function testThatCreateControllerWorksAsExpectedWithValidParamsAndNoNamespaceAndNoExtendsClassSupplied() {
+        
+        $src_path = dirname(SMVC_APP_ROOT_PATH . PHP_EOL) . DIRECTORY_SEPARATOR 
+                    . 'test-create-controller-output' . DIRECTORY_SEPARATOR . 'src';
+        
+        $dest_controller_class_file = 
+            $src_path . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR 
+                      . 'BlogComments.php';
+        $dest_view_file = 
+            $src_path . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR 
+                      . 'blog-comments' . DIRECTORY_SEPARATOR . 'index.php';
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-comments',
+                '--path-to-src-folder', $src_path,
+                //'--extends-controller', \SlimMvcTools\Controllers\BaseController::class,
+                //'--namespace-4-controller', "MyApp\\Controllers",
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-comments',
+                '-p', $src_path,
+                //'-e', \SlimMvcTools\Controllers\BaseController::class,
+                //'-n', "MyApp\\Controllers",
+            ],
+        ];
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            
+            $expected_message = "Creating Controller Class `BlogComments` in `{$dest_controller_class_file}` ....";
+            $expected_message2 = PHP_EOL . "Successfully created `{$dest_controller_class_file}` ....".PHP_EOL;
+            $expected_message3 = PHP_EOL . "Creating index view for `BlogComments::actionIndex()` in `{$dest_view_file}` ....";
+            $expected_message4 = PHP_EOL . "Successfully created `{$dest_view_file}` ....".PHP_EOL;
+            $expected_message5 = PHP_EOL . "All done!!";
+            $expected_message6 = PHP_EOL . "Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `BlogComments` in `{$dest_controller_class_file}`.";
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, $return_val->getReturnCode());
+            
+            // assert no namespace was decalred in the generated controller class
+            self::assertStringNotContainsString('namespace', file_get_contents($dest_controller_class_file));
+            
+            // assert default base controller was extended in the generated controller class
+            self::assertStringContainsString("extends \\SlimMvcTools\\Controllers\\BaseController", file_get_contents($dest_controller_class_file));
+            
+            self::assertStringContainsString($expected_message, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message2, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message3, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message4, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message5, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message6, $return_val->getReturnMessage());
+            
+            // clean-up
+            $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'controllers');
+            $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'views');
+        }
+    }
+    
+    public function testThatCreateControllerWorksAsExpectedWithValidParamsAndNamespaceAndExtendsClassSupplied() {
+        
+        $src_path = dirname(SMVC_APP_ROOT_PATH . PHP_EOL) . DIRECTORY_SEPARATOR 
+                    . 'test-create-controller-output' . DIRECTORY_SEPARATOR . 'src';
+        
+        $dest_controller_class_file = 
+            $src_path . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR 
+                      . 'BlogComments.php';
+        $dest_view_file = 
+            $src_path . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR 
+                      . 'blog-comments' . DIRECTORY_SEPARATOR . 'index.php';
+        
+        $argvs = [
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '--controller-name', 'blog-comments',
+                '--path-to-src-folder', $src_path,
+                '--extends-controller', \SMVCTools\Tests\TestObjects\ChildController::class,
+                '--namespace-4-controller', "MyApp\\Controllers",
+            ],
+            [
+                'smvc-create-controller', //script name is always at index 0
+                '-c', 'blog-comments',
+                '-p', $src_path,
+                '-e', \SMVCTools\Tests\TestObjects\ChildController::class,
+                '-n', "MyApp\\Controllers",
+            ],
+        ];
+        
+        foreach ($argvs as $argv) {
+            
+            $argc = count($argv);
+            $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
+            
+            $expected_message = "Creating Controller Class `BlogComments` in `{$dest_controller_class_file}` ....";
+            $expected_message2 = PHP_EOL . "Successfully created `{$dest_controller_class_file}` ....".PHP_EOL;
+            $expected_message3 = PHP_EOL . "Creating index view for `BlogComments::actionIndex()` in `{$dest_view_file}` ....";
+            $expected_message4 = PHP_EOL . "Successfully created `{$dest_view_file}` ....".PHP_EOL;
+            $expected_message5 = PHP_EOL . "All done!!";
+            $expected_message6 = PHP_EOL . "Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `BlogComments` in `{$dest_controller_class_file}`.";
+            
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, $return_val->getReturnCode());
+            
+            // assert namespace was decalred in the generated controller class
+            self::assertStringContainsString('namespace MyApp\\Controllers', file_get_contents($dest_controller_class_file));
+            
+            // assert specified base controller was extended in the generated controller class
+            self::assertStringContainsString("extends SMVCTools\\Tests\\TestObjects\\ChildController", file_get_contents($dest_controller_class_file));
+            
+            self::assertStringContainsString($expected_message, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message2, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message3, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message4, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message5, $return_val->getReturnMessage());
+            self::assertStringContainsString($expected_message6, $return_val->getReturnMessage());
+            
+            // clean-up
+            $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'controllers');
+            $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'views');
         }
     }
 }

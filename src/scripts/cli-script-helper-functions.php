@@ -230,7 +230,7 @@ function processTemplateFile(
     string $template_file_path, string $destination_file_path, array $replaces
 ) {
     $retval = file_get_contents($template_file_path);
-
+    
     if($retval !== false) {
 
         $file_contents = $retval;

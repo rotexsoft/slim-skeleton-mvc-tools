@@ -46,6 +46,8 @@ tests/test-template-output/logs/*
 
 tests/test-create-controller-output/*
 !tests/test-create-controller-output/.gitkeep
+!tests/test-create-controller-output/src
+!tests/test-create-controller-output/src/.gitkeep
 
 # files below are generated when tests are run
 tests/test-template-output/FooBar.php
