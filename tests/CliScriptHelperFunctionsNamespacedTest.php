@@ -560,6 +560,8 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
             // assert specified base controller was extended in the generated controller class
             self::assertStringContainsString("extends SMVCTools\\Tests\\TestObjects\\ChildController", file_get_contents($dest_controller_class_file));
             
+            self::assertTrue(file_exists($dest_view_file));
+            
             self::assertStringContainsString($expected_message, $return_val->getReturnMessage());
             self::assertStringContainsString($expected_message2, $return_val->getReturnMessage());
             self::assertStringContainsString($expected_message3, $return_val->getReturnMessage());
