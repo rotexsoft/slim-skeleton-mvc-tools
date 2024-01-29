@@ -24,7 +24,8 @@
         "psr/container": "^2.0",
         "pimple/pimple": "^3.5",
         "nyholm/psr7": "^1.5",
-        "nyholm/psr7-server": "^1.0"
+        "nyholm/psr7-server": "^1.0",
+        "vespula/locale": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5.20",

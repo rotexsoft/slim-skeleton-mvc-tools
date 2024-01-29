@@ -20,4 +20,8 @@ final class ContainerKeys {
     public const VESPULA_AUTH = 'vespula_auth';
     public const APP_SETTINGS = 'settings';
     public const NAMESPACES_4_CONTROLLERS = 'namespaces_for_controllers';
+    
+    public const LOCALE_OBJ = 'vespula_locale_obj';
+    public const VALID_LOCALES = 'valid_locales';
+    public const DEFAULT_LOCALE = 'default_locale';
 }
