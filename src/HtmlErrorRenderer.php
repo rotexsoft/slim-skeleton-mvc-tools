@@ -24,7 +24,7 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         
         if ($displayErrorDetails) {
             
-            $html = '<p>The application could not run because of the following error:</p>';
+            $html = "<p>{$this->defaultErrorDescription}:</p>";
             $html .= '<h2>Details</h2>';
             $html .= $requestLine;
             $html .= $this->renderExceptionFragment($exception);
@@ -65,14 +65,14 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         return $html . sprintf('<pre>%s</pre>', htmlentities($exception->getTraceAsString()));
     }
     
-    public function setDefaultErrorTitle(string $text): string {
+    public function setDefaultErrorTitle(string $text): self {
         
         $this->defaultErrorTitle = $text;
 
         return $this;
     }
 
-    public function setDefaultErrorDescription(string $text): string {
+    public function setDefaultErrorDescription(string $text): self {
         
         $this->defaultErrorDescription = $text;
 
