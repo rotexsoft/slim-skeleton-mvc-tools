@@ -23,8 +23,8 @@
         "vespula/auth": "^2.1.1",
         "psr/container": "^2.0",
         "pimple/pimple": "^3.5",
-        "nyholm/psr7": "^1.5",
-        "nyholm/psr7-server": "^1.0",
+        "nyholm/psr7": "^1.8",
+        "nyholm/psr7-server": "^1.1",
         "vespula/locale": "^1.0"
     },
     "require-dev": {
