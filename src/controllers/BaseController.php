@@ -42,6 +42,9 @@ class BaseController
      */
     protected \Vespula\Auth\Auth $vespula_auth;
     
+    /**
+     * Object for getting locale specific translations of text to be displayed
+     */
     protected \Vespula\Locale\Locale $vespula_locale;
     
     /**
@@ -62,6 +65,9 @@ class BaseController
         return $this;
     }
     
+    /**
+     * Object for logging events
+     */
     protected \Psr\Log\LoggerInterface $logger;
     
     /**
