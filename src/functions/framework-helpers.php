@@ -399,7 +399,7 @@ function sMVC_PrependAction2ActionMethodName(string $action_method_name): string
     return $action_method_name;
 }
 
-function sMVC_AddLangSelectionParamToUri(\Psr\Http\Message\UriInterface $uri, $lang='en_US') : string {
+function sMVC_AddLangSelectionParamToUri(\Psr\Http\Message\UriInterface $uri, string $lang='en_US') : string {
     
     return sMVC_UriToString(
         sMVC_AddQueryStrParamToUri(
