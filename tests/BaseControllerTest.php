@@ -725,7 +725,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         self::assertStringContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionResult);
         self::assertStringContainsString('<span>User Name: </span>', $actionResult);
-        self::assertStringContainsString('<input type="text" name="username" placeholder="User Name" value="">', $actionResult);
+        self::assertStringContainsString('<input type="text" name="username" placeholder="User&#x20;Name" value="">', $actionResult);
         self::assertStringContainsString('<span>Password: </span>', $actionResult);
         self::assertStringContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="">', $actionResult);
         self::assertStringContainsString('<input type="submit" value="Login">', $actionResult);
@@ -837,7 +837,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         self::assertStringContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionLoginResult);
         self::assertStringContainsString('<span>User Name: </span>', $actionLoginResult);
-        self::assertStringContainsString('<input type="text" name="username" placeholder="User Name" value="">', $actionLoginResult);
+        self::assertStringContainsString('<input type="text" name="username" placeholder="User&#x20;Name" value="">', $actionLoginResult);
         self::assertStringContainsString('<span>Password: </span>', $actionLoginResult);
         self::assertStringContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="">', $actionLoginResult);
         self::assertStringContainsString('<input type="submit" value="Login">', $actionLoginResult);
@@ -922,7 +922,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         self::assertStringContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionLoginResult);
         self::assertStringContainsString('<span>User Name: </span>', $actionLoginResult);
-        self::assertStringContainsString('<input type="text" name="username" placeholder="User Name" value="admin">', $actionLoginResult);
+        self::assertStringContainsString('<input type="text" name="username" placeholder="User&#x20;Name" value="admin">', $actionLoginResult);
         self::assertStringContainsString('<span>Password: </span>', $actionLoginResult);
         self::assertStringContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="">', $actionLoginResult);
         self::assertStringContainsString('<input type="submit" value="Login">', $actionLoginResult);
@@ -1007,7 +1007,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         self::assertStringContainsString("<form action=\"{$login_path}\" method=\"post\">", $actionLoginResult);
         self::assertStringContainsString('<span>User Name: </span>', $actionLoginResult);
-        self::assertStringContainsString('<input type="text" name="username" placeholder="User Name" value="">', $actionLoginResult);
+        self::assertStringContainsString('<input type="text" name="username" placeholder="User&#x20;Name" value="">', $actionLoginResult);
         self::assertStringContainsString('<span>Password: </span>', $actionLoginResult);
         self::assertStringContainsString('<input type="password" name="password" autocomplete="off" placeholder="Password" value="admin">', $actionLoginResult);
         self::assertStringContainsString('<input type="submit" value="Login">', $actionLoginResult);
@@ -1160,7 +1160,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // the logger
         ////////////////////////////////////////////////////
         self::assertEquals(
-            $controller->getAppSetting('base_controller_do_login_auth_is_valid_msg'),
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_is_valid_msg'),
             $result
         );
         self::assertTrue($controller->isLoggedIn());
@@ -1210,7 +1210,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // and that the controller is in a logged in state
         ////////////////////////////////////////////////////
         self::assertEquals(
-            $controller->getAppSetting('base_controller_do_login_auth_is_valid_msg'),
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_is_valid_msg'),
             $result2
         );
         self::assertTrue($controller->isLoggedIn());
@@ -1239,7 +1239,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // and that the controller is in a logged out state
         //////////////////////////////////////////////////////
         self::assertStringContainsString(
-            $controller->getAppSetting('base_controller_do_login_auth_not_is_valid_msg'),
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_not_is_valid_msg'),
             $result3
         );
         self::assertStringContainsString(
@@ -1276,7 +1276,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         // Right error message was returned
         self::assertEquals(
-            $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_general_msg'),
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_general_msg'),
             $result4
         );
         
@@ -1287,7 +1287,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
                 \str_replace(
                     '<br>',
                     PHP_EOL,
-                    $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_general_msg')
+                    $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_general_msg')
                 )
             )
         );
@@ -1314,7 +1314,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         // Right error message was returned
         self::assertEquals(
-            $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_back_end_msg'),
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_back_end_msg'),
             $result5
         );
         
@@ -1325,7 +1325,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
                 \str_replace(
                     '<br>',
                     PHP_EOL,
-                    $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_back_end_msg')
+                    $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_back_end_msg')
                 )
             )
         );
@@ -1355,7 +1355,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         // Right error message was returned
         self::assertEquals(
-            $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_user_passwd_msg'),
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_user_passwd_msg'),
             $result6
         );
         
@@ -1366,7 +1366,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
                 \str_replace(
                     '<br>',
                     PHP_EOL,
-                    $controller->getAppSetting('base_controller_do_login_auth_v_auth_exception_user_passwd_msg')
+                    $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_user_passwd_msg')
                 )
             )
         );
@@ -1394,7 +1394,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         
         // Right error message was returned
         self::assertEquals(
-            $controller->getAppSetting('base_controller_do_login_auth_exception_msg'),
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_exception_msg'),
             $result7
         );
         
@@ -1405,7 +1405,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
                 \str_replace(
                     '<br>',
                     PHP_EOL,
-                    $controller->getAppSetting('base_controller_do_login_auth_exception_msg')
+                    $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_exception_msg')
                 )
             )
         );
@@ -1709,7 +1709,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $auth->logout();
         $action_result3 = $controller->actionLoginStatus();
         
-        self::assertStringContainsString("<p> <a href=\"{$login_action_path}\">Log in</a> </p>", $action_result3);
+        self::assertStringContainsString("<p> <a href=\"{$login_action_path}\">Login</a> </p>", $action_result3);
         self::assertStringNotContainsString(
             "<a href=\"{$login_status_action_path}\">Check Login Status</a>", 
             $action_result3

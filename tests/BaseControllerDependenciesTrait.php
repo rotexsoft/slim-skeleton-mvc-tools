@@ -2,7 +2,8 @@
 declare(strict_types=1);
 
 use \SlimMvcTools\Container,
-    \SlimMvcTools\ContainerKeys;
+    \SlimMvcTools\ContainerKeys,
+    \SlimMvcTools\Controllers\BaseController;
 
 /**
  *
@@ -92,20 +93,6 @@ SQL;
                 'error_handler_class' => \SlimMvcTools\ErrorHandler::class,
                 'html_renderer_class' => \SlimMvcTools\HtmlErrorRenderer::class,
                 'log_renderer_class'  => \SlimMvcTools\LogErrorRenderer::class,
-                
-                'base_controller_action_login_empty_username_msg' => "The 'username' field is empty.",
-                'base_controller_action_login_empty_password_msg' => "The 'password' field is empty.",
-                'base_controller_do_login_auth_is_valid_msg' => 'You are now logged into a new session.',
-                'base_controller_do_login_auth_not_is_valid_msg' => 'Login Failed!',
-                'base_controller_do_login_auth_v_auth_exception_general_msg' => 'Login Failed!<br>Please contact site administrator or try again later.',
-                'base_controller_do_login_auth_v_auth_exception_back_end_msg' => "Login Failed!<br>Can't connect to login server right now.<br>Please try again later.",
-                'base_controller_do_login_auth_v_auth_exception_user_passwd_msg' => 'Login Failed!<br>Incorrect User Name and Password combination.<br>Please try again.',
-                'base_controller_do_login_auth_exception_msg' => 'Login Failed!<br>Please contact the site administrator.',
-                'base_controller_action_login_status_is_anon_msg' => 'You are not logged in.',
-                'base_controller_action_login_status_is_idle_msg' => 'Your session was idle for too long. Please log in again.',
-                'base_controller_action_login_status_is_expired_msg' => 'Your session has expired. Please log in again.',
-                'base_controller_action_login_status_is_valid_msg' => 'You are still logged in.',
-                'base_controller_action_login_status_unknown_msg' => 'Unknown session status.',
             ];
             
             foreach ($override_settings as $key => $value) {
@@ -114,6 +101,26 @@ SQL;
             }
             
             $psr11Container[ContainerKeys::APP_SETTINGS] = $settings;
+                
+            $psr11Container[ContainerKeys::DEFAULT_LOCALE] = 'en_US';
+            $psr11Container[ContainerKeys::VALID_LOCALES] = ['en_US', 'fr_CA']; // add more values for languages you will be supporting in your application
+            $psr11Container[ContainerKeys::LOCALE_OBJ] = function ($c) {
+
+                $ds = DIRECTORY_SEPARATOR;
+                $locale_obj = new \Vespula\Locale\Locale($c[ContainerKeys::DEFAULT_LOCALE]);
+                $path_2_locale_language_files = __DIR__ . DIRECTORY_SEPARATOR . 'fake-smvc-app-root' . $ds.'config'.$ds.'languages';        
+                $locale_obj->load($path_2_locale_language_files); //load local entries for base controller
+    
+                // Try to update to previously selected language if stored in session
+                if (
+                    session_status() === PHP_SESSION_ACTIVE
+                    && array_key_exists(BaseController::SESSN_PARAM_CURRENT_LOCALE_LANG, $_SESSION)
+                ) {
+                    $locale_obj->setCode($_SESSION[BaseController::SESSN_PARAM_CURRENT_LOCALE_LANG]);
+                }
+    
+                return $locale_obj;
+            };
             
             $psr11Container[ContainerKeys::NAMESPACES_4_CONTROLLERS] = [
                 '\\SlimMvcTools\\Controllers\\',
@@ -125,29 +132,32 @@ SQL;
 
             //Object for rendering layout files
             $psr11Container[ContainerKeys::LAYOUT_RENDERER] = 
-                $psr11Container->factory(function () {
+                $psr11Container->factory(function ($c) {
 
                     // return a new instance on each access to 
                     // $psr11Container[ContainerKeys::LAYOUT_RENDERER]
                     $ds = DIRECTORY_SEPARATOR;
                     $path_2_layout_files = __DIR__ . DIRECTORY_SEPARATOR . 'test-template-output';
                     $layout_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_layout_files]);
+                    $layout_renderer->setVar('__localeObj', $c[ContainerKeys::LOCALE_OBJ]);
 
                     return $layout_renderer;
                 });
 
             //Object for rendering view files
             $psr11Container[ContainerKeys::VIEW_RENDERER] = 
-                $psr11Container->factory(function () {
+                $psr11Container->factory(function ($c) {
 
                     // Return a new instance on each access to 
                     // $psr11Container[ContainerKeys::VIEW_RENDERER]
                     $ds = DIRECTORY_SEPARATOR;
                     $path_2_view_files = __DIR__ . DIRECTORY_SEPARATOR . 'fake-smvc-app-root' ."{$ds}src{$ds}views{$ds}base";
                     $view_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_view_files]);
+                    $view_renderer->setVar('__localeObj', $c[ContainerKeys::LOCALE_OBJ]);
 
                     return $view_renderer;
                 });
+
         }
         
         return $psr11Container;
