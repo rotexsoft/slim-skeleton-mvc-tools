@@ -25,6 +25,9 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
     
     // This must be the first test in this file after the setUp() method so that
     // it gets executed first. It modifies $_SESSION, so it should be tested first.
+    /**
+     * @runInSeparateProcess
+     */
     public function testThat_storeCurrentUrlForLoginRedirection_WorksAsExpected2() {
         
         $req = $this->newRequest('http://google.com/');
@@ -615,6 +618,42 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals('grand-child-controller', $controller3->getControllerNameFromUri());
         self::assertEquals('', $controller3->getActionNameFromUri());
+    }
+    
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat_updateSelectedLanguage_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        // no language parameter was specified via a request uri query param
+        $controller->updateSelectedLanguage();
+        
+        self::assertEquals(
+            $psr11Container->get(ContainerKeys::DEFAULT_LOCALE), 
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->getCode()
+        );
+        
+        // Query param in the request uri
+        $param_key = BaseController::GET_QUERY_PARAM_SELECTED_LANG;
+        $req2 = $this->newRequest("http://google.com/?{$param_key}=fr_CA");
+        $controller2 = new BaseController(
+            $psr11Container, '', '', $req2, $resp
+        );
+        // Language parameter was specified via a request uri query param
+        $controller2->updateSelectedLanguage();
+        
+        self::assertEquals(
+            'fr_CA', 
+            $controller->getContainerItem(ContainerKeys::LOCALE_OBJ)->getCode()
+        );
     }
     
     public function testThat_actionIndex_WorksAsExpected() {
