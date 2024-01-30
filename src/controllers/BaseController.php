@@ -952,6 +952,17 @@ class BaseController
         
         $auth = $this->vespula_auth;
         $logged_in_user = $this->isLoggedIn() ? $auth->getUsername() : '';
+        $redirect_path = '';
+
+        /** @psalm-suppress MixedArrayOffset */
+        if(
+            session_status() === PHP_SESSION_ACTIVE
+            && isset($_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT])
+        ) {
+            //there is an active session with a redirect url stored in it
+            /** @psalm-suppress MixedAssignment */
+            $redirect_path = $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT];
+        }
         
         $auth->logout(); //logout
         
@@ -973,35 +984,28 @@ class BaseController
                  );
         }
 
-        // SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES === true
-        // means that links generated in this action do not need to be prefixed
-        // with action- since when users click on them, the framework will 
-        // automatically append action to the resolved method name
-        // see \SlimMvcTools\MvcRouteHandler::__invoke(...)
-        /** @psalm-suppress UndefinedConstant */
-        $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
-        $action = ($prepend_action) ? 'action-' : '';
-        $actn = ((bool)$show_status_on_completion) ? $action.'login-status' : $action.'login';
+        if($redirect_path === '') {
+            
+            // SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES === true
+            // means that links generated in this action do not need to be prefixed
+            // with action- since when users click on them, the framework will 
+            // automatically append action to the resolved method name
+            // see \SlimMvcTools\MvcRouteHandler::__invoke(...)
+            /** @psalm-suppress UndefinedConstant */
+            $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+            $action = ($prepend_action) ? 'action-' : '';
+            $actn = ((bool)$show_status_on_completion) ? $action.'login-status' : $action.'login';
 
-        $controller = $this->controller_name_from_uri;
+            $controller = $this->controller_name_from_uri;
 
-        if( ($controller === '') ) {
+            if( ($controller === '') ) {
 
-            $controller = 'base-controller';
+                $controller = 'base-controller';
+            }
+
+            $redirect_path = $this->makeLink("/{$controller}/{$actn}");
         }
-
-        $redirect_path = $this->makeLink("/{$controller}/{$actn}");
-
-        /** @psalm-suppress MixedArrayOffset */
-        if(
-            session_status() === PHP_SESSION_ACTIVE
-            && isset($_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT])
-        ) {
-            //there is an active session with a redirect url stored in it
-            /** @psalm-suppress MixedAssignment */
-            $redirect_path = $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT];
-        }
-
+        
         //re-direct
         /** @psalm-suppress MixedArgument */
         return $this->response->withStatus(302)->withHeader('Location', $redirect_path);
