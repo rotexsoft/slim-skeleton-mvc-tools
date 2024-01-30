@@ -75,10 +75,10 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // $controller3->getAppBasePath()/da-controller/da-action
         // and what will be stored in session is the string value of
         // $controller3->getAppBasePath()/da-controller/da-action#yoo?foo=1&bar=2
-        $controller3->setRequest($this->newRequest('http://google.com/#yoo?foo=1&bar=2'));
+        $controller3->setRequest($this->newRequest('http://google.com/da-controller/da-action#yoo?foo=1&bar=2'));
         self::assertSame($controller3, $controller3->storeCurrentUrlForLoginRedirection());
         self::assertArrayHasKey(BaseController::SESSN_PARAM_LOGIN_REDIRECT, $_SESSION);
-        self::assertStringContainsString($controller3->getAppBasePath(), $_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT]);
+        
         self::assertStringContainsString('/da-controller/da-action#yoo?foo=1&bar=2', $_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT]);
     }
 
@@ -1084,9 +1084,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $_POST['username'] = 'admin';
         $_POST['password'] = 'admin';
         $actionLoginResult = $controller->actionLogin();
-        $expectedRedirectPath = $controller->makeLink(
-            "/{$controller->getControllerNameFromUri()}/{$controller->getActionNameFromUri()}"
-        );
+        $expectedRedirectPath = "/";
 
         // Response Object with a redirect uri should not be returned in this scenario
         self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult);

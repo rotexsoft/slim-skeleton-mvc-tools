@@ -1154,17 +1154,8 @@ class BaseController
         $uri = $this->request->getUri();
         $fragment = $uri->getFragment();
         $query = $uri->getQuery();
-        
-        $path = $this->controller_name_from_uri;
-        
-        if($path !== '') {
-            
-            // There's no way we can have the action part without a preceeding 
-            // controller part in any uri path.
-            $path .= ($this->action_name_from_uri === '') ? '' : '/' .$this->action_name_from_uri;
-        }
-        
-        $curr_url = $this->makeLink($path)
+        $path = $uri->getPath();
+        $curr_url = $path
                     . ( ($query !== '') ? '?' . $query : '' )
                     . ( ($fragment !== '') ? '#' . $fragment : '' );
 
