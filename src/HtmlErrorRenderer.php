@@ -22,13 +22,6 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         
         $requestLine = '';
         
-        // It may lead to injecting bad markup into the html
-        // Look into escaping thoroughly before uncommenting
-//        if($exception instanceof \Slim\Exception\HttpException) {
-//            
-//            $requestLine .=  sprintf('<div><strong>Request Uri:</strong> %s</div><br>', $exception->getRequest()->getUri()->__toString());
-//        }
-        
         if ($displayErrorDetails) {
             
             $html = '<p>The application could not run because of the following error:</p>';
@@ -62,18 +55,27 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
     private function renderExceptionFragment(\Throwable $exception): string {
         
         $html = sprintf('<div><strong>Type:</strong> %s</div>', get_class($exception));
-        
         $code = $exception->getCode();
         $html .= sprintf('<div><strong>Code:</strong> %s</div>', $code);
-
         $html .= sprintf('<div><strong>Message:</strong> %s</div>', htmlentities($exception->getMessage()));
-
         $html .= sprintf('<div><strong>File:</strong> %s</div>', $exception->getFile());
-
         $html .= sprintf('<div><strong>Line:</strong> %s</div>', $exception->getLine());
-
         $html .= '<h2>Trace</h2>';
 
         return $html . sprintf('<pre>%s</pre>', htmlentities($exception->getTraceAsString()));
+    }
+    
+    public function setDefaultErrorTitle(string $text): string {
+        
+        $this->defaultErrorTitle = $text;
+
+        return $this;
+    }
+
+    public function setDefaultErrorDescription(string $text): string {
+        
+        $this->defaultErrorDescription = $text;
+
+        return $this;
     }
 }
