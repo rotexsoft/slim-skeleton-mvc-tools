@@ -1961,4 +1961,36 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             }
         } // foreach($force_methods as $force_method => $exception_class)        
     }
+    
+    public function testThat_GetSetLogger_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        self::assertSame($psr11Container->get(ContainerKeys::LOGGER), $controller->getLogger());
+        
+        $nu_logger = new \SMVCTools\Tests\TestObjects\InMemoryLogger();
+        $controller->setLogger($nu_logger);
+        self::assertSame($nu_logger, $controller->getLogger());
+    }
+    
+    public function testThat_GetSetVespulaLocale_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        self::assertSame($psr11Container->get(ContainerKeys::LOCALE_OBJ), $controller->getVespulaLocale());
+        
+        $nu_locale = new \Vespula\Locale\Locale('fr_CA');
+        $controller->setVespulaLocale($nu_locale);
+        self::assertSame($nu_locale, $controller->getVespulaLocale());
+    }
 }

@@ -41,6 +41,47 @@ class BaseController
      *  - actionLoginStatus
      */
     protected \Vespula\Auth\Auth $vespula_auth;
+    
+    protected \Vespula\Locale\Locale $vespula_locale;
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getVespulaLocale(): \Vespula\Locale\Locale {
+        
+        return $this->vespula_locale;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function setVespulaLocale(\Vespula\Locale\Locale $nu_locale): self {
+        
+        $this->vespula_locale = $nu_locale;
+        
+        return $this;
+    }
+    
+    protected \Psr\Log\LoggerInterface $logger;
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function getLogger(): \Psr\Log\LoggerInterface {
+        
+        return $this->logger;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function setLogger(\Psr\Log\LoggerInterface $nu_logger): self {
+        
+        $this->logger = $nu_logger;
+        
+        return $this;
+    }
+    
 
     /**
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
@@ -198,16 +239,20 @@ class BaseController
         $this->controller_name_from_uri = ($controller_name_from_uri !== '') ? $controller_name_from_uri : $this->controller_name_from_uri;
         
         /** @psalm-suppress MixedAssignment */
+        $this->logger = $this->getContainerItem(ContainerKeys::LOGGER);
+        
+        /** @psalm-suppress MixedAssignment */
+        $this->vespula_locale = $this->getContainerItem(ContainerKeys::LOCALE_OBJ);
+        
+        /** @psalm-suppress MixedAssignment */
         $this->vespula_auth = $this->getContainerItem(ContainerKeys::VESPULA_AUTH);
         
-        /** 
-         * @psalm-suppress MixedArgument
+        /**
          * @psalm-suppress MixedAssignment
          */
         $this->layout_renderer = $this->getContainerItem(ContainerKeys::LAYOUT_RENDERER);
         
-        /** 
-         * @psalm-suppress MixedArgument
+        /**
          * @psalm-suppress MixedAssignment
          */
         $this->view_renderer = $this->getContainerItem(ContainerKeys::VIEW_RENDERER);
@@ -331,14 +376,10 @@ class BaseController
         ) {
             // User specified a language in the uri which is an acceptable
             // language defined for this application
-
-            /** @var \Vespula\Locale\Locale $locale_obj */
-            $locale_obj = $this->getContainerItem(ContainerKeys::LOCALE_OBJ);
-
             /**
              * @psalm-suppress MixedArgument
              */
-            $locale_obj->setCode($query_params[self::GET_QUERY_PARAM_SELECTED_LANG]);
+            $this->vespula_locale->setCode($query_params[self::GET_QUERY_PARAM_SELECTED_LANG]);
 
             if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
@@ -492,8 +533,7 @@ class BaseController
         $data['sMVC_MakeLink'] = fn(string $path): string => $self->makeLink($path);
         $data['controller_object'] = $this;
         
-        /** 
-         * @psalm-suppress MixedArgument
+        /**
          * @psalm-suppress MixedAssignment
          */
         $this->layout_renderer = $this->getContainerItem(ContainerKeys::LAYOUT_RENDERER); // get new instance for each call to this method renderLayout
@@ -528,8 +568,7 @@ class BaseController
         $parent_classes = [];
         $parent_class = get_parent_class($this);
         
-        /** 
-         * @psalm-suppress MixedArgument
+        /**
          * @psalm-suppress MixedAssignment
          */
         $this->view_renderer = $this->getContainerItem(ContainerKeys::VIEW_RENDERER);  // get new instance for each call to this method renderView
@@ -678,9 +717,8 @@ class BaseController
             if( empty($username) ) {
                 /** 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $error_msg .= $this->getContainerItem(ContainerKeys::LOCALE_OBJ)
+                $error_msg .= $this->vespula_locale
                                    ->gettext('base_controller_action_login_empty_username_msg');
             }
 
@@ -689,9 +727,8 @@ class BaseController
                 $error_msg .= (($error_msg === ''))? '' : '<br>';
                 /** 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $error_msg .= $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_action_login_empty_password_msg');
+                $error_msg .= $this->vespula_locale->gettext('base_controller_action_login_empty_password_msg');
             }
 
             if( ($error_msg === '') ) {
@@ -774,29 +811,21 @@ class BaseController
 
             if( $auth->isValid() ) { // login successful
 
-                /** @psalm-suppress MixedArgument */
-                if(
-                    $this->getContainer()->has(ContainerKeys::LOGGER)
-                    && ( $this->getContainer()->get(ContainerKeys::LOGGER) instanceof \Psr\Log\LoggerInterface )
-                ){
-                    /** 
-                     * @psalm-suppress MixedArgument
-                     * @psalm-suppress MixedMethodCall
-                     * @psalm-suppress PossiblyInvalidOperand 
-                     */
-                    $this->getContainer()
-                         ->get(ContainerKeys::LOGGER)
-                         ->info( 
-                            "User `{$auth->getUsername()}` successfully logged in." . PHP_EOL .PHP_EOL
-                         );
-                }
+                /** 
+                 * @psalm-suppress MixedArgument
+                 * @psalm-suppress MixedMethodCall
+                 * @psalm-suppress PossiblyInvalidOperand 
+                 */
+                $this->logger
+                     ->info( 
+                        "User `{$auth->getUsername()}` successfully logged in." . PHP_EOL .PHP_EOL
+                     );
                 
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $_msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_is_valid_msg');
+                $_msg = $this->vespula_locale->gettext('base_controller_do_login_auth_is_valid_msg');
                 
                 /** @psalm-suppress MixedAssignment */
                 $success_redirect_path = 
@@ -818,9 +847,8 @@ class BaseController
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $_msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_not_is_valid_msg');
+                $_msg = $this->vespula_locale->gettext('base_controller_do_login_auth_not_is_valid_msg');
 
                 /** 
                  * @psalm-suppress UndefinedFunction
@@ -854,70 +882,53 @@ class BaseController
             /**
              * @psalm-suppress MixedAssignment 
              * @psalm-suppress MixedOperand
-             * @psalm-suppress MixedMethodCall
              */
-            $_msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_general_msg');
+            $_msg = $this->vespula_locale->gettext('base_controller_do_login_auth_v_auth_exception_general_msg');
 
             if(\in_array($vaExc->getMessage(), $backendIssues) || str_starts_with($vaExc->getMessage(), 'File not found ')) {
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $_msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_back_end_msg');
+                $_msg = $this->vespula_locale->gettext('base_controller_do_login_auth_v_auth_exception_back_end_msg');
             }
 
             if(\in_array($vaExc->getMessage(), $usernamePswdMismatchIssues)) {
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $_msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_v_auth_exception_user_passwd_msg');
+                $_msg = $this->vespula_locale->gettext('base_controller_do_login_auth_v_auth_exception_user_passwd_msg');
             }
-
-            /** @psalm-suppress MixedArgument */
-            if(
-                $this->getContainer()->has(ContainerKeys::LOGGER)
-                && ( $this->getContainer()->get(ContainerKeys::LOGGER) instanceof \Psr\Log\LoggerInterface )
-            ){
-                /** 
-                 * @psalm-suppress MixedArgument
-                 * @psalm-suppress MixedMethodCall
-                 * @psalm-suppress PossiblyInvalidOperand 
-                 */
-                $this->getContainer()
-                     ->get(ContainerKeys::LOGGER)
-                     ->error( 
-                        \str_replace('<br>', PHP_EOL, $_msg)
-                        . Utils::getThrowableAsStr($vaExc)
-                     );
-            }
+            
+            /** 
+             * @psalm-suppress MixedArgument
+             * @psalm-suppress MixedMethodCall
+             * @psalm-suppress PossiblyInvalidOperand 
+             */
+            $this->logger
+                 ->error( 
+                    \str_replace('<br>', PHP_EOL, $_msg)
+                    . Utils::getThrowableAsStr($vaExc)
+                 );
 
         } catch(\Exception $basExc) {
             /**
              * @psalm-suppress MixedAssignment 
              * @psalm-suppress MixedOperand
-             * @psalm-suppress MixedMethodCall
              */
-            $_msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_do_login_auth_exception_msg');
+            $_msg = $this->vespula_locale->gettext('base_controller_do_login_auth_exception_msg');
 
-            if(
-                $this->getContainer()->has(ContainerKeys::LOGGER)
-                && ( $this->getContainer()->get(ContainerKeys::LOGGER) instanceof \Psr\Log\LoggerInterface )
-            ) {
-                /** 
-                 * @psalm-suppress MixedArgument
-                 * @psalm-suppress MixedMethodCall
-                 * @psalm-suppress PossiblyInvalidOperand 
-                 */
-                $this->getContainer()
-                     ->get(ContainerKeys::LOGGER)
-                     ->error(
-                        \str_replace('<br>', PHP_EOL, $_msg)
-                        . Utils::getThrowableAsStr($basExc)
-                     );
-            }
+            /** 
+             * @psalm-suppress MixedArgument
+             * @psalm-suppress MixedMethodCall
+             * @psalm-suppress PossiblyInvalidOperand 
+             */
+            $this->logger
+                 ->error(
+                    \str_replace('<br>', PHP_EOL, $_msg)
+                    . Utils::getThrowableAsStr($basExc)
+                 );
         }
         /** @psalm-suppress MixedReturnStatement */
         return $_msg;
@@ -945,21 +956,15 @@ class BaseController
             
         } elseif ($logged_in_user !== '') {
             
-            if(
-                $this->getContainer()->has(ContainerKeys::LOGGER)
-                && ( $this->getContainer()->get(ContainerKeys::LOGGER) instanceof \Psr\Log\LoggerInterface )
-            ){
-                /** 
-                 * @psalm-suppress MixedArgument
-                 * @psalm-suppress MixedMethodCall
-                 * @psalm-suppress PossiblyInvalidOperand 
-                 */
-                $this->getContainer()
-                     ->get(ContainerKeys::LOGGER)
-                     ->info( 
-                        "User `{$logged_in_user}` successfully logged out" . PHP_EOL .PHP_EOL
-                     );
-            }
+            /** 
+             * @psalm-suppress MixedArgument
+             * @psalm-suppress MixedMethodCall
+             * @psalm-suppress PossiblyInvalidOperand 
+             */
+            $this->logger
+                 ->info( 
+                    "User `{$logged_in_user}` successfully logged out" . PHP_EOL .PHP_EOL
+                 );
         }
 
         // SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES === true
@@ -1012,45 +1017,40 @@ class BaseController
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_action_login_status_is_anon_msg');
+                $msg = $this->vespula_locale->gettext('base_controller_action_login_status_is_anon_msg');
                 break;
 
             case $auth->isIdle():
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_action_login_status_is_idle_msg');
+                $msg = $this->vespula_locale->gettext('base_controller_action_login_status_is_idle_msg');
                 break;
 
             case $auth->isExpired():
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_action_login_status_is_expired_msg');
+                $msg = $this->vespula_locale->gettext('base_controller_action_login_status_is_expired_msg');
                 break;
 
             case $auth->isValid():
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $msg = $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_action_login_status_is_valid_msg');
+                $msg = $this->vespula_locale->gettext('base_controller_action_login_status_is_valid_msg');
                 break;
 
             default:
                 /**
                  * @psalm-suppress MixedAssignment 
                  * @psalm-suppress MixedOperand
-                 * @psalm-suppress MixedMethodCall
                  */
-                $msg =  $this->getContainerItem(ContainerKeys::LOCALE_OBJ)->gettext('base_controller_action_login_status_unknown_msg');
+                $msg =  $this->vespula_locale->gettext('base_controller_action_login_status_unknown_msg');
                 break;
         }
 
