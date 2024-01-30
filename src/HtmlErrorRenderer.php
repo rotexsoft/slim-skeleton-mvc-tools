@@ -47,13 +47,14 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
     
     public function renderHtmlBody(string $title = '', string $html = ''): string {
         
-        if($this->path_to_error_template_file === '') {
-            
+        if(
+            $this->path_to_error_template_file === ''
+            || !file_exists($this->path_to_error_template_file)
+        ) {
             return parent::renderHtmlBody($title, $html);
         }
         
-        $file_contents = 
-            file_get_contents($this->path_to_error_template_file);
+        $file_contents = file_get_contents($this->path_to_error_template_file);
         
         return sprintf($file_contents, $title, $title, $html);
     }
