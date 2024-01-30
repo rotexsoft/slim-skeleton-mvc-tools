@@ -201,6 +201,22 @@ class FrameworkHelpersTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('http://tnyholm.se/blah?var=1&baa=yoo&boo=baa', sMVC_UriToString($result2));
     }
     
+    public function testThat_sMVC_AddLangSelectionParamToUri_WorksAsExpected() {
+        
+        $result = sMVC_AddLangSelectionParamToUri(
+                    $this->newRequest('https://google.com')->getUri(),
+                    'fr_CA'
+                );
+        
+        $result2 = sMVC_AddLangSelectionParamToUri(
+                    $this->newRequest('https://google.com/?baa=yoo')->getUri(),
+                    'fr_CA'
+                );
+        $param_key = \SlimMvcTools\Controllers\BaseController::GET_QUERY_PARAM_SELECTED_LANG;
+        self::assertEquals("https://google.com?{$param_key}=fr_CA", $result);
+        self::assertEquals("https://google.com/?baa=yoo&{$param_key}=fr_CA", $result2);
+    }
+    
     public function testThat_sMVC_DisplayAndLogFrameworkFileNotFoundError_WorksAsExpected() {
         
         $error_message = 'Test Error';

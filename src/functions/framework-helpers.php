@@ -398,3 +398,14 @@ function sMVC_PrependAction2ActionMethodName(string $action_method_name): string
 
     return $action_method_name;
 }
+
+function sMVC_AddLangSelectionParamToUri(\Psr\Http\Message\UriInterface $uri, $lang='en_US') : string {
+    
+    return sMVC_UriToString(
+        sMVC_AddQueryStrParamToUri(
+            $uri, 
+            \SlimMvcTools\Controllers\BaseController::GET_QUERY_PARAM_SELECTED_LANG, 
+            $lang
+        )
+    );
+}
