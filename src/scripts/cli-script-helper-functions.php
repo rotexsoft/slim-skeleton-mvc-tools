@@ -384,7 +384,6 @@ function createController($argc, array $argv): CreateControllerReturnValue {
                 $controller_2_extend = $default_controller_2_extend;
             }
 
-
             ////////////////////////////////////////////////////////////////////////////
             $namepace_declaration = '';
             //omit namespace declaration by default
