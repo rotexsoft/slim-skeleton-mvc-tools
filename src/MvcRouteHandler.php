@@ -23,8 +23,7 @@ class MvcRouteHandler {
         bool $auto_prepend_action_to_method_name
     ) {
         $this->app = $app;
-        $this->auto_prepend_action_to_method_name = 
-                    $auto_prepend_action_to_method_name;
+        $this->auto_prepend_action_to_method_name = $auto_prepend_action_to_method_name;
         $this->default_controller_class = $default_controller_class;
         $this->default_controller_action = $default_controller_action;
     }
@@ -75,9 +74,7 @@ class MvcRouteHandler {
         /** @psalm-suppress MixedArgument */
         $controller_obj = sMVC_CreateController($container, $controller_from_uri, $action_from_uri, $req, $resp);
 
-        $this->assertMethodExistsOnControllerObj(
-            $req, $controller_obj, $action_method
-        );
+        $this->assertMethodExistsOnControllerObj( $req, $controller_obj, $action_method );
 
         $pre_action_response = $controller_obj->preAction();
         $controller_obj->setResponse( $pre_action_response );
@@ -100,7 +97,8 @@ class MvcRouteHandler {
         if( is_string($actn_res) ) {
 
             $resp = $pre_action_response;
-            $resp->getBody()->write($actn_res); // write the string in the response object as the response body
+            // write the string into the response object as the response body
+            $resp->getBody()->write($actn_res);
 
         } elseif ( $actn_res instanceof \Psr\Http\Message\ResponseInterface ) {
 
