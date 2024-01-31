@@ -12,7 +12,7 @@ namespace SlimMvcTools;
  *
  * @author rotimi
  */
-final class ContainerKeys {
+class ContainerKeys {
 
     public const LAYOUT_RENDERER = 'new_layout_renderer';
     public const VIEW_RENDERER = 'new_view_renderer';
