@@ -100,7 +100,6 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($psr11Container, $controller->getContainer());
         self::assertSame($req, $controller->getRequest());
         self::assertSame($resp, $controller->getResponse());
-        self::assertEquals(sMVC_UriToString($req->getUri()), $controller->getCurrentUri());
         self::assertEquals('an-action', $controller->getActionNameFromUri());
         self::assertEquals('a-controller', $controller->getControllerNameFromUri());
         
@@ -163,10 +162,6 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals('action-from-constructor', $controller5->getActionNameFromUri());
         self::assertEquals('controller-from-constructor', $controller5->getControllerNameFromUri());
-        self::assertEquals(
-            'http://google.com/controller-from-constructor/action-from-constructor', 
-            $controller5->getCurrentUriComputed()
-        );
         
         //////////////////////////////////////////////////////////
         
@@ -282,135 +277,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals('da-controller', $controller3->getControllerNameFromUri());
     }
-
-    public function testThat_getCurrentUri_WorksAsExpected() {
-        
-        $req = $this->newRequest('http://google.com/');
-        $resp = $this->newResponse();
-        $psr11Container = $this->getContainer();
-        
-        $controller = new BaseController(
-            $psr11Container, '', '', $req, $resp
-        );
-        self::assertEquals(sMVC_UriToString($req->getUri()), $controller->getCurrentUri());   
-        
-        $controller2 = new BaseController(
-            $psr11Container, 'base-controller', 'da-action', $req, $resp
-        );
-        self::assertEquals(sMVC_UriToString($req->getUri()), $controller2->getCurrentUri());   
-    }
-
-    public function testThat_getCurrentUriComputed_WorksAsExpected() {
-        
-        $resp = $this->newResponse();
-        $psr11Container = $this->getContainer();
-        
-        // container with [ContainerKeys::APP_SETTINGS]['app_base_path'] with no leading slash
-        $psr11Container2 = $this->getContainer(['app_base_path' => 'da-path2',]);
-        
-        //////////////////////////////////////////////////////////
-        // Test that when no controller and no action are in the
-        // request uri, that the controller & action passed to the 
-        // constructor are computed into controller's 
-        // current_uri_computed property
-        //////////////////////////////////////////////////////////
-        $req = $this->newRequest('http://google.com/');
-        $controller = new BaseController(
-            $psr11Container, 'controller-from-constructor', 
-            'action-from-constructor', $req, $resp
-        );
-        self::assertEquals(
-            'http://google.com/controller-from-constructor/action-from-constructor', 
-            $controller->getCurrentUriComputed()
-        );
-        
-        //////////////////////////////////////////////////////////
-        // Test that when no controller and no action are in the
-        // request uri, that the controller & empty action passed 
-        // to the constructor are computed into controller's 
-        // current_uri_computed property
-        //////////////////////////////////////////////////////////
-        $req2 = $this->newRequest('http://google.com/');
-        $controller2 = new BaseController(
-            $psr11Container, 'controller-from-constructor', '', $req2, $resp
-        );
-        self::assertEquals(
-            'http://google.com/controller-from-constructor', 
-            $controller2->getCurrentUriComputed()
-        );
-        
-        ////////////////////////////////////////////////////////////////////////
-        // Tests with base path with leading slash
-        ////////////////////////////////////////////////////////////////////////
-        
-        //////////////////////////////////////////////////////////
-        // Test that when no controller and no action are in the
-        // request uri, that the controller & action passed to the 
-        // constructor are computed into controller's 
-        // current_uri_computed property
-        //////////////////////////////////////////////////////////
-        $req3 = $this->newRequest('http://google.com' . $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'] );
-        $controller3 = new BaseController(
-            $psr11Container, 'controller-from-constructor', 
-            'action-from-constructor', $req3, $resp
-        );
-        self::assertEquals(
-            'http://google.com'. $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'] .'/controller-from-constructor/action-from-constructor', 
-            $controller3->getCurrentUriComputed()
-        );
-        
-        //////////////////////////////////////////////////////////
-        // Test that when no controller and no action are in the
-        // request uri, that the controller & empty action passed 
-        // to the constructor are computed into controller's 
-        // current_uri_computed property
-        //////////////////////////////////////////////////////////
-        $req4 = $this->newRequest('http://google.com' . $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'] );
-        $controller4 = new BaseController(
-            $psr11Container, 'controller-from-constructor', '', $req4, $resp
-        );
-        self::assertEquals(
-            'http://google.com'. $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'] .'/controller-from-constructor', 
-            $controller4->getCurrentUriComputed()
-        );
-        
-        ////////////////////////////////////////////////////////////////////////
-        // Tests with base path with no leading slash
-        ////////////////////////////////////////////////////////////////////////
-        
-        //////////////////////////////////////////////////////////
-        // Test that when no controller and no action are in the
-        // request uri, that the controller & action passed to the 
-        // constructor are computed into controller's 
-        // current_uri_computed property
-        //////////////////////////////////////////////////////////
-        
-        $req5 = $this->newRequest('http://google.com/' . $psr11Container2->get(ContainerKeys::APP_SETTINGS)['app_base_path'] );
-        $controller5 = new BaseController(
-            $psr11Container2, 'controller-from-constructor', 
-            'action-from-constructor', $req5, $resp
-        );
-        self::assertEquals(
-            'http://google.com/'. $psr11Container2->get(ContainerKeys::APP_SETTINGS)['app_base_path'] .'/controller-from-constructor/action-from-constructor', 
-            $controller5->getCurrentUriComputed()
-        );
-        
-        //////////////////////////////////////////////////////////
-        // Test that when no controller and no action are in the
-        // request uri, that the controller & empty action passed 
-        // to the constructor are computed into controller's 
-        // current_uri_computed property
-        //////////////////////////////////////////////////////////
-        $req6 = $this->newRequest('http://google.com/' . $psr11Container2->get(ContainerKeys::APP_SETTINGS)['app_base_path'] );
-        $controller6 = new BaseController(
-            $psr11Container2, 'controller-from-constructor', '', $req6, $resp
-        );
-        self::assertEquals(
-            'http://google.com/'. $psr11Container2->get(ContainerKeys::APP_SETTINGS)['app_base_path'] .'/controller-from-constructor', 
-            $controller6->getCurrentUriComputed()
-        );
-    }
-
+    
     public function testThat_GetSetVespulaAuthObject_WorksAsExpected() {
         
         $req = $this->newRequest('http://google.com/');

@@ -168,44 +168,6 @@ class BaseController
         
         return $this->controller_name_from_uri;
     }
-
-    /**
-     * The full url of the current request AS IS from the browser 
-     * e.g. http://someserver.com/controller/action[/param1/.../paramN][?var1=val1&...&varN=valN][#some-fragment]
-     * @psalm-suppress PossiblyUnusedProperty
-     */
-    protected string $current_uri;
-    
-    /**
-     * @psalm-suppress PossiblyUnusedMethod
-     */
-    public function getCurrentUri(): string {
-        
-        return $this->current_uri;
-    }
-    
-    /**
-     * The full url of the current request computed in the constructor of this class
-     * 
-     * This value is more reliable for requests with no controller and/or action specified 
-     * in the URL, meaning that the default controller and/or action will be used to service
-     * the request represented by the URL.
-     * 
-     * Still using the url format like the one below:
-     * 
-     * http[s]://someserver.com/controller/action[/param1/.../paramN][?var1=val1&...&varN=valN][#some-fragment]
-     * 
-     * @psalm-suppress PossiblyUnusedProperty
-     */
-    protected string $current_uri_computed;
-    
-    /**
-     * @psalm-suppress PossiblyUnusedMethod
-     */
-    public function getCurrentUriComputed(): string {
-        
-        return $this->current_uri_computed;
-    }
     
     /**
      * The name of the layout file that will be rendered by $this->layout_renderer inside
@@ -239,8 +201,6 @@ class BaseController
         $this->container = $container;
         $this->request = $req;
         $this->response = $res;
-        $this->current_uri = sMVC_UriToString($req->getUri());
-        $this->current_uri_computed = $this->current_uri; // default value, will recompute later below if needed
         $this->action_name_from_uri = ($action_name_from_uri !== '') ? $action_name_from_uri : $this->action_name_from_uri;
         $this->controller_name_from_uri = ($controller_name_from_uri !== '') ? $controller_name_from_uri : $this->controller_name_from_uri;
         
@@ -265,77 +225,6 @@ class BaseController
         
         $uri_path = ($req->getUri() instanceof \Psr\Http\Message\UriInterface)
                                                 ? $req->getUri()->getPath() : '';
-        
-        if(
-            (
-                $this->controller_name_from_uri !== ''
-                && !str_contains($uri_path, $this->controller_name_from_uri)
-            )
-            || 
-            (
-                $this->action_name_from_uri !== ''
-                && !str_contains($uri_path, $this->action_name_from_uri)
-            )
-        ) {
-            // This must be a uri with either no controller & no action
-            // or with a controller and no action, meaning that either
-            // the default controller and / or the default action will
-            // be invoked. This uri could still contain $this->getAppBasePath()
-            
-            // We need to recompute the current uri to include the 
-            // default controller and / or the default action while also
-            // preserving the base-path in its current position & other
-            // parts of the uri like the query string & fragment
-            // The recomputed uri will be stored in $this->current_uri_computed
-            // It is assumed that since either both the controller & action
-            // or only the action are/is missing from the original uri, there
-            // won't be any parameters in the uri path meant to be passed on to
-            // the action to be invoked.
-            
-            // Give $recomputed_uri a default value of the uri from the request
-            $recomputed_uri = $req->getUri();
-            
-            if($uri_path === '/') {
-                
-                ///////////////////////////////////////////////////
-                // no controller, no action, no explicit base path
-                ///////////////////////////////////////////////////
-                
-                $recomputed_uri = 
-                    (
-                        $this->controller_name_from_uri !== ''
-                        && $this->action_name_from_uri !== ''
-                    )
-                    ? $req->getUri()->withPath("/{$this->controller_name_from_uri}/{$this->action_name_from_uri}")
-                    : $req->getUri()->withPath("/{$this->controller_name_from_uri}");
-                    
-            } elseif (str_contains($uri_path, $this->getAppBasePath())) {
-                
-                /////////////////////////////////////////////
-                // base path is contained in the request uri
-                /////////////////////////////////////////////
-                
-                $recomputed_uri = 
-                    (
-                        $this->controller_name_from_uri !== ''
-                        && $this->action_name_from_uri !== ''
-                    )
-                    ? 
-                    (
-                        str_starts_with($this->getAppBasePath(), '/')
-                        ? $req->getUri()->withPath("{$this->getAppBasePath()}/{$this->controller_name_from_uri}/{$this->action_name_from_uri}")
-                        : $req->getUri()->withPath("/{$this->getAppBasePath()}/{$this->controller_name_from_uri}/{$this->action_name_from_uri}")
-                    )
-                    :
-                    (
-                        str_starts_with($this->getAppBasePath(), '/')
-                        ? $req->getUri()->withPath("{$this->getAppBasePath()}/{$this->controller_name_from_uri}")
-                        : $req->getUri()->withPath("/{$this->getAppBasePath()}/{$this->controller_name_from_uri}")
-                    );
-            }
-            
-            $this->current_uri_computed = sMVC_UriToString($recomputed_uri);
-        }
         
         if( 
             ( ($this->controller_name_from_uri === '') || ($this->action_name_from_uri === '') )
