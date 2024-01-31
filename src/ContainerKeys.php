@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace SlimMvcTools;
@@ -9,7 +8,6 @@ namespace SlimMvcTools;
  * of \SlimMvcTools\Container that gets injected into 
  * \SlimMvcTools\Controllers\BaseController or any of its sub-classes
  * 
- *
  * @author rotimi
  */
 class ContainerKeys {
