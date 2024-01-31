@@ -13,26 +13,25 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
     
     protected string $path_to_error_template_file = '';
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function __construct(string $full_path_to_error_template_file) {
         
         $this->path_to_error_template_file = $full_path_to_error_template_file;
     }
     
     public function __invoke(\Throwable $exception, bool $displayErrorDetails): string {
-        
-        $requestLine = '';
-        
+                
         if ($displayErrorDetails) {
             
             $html = "<p>{$this->defaultErrorDescription}:</p>";
             $html .= '<h2>Details</h2>';
-            $html .= $requestLine;
             $html .= $this->renderExceptionFragment($exception);
             
         } else {
             
             $html = "<p>{$this->getErrorDescription($exception)}</p>";
-            $html .= $requestLine;
         }
 
         return $this->renderHtmlBody($this->getErrorTitle($exception), $html);
@@ -65,13 +64,19 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         return $html . sprintf('<pre>%s</pre>', htmlentities($exception->getTraceAsString()));
     }
     
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function setDefaultErrorTitle(string $text): self {
         
         $this->defaultErrorTitle = $text;
 
         return $this;
     }
-
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function setDefaultErrorDescription(string $text): self {
         
         $this->defaultErrorDescription = $text;
