@@ -11,6 +11,8 @@ namespace SlimMvcTools;
  */
 class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
     
+    use BaseErrorRendererTrait;
+    
     protected string $path_to_error_template_file = '';
     
     /**
@@ -62,25 +64,5 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         $html .= '<h2>Trace</h2>';
 
         return $html . sprintf('<pre>%s</pre>', htmlentities($exception->getTraceAsString()));
-    }
-    
-    /**
-     * @psalm-suppress PossiblyUnusedMethod
-     */
-    public function setDefaultErrorTitle(string $text): self {
-        
-        $this->defaultErrorTitle = $text;
-
-        return $this;
-    }
-    
-    /**
-     * @psalm-suppress PossiblyUnusedMethod
-     */
-    public function setDefaultErrorDescription(string $text): self {
-        
-        $this->defaultErrorDescription = $text;
-
-        return $this;
     }
 }

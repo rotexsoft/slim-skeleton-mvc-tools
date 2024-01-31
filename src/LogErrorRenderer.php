@@ -11,6 +11,8 @@ namespace SlimMvcTools;
  */
 class LogErrorRenderer extends \Slim\Error\Renderers\PlainTextErrorRenderer {
 
+    use BaseErrorRendererTrait;
+    
     public function __invoke(\Throwable $exception, bool $displayErrorDetails): string {
         
         $nl = PHP_EOL;
