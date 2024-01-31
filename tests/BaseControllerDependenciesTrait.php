@@ -11,10 +11,10 @@ use \SlimMvcTools\Container,
  */
 trait BaseControllerDependenciesTrait {
     
-    protected function newResponse(): \Psr\Http\Message\ResponseInterface {
+    protected function newResponse(string $body_text='Hello world'): \Psr\Http\Message\ResponseInterface {
         
         $psr17Factory = new \Nyholm\Psr7\Factory\Psr17Factory();
-        $responseBody = $psr17Factory->createStream('Hello world');
+        $responseBody = $psr17Factory->createStream($body_text);
         $response = $psr17Factory->createResponse(200)->withBody($responseBody);
         
         return $response;
