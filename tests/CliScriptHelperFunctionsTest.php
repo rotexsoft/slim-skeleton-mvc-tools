@@ -155,8 +155,10 @@ INPUT;
 
     public function testThatIsValidExtendsClassNameWorksAsExpected() {
 
-        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('Name\\Space\\Class'));
-        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\Name\\Space\\Class'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('SMVCTools\\Tests\\TestObjects\\ChildController'));
+        self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\SMVCTools\\Tests\\TestObjects\\ChildController'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('SMVCTools\\Tests\\TestObjects\\NonController'));
+        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\SMVCTools\\Tests\\TestObjects\\NonController'));
         self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('NameSpace\\Class\\'));
         self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\NameSpace\\Class\\'));
         self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('-NameSpace\\Class'));
@@ -330,7 +332,8 @@ INPUT;
             
             $argc = count($argv);
             $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
-            $expected_message = 'Invalid controller class name `1BadControllerToExtendsClassName` for extension supplied. Goodbye!!';
+            $expected_message = "Invalid controller class name `1BadControllerToExtendsClassName` for extension supplied. The class to extend must be `"
+                                . \SlimMvcTools\Controllers\BaseController::class ."` or its sub-class. Goodbye!!";
             
             self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
             self::assertEquals($expected_message, $return_val->getReturnMessage());

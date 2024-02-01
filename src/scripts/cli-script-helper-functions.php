@@ -125,7 +125,7 @@ function isValidClassName(string $class_name): bool {
     return (bool)preg_match( $regex_4_valid_class_name, preg_quote($class_name, '/') );
 }
 
-function isValidExtendsClassName(string $controller_2_extend): bool {
+function isValidExtendsClassName(string $controller_2_extend, string $parent_class= \SlimMvcTools\Controllers\BaseController::class): bool {
     
     $extend_class_parts = explode('\\', $controller_2_extend);
 
@@ -140,8 +140,9 @@ function isValidExtendsClassName(string $controller_2_extend): bool {
 
         if( !isValidClassName($class_part) ) { return false; }
     }
-
-    return true;
+    
+    return class_exists($parent_class, true)
+            && is_a($controller_2_extend, $parent_class, true);
 }
 
 function isValidNamespaceName(string $namepace_4_controller): bool {
@@ -370,11 +371,12 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
             if ($controller_2_extend !== '') {
 
-                if( !isValidExtendsClassName($controller_2_extend) ) {
+                if( !isValidExtendsClassName($controller_2_extend, $default_controller_2_extend) ) {
 
                     return new CreateControllerReturnValue(
                         CliExitCodes::FAILURE_EXIT,
-                        "Invalid controller class name `$controller_2_extend` for extension supplied. Goodbye!!"
+                        "Invalid controller class name `$controller_2_extend` for extension supplied. The class to extend must be `"
+                        . \SlimMvcTools\Controllers\BaseController::class ."` or its sub-class. Goodbye!!"
                     );
                 }
 
