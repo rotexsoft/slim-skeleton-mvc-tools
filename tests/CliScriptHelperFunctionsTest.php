@@ -332,7 +332,7 @@ INPUT;
             
             $argc = count($argv);
             $return_val = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
-            $expected_message = "Invalid controller class name `1BadControllerToExtendsClassName` for extension supplied. The class to extend must be `"
+            $expected_message = "Invalid controller class name `1BadControllerToExtendsClassName` for extension supplied. The class to extend must be `\\"
                                 . \SlimMvcTools\Controllers\BaseController::class ."` or its sub-class. Goodbye!!";
             
             self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());

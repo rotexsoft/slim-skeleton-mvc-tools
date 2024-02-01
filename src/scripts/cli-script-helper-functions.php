@@ -376,7 +376,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
                     return new CreateControllerReturnValue(
                         CliExitCodes::FAILURE_EXIT,
                         "Invalid controller class name `$controller_2_extend` for extension supplied. The class to extend must be `"
-                        . \SlimMvcTools\Controllers\BaseController::class ."` or its sub-class. Goodbye!!"
+                        . $default_controller_2_extend ."` or its sub-class. Goodbye!!"
                     );
                 }
 
