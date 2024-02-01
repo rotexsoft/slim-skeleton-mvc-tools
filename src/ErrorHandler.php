@@ -30,19 +30,4 @@ class ErrorHandler extends \Slim\Handlers\ErrorHandler {
         $this->container = $container;
         return $this;
     }
-
-//    public function __invoke(ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails, bool $logErrors, bool $logErrorDetails): \Psr\Http\Message\ResponseInterface {
-//        
-//        if($this->container !== null) {
-//            
-//            // In sub-classes of this class
-//            // do some stuff with the container 
-//            // like pull out a mailer object and
-//            // send out notification emails about
-//            // the current error before finally
-//            // displaying the error page.
-//        }
-//        
-//        return parent::__invoke($request, $exception, $displayErrorDetails, $logErrors, $logErrorDetails);
-//    }
 }
