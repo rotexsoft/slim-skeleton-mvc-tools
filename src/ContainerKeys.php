@@ -12,6 +12,8 @@ namespace SlimMvcTools;
  */
 class ContainerKeys {
 
+    public const NEW_RESPONSE_OBJECT = 'new_response_object';
+    public const NEW_REQUEST_OBJECT = 'new_request_object';
     public const LAYOUT_RENDERER = 'new_layout_renderer';
     public const VIEW_RENDERER = 'new_view_renderer';
     public const LOGGER = 'logger';
