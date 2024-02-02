@@ -125,7 +125,7 @@ function isValidClassName(string $class_name): bool {
     return (bool)preg_match( $regex_4_valid_class_name, preg_quote($class_name, '/') );
 }
 
-function isValidExtendsClassName(string $controller_2_extend, string $parent_class= \SlimMvcTools\Controllers\BaseController::class): bool {
+function isValidExtendsClassName(string $controller_2_extend): bool {
     
     $extend_class_parts = explode('\\', $controller_2_extend);
 
@@ -141,8 +141,7 @@ function isValidExtendsClassName(string $controller_2_extend, string $parent_cla
         if( !isValidClassName($class_part) ) { return false; }
     }
     
-    return class_exists($parent_class, true)
-            && is_a($controller_2_extend, $parent_class, true);
+    return true;
 }
 
 function isValidNamespaceName(string $namepace_4_controller): bool {
@@ -371,7 +370,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
             if ($controller_2_extend !== '') {
 
-                if( !isValidExtendsClassName($controller_2_extend, $default_controller_2_extend) ) {
+                if( !isValidExtendsClassName($controller_2_extend) ) {
 
                     return new CreateControllerReturnValue(
                         CliExitCodes::FAILURE_EXIT,
