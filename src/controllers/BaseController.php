@@ -522,8 +522,10 @@ class BaseController
 
     /**
      * @psalm-suppress PossiblyUnusedMethod
+     * 
+     * @return ResponseInterface|string
      */
-    public function actionIndex(): string {
+    public function actionIndex() {
 
         //get the contents of the view first
         $view_str = $this->renderView('index.php', ['controller_object'=>$this]);

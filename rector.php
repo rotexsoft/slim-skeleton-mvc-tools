@@ -27,6 +27,8 @@ return static function (RectorConfig $rectorConfigurator): void {
         \Rector\CodeQuality\Rector\If_\ShortenElseIfRector::class,
 //        \Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector::class,
         \Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
 //        \Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector::class,
 //        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
 //        //\Rector\TypeDeclaration\Rector\ClassMethod\AddArrayReturnDocTypeRector::class,
