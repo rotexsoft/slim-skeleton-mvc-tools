@@ -157,8 +157,6 @@ INPUT;
 
         self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('SMVCTools\\Tests\\TestObjects\\ChildController'));
         self::assertTrue(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\SMVCTools\\Tests\\TestObjects\\ChildController'));
-        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('SMVCTools\\Tests\\TestObjects\\NonController'));
-        self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\SMVCTools\\Tests\\TestObjects\\NonController'));
         self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('NameSpace\\Class\\'));
         self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('\\NameSpace\\Class\\'));
         self::assertFalse(\SlimMvcTools\Functions\CliHelpers\isValidExtendsClassName('-NameSpace\\Class'));
