@@ -47,10 +47,8 @@ class FooBar extends SomeNameSpace\Controller2Extend
         
         //get the contents of the view first
         $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
-        return $view_str;
         
-        //uncomment and edit the line below to incorporate the view above into your app's template
-        //return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
+        return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
     public function preAction(): ResponseInterface {
