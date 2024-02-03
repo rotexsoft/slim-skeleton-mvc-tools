@@ -8,36 +8,6 @@ namespace {
     // Delete when PHP 8.1 becomes minimum version 
     ////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @see https://www.php.net/manual/en/function.str-starts-with
-     */
-    if (!function_exists('str_starts_with')) {
-        function str_starts_with (string $haystack, string $needle): bool
-        {
-            return $needle === '' || strpos($haystack, $needle) === 0;
-        }
-    }
-
-    /**
-     * @see https://www.php.net/manual/en/function.str-contains
-     */
-    if (!function_exists('str_contains')) {
-        function str_contains (string $haystack, string $needle): bool
-        {
-            return $needle === '' || strpos($haystack, $needle) !== false;
-        }
-    }
-
-    /**
-     * @see https://www.php.net/manual/en/function.str-ends-with
-     */
-    if (!function_exists('str_ends_with')) {
-        function str_ends_with (string $haystack, string $needle): bool
-        {
-            return $needle === '' || substr($haystack, -strlen($needle)) === $needle;
-        }
-    }
-
     if (!function_exists('mb_str_starts_with')) {
         function mb_str_starts_with (string $haystack, string $needle): bool
         {

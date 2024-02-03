@@ -38,7 +38,7 @@ class LogErrorRenderer extends \Slim\Error\Renderers\PlainTextErrorRenderer {
     private function formatExceptionFragment(\Throwable $exception): string {
         
         $nl = PHP_EOL;
-        $text = sprintf("Type: %s{$nl}", get_class($exception));
+        $text = sprintf("Type: %s{$nl}", $exception::class);
         $code = $exception->getCode();
         $text .= sprintf("Code: %s{$nl}", $code);
         $text .= sprintf("Message: %s{$nl}", htmlentities($exception->getMessage()));

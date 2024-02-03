@@ -40,10 +40,7 @@ class __TEMPLTATE_CONTROLLER__ extends __CONTROLLER_2_EXTEND__
         parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
     }
     
-    /**
-     * @return \Psr\Http\Message\ResponseInterface|string
-     */
-    public function actionIndex() {
+    public function actionIndex(): ResponseInterface|string  {
         
         //get the contents of the view first
         $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
