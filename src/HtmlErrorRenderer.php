@@ -50,7 +50,11 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         
         $file_contents = file_get_contents($this->path_to_error_template_file);
         
-        return sprintf($file_contents, $title, $title, $html);
+        return str_replace(
+            ['{{{TITLE}}}', '{{{ERROR_HEADING}}}', '{{{ERROR_DETAILS}}}'], 
+            [$title, $title, $html], 
+            $file_contents
+        );
     }
     
     private function renderExceptionFragment(\Throwable $exception): string {
