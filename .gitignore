@@ -51,3 +51,10 @@ tests/test-create-controller-output/*
 
 # files below are generated when tests are run
 tests/test-template-output/FooBar.php
+
+.phpdoc
+.phpdoc/
+.phpdoc/*
+*/.phpdoc
+*/.phpdoc/
+*/.phpdoc/*
