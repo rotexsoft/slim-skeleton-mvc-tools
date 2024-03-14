@@ -875,7 +875,7 @@ class BaseController
                  );
         }
 
-        if($redirect_path === '') {
+        if($redirect_path === '' || ((bool)$show_status_on_completion)) {
             
             // SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES === true
             // means that links generated in this action do not need to be prefixed
