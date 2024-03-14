@@ -1507,11 +1507,15 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionResult4);
         self::assertEquals(302, $actionResult4->getStatusCode());
         self::assertTrue($actionResult4->hasHeader('Location'));
-        self::assertEquals(
-            $_SESSION[BaseController::SESSN_PARAM_LOGIN_REDIRECT], 
-            $actionResult4->getHeaderLine('Location')
-        ); // the uri that the returned response object contains has the redirect url stored in session
         
+        if(SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) {
+            
+            self::assertEquals("{$controller4->getAppBasePath()}/da-shizzle-for-rizzle-controller/login-status", $actionResult4->getHeaderLine('Location'));
+            
+        } else {
+            
+            self::assertEquals("{$controller4->getAppBasePath()}/da-shizzle-for-rizzle-controller/action-login-status", $actionResult4->getHeaderLine('Location'));
+        }
         ////////////////////////////////////////////////////////////////////////
         
         // Test that when false is supplied as the value for the $show_status_on_completion
