@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.1.0",
         "slim/slim": "^4.10",
-        "rotexsoft/file-renderer": "^5.0.0",
+        "rotexsoft/file-renderer": "^6.0.0",
         "vespula/log": "^2.2.3",
         "vespula/auth": "^2.1.1",
         "psr/container": "^2.0",
