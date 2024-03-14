@@ -18,11 +18,6 @@ use \Psr\Http\Message\ServerRequestInterface,
 class BaseController
 {
     /**
-     * A container object containing dependencies needed by the controller.
-     */
-    protected \Psr\Container\ContainerInterface $container;
-
-    /**
      * View object for rendering layout files.
      */
     protected \Rotexsoft\FileRenderer\Renderer $layout_renderer;
@@ -118,16 +113,6 @@ class BaseController
     }
 
     /**
-     * Request Object 
-     */
-    protected \Psr\Http\Message\ServerRequestInterface $request;
-    
-    /**
-     * Response Object 
-     */
-    protected \Psr\Http\Message\ResponseInterface $response;
-
-    /**
      * The action section of the url.
      *
      * It should be set to an empty string if the action was not specified via the url
@@ -192,15 +177,21 @@ class BaseController
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function __construct(
-        \Psr\Container\ContainerInterface $container, 
+        /**
+         * A container object containing dependencies needed by the controller.
+         */
+        protected \Psr\Container\ContainerInterface $container, 
         string $controller_name_from_uri,
         string $action_name_from_uri,
-        ServerRequestInterface $req, 
-        ResponseInterface $res
+        /**
+         * Request Object
+         */
+        protected \Psr\Http\Message\ServerRequestInterface $request, 
+        /**
+         * Response Object
+         */
+        protected \Psr\Http\Message\ResponseInterface $response
     ) {
-        $this->container = $container;
-        $this->request = $req;
-        $this->response = $res;
         $this->action_name_from_uri = ($action_name_from_uri !== '') ? $action_name_from_uri : $this->action_name_from_uri;
         $this->controller_name_from_uri = ($controller_name_from_uri !== '') ? $controller_name_from_uri : $this->controller_name_from_uri;
         
@@ -223,12 +214,12 @@ class BaseController
          */
         $this->view_renderer = $this->getContainerItem(ContainerKeys::VIEW_RENDERER);
         
-        $uri_path = ($req->getUri() instanceof \Psr\Http\Message\UriInterface)
-                                                ? $req->getUri()->getPath() : '';
+        $uri_path = ($this->request->getUri() instanceof \Psr\Http\Message\UriInterface)
+                                                ? $this->request->getUri()->getPath() : '';
         
         if( 
             ( ($this->controller_name_from_uri === '') || ($this->action_name_from_uri === '') )
-            && ( ($uri_path !== '') && ($uri_path !== '/') && (strpos($uri_path, '/') !== false) )
+            && ( ($uri_path !== '') && ($uri_path !== '/') && (str_contains($uri_path, '/')) )
         ) {
             // Calculate $this->controller_name_from_uri and / or
             // $this->action_name_from_uri if necessary
@@ -522,10 +513,8 @@ class BaseController
 
     /**
      * @psalm-suppress PossiblyUnusedMethod
-     * 
-     * @return ResponseInterface|string
      */
-    public function actionIndex() {
+    public function actionIndex(): ResponseInterface|string {
 
         //get the contents of the view first
         $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
@@ -538,10 +527,9 @@ class BaseController
      *
      * @param bool $onlyPublicMethodsPrefixedWithAction true to include only public methods prefixed with `action`
      *                                                  or false to include all public methods
-     * @return \Psr\Http\Message\ResponseInterface|string
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function actionRoutes($onlyPublicMethodsPrefixedWithAction=true) {
+    public function actionRoutes($onlyPublicMethodsPrefixedWithAction=true): ResponseInterface|string {
 
         $resp = $this->getResponseObjForLoginRedirectionIfNotLoggedIn();
 
@@ -563,10 +551,9 @@ class BaseController
     }
 
     /**
-     * @return \Psr\Http\Message\ResponseInterface|string
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function actionLogin() {
+    public function actionLogin(): ResponseInterface|string {
 
         $data_4_login_view = [
             'controller_object' => $this, 'error_message' => '', 
@@ -805,7 +792,7 @@ class BaseController
              */
             $this->logger
                  ->error( 
-                    \str_replace('<br>', PHP_EOL, $_msg)
+                    \str_replace('<br>', PHP_EOL, (string) $_msg)
                     . Utils::getThrowableAsStr($vaExc)
                  );
 
@@ -823,7 +810,7 @@ class BaseController
              */
             $this->logger
                  ->error(
-                    \str_replace('<br>', PHP_EOL, $_msg)
+                    \str_replace('<br>', PHP_EOL, (string) $_msg)
                     . Utils::getThrowableAsStr($basExc)
                  );
         }
@@ -839,7 +826,7 @@ class BaseController
      *                                         actionLogin()
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function actionLogout($show_status_on_completion = false): ResponseInterface {
+    public function actionLogout(mixed $show_status_on_completion = false): ResponseInterface {
         
         $auth = $this->vespula_auth;
         $logged_in_user = $this->isLoggedIn() ? $auth->getUsername() : '';
@@ -912,48 +899,14 @@ class BaseController
         $auth = $this->vespula_auth;
 
         //Just get the current login status
-        switch (true) {
-
-            case $auth->isAnon():
-                /**
-                 * @psalm-suppress MixedAssignment 
-                 * @psalm-suppress MixedOperand
-                 */
-                $msg = $this->vespula_locale->gettext('base_controller_action_login_status_is_anon_msg');
-                break;
-
-            case $auth->isIdle():
-                /**
-                 * @psalm-suppress MixedAssignment 
-                 * @psalm-suppress MixedOperand
-                 */
-                $msg = $this->vespula_locale->gettext('base_controller_action_login_status_is_idle_msg');
-                break;
-
-            case $auth->isExpired():
-                /**
-                 * @psalm-suppress MixedAssignment 
-                 * @psalm-suppress MixedOperand
-                 */
-                $msg = $this->vespula_locale->gettext('base_controller_action_login_status_is_expired_msg');
-                break;
-
-            case $auth->isValid():
-                /**
-                 * @psalm-suppress MixedAssignment 
-                 * @psalm-suppress MixedOperand
-                 */
-                $msg = $this->vespula_locale->gettext('base_controller_action_login_status_is_valid_msg');
-                break;
-
-            default:
-                /**
-                 * @psalm-suppress MixedAssignment 
-                 * @psalm-suppress MixedOperand
-                 */
-                $msg =  $this->vespula_locale->gettext('base_controller_action_login_status_unknown_msg');
-                break;
-        }
+        /** @psalm-suppress MixedAssignment */
+        $msg = match (true) {
+            $auth->isAnon() => $this->vespula_locale->gettext('base_controller_action_login_status_is_anon_msg'),
+            $auth->isIdle() => $this->vespula_locale->gettext('base_controller_action_login_status_is_idle_msg'),
+            $auth->isExpired() => $this->vespula_locale->gettext('base_controller_action_login_status_is_expired_msg'),
+            $auth->isValid() => $this->vespula_locale->gettext('base_controller_action_login_status_is_valid_msg'),
+            default => $this->vespula_locale->gettext('base_controller_action_login_status_unknown_msg'),
+        };
 
         /** 
          * @psalm-suppress UndefinedConstant
@@ -984,10 +937,8 @@ class BaseController
      *
      * False is returned if the user is logged in and there is no need to redirect to
      * the login page.
-     *
-     * @return bool|\Psr\Http\Message\ResponseInterface
      */
-    public function getResponseObjForLoginRedirectionIfNotLoggedIn() {
+    public function getResponseObjForLoginRedirectionIfNotLoggedIn(): bool|\Psr\Http\Message\ResponseInterface {
 
         if( !$this->isLoggedIn() ) {
 
@@ -1027,6 +978,7 @@ class BaseController
 
     public function storeCurrentUrlForLoginRedirection(): self {
 
+        /** @psalm-suppress RedundantCast */
         if(
             in_array(
                 strtolower($this->action_name_from_uri),
@@ -1036,7 +988,7 @@ class BaseController
                 ]
             )
             || strtolower($this->request->getHeaderLine('X-Requested-With')) === strtolower('XMLHttpRequest') //ajax request
-            || ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ) //ajax request
+            || ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower((string) $_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ) //ajax request
         ) { return $this; }
 
         // Use the uri to grab the query string & the fragment part 
@@ -1077,7 +1029,7 @@ class BaseController
         } else {
 
             $msg = "ERROR: The item with the key named `$item_key_in_container` does not exist in"
-                 . " the container associated with `" . get_class($this) . "` ."
+                 . " the container associated with `" . static::class . "` ."
                  . PHP_EOL;
 
             throw new \Slim\Exception\HttpInternalServerErrorException($this->request, $msg);

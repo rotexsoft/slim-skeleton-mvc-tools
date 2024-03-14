@@ -13,76 +13,31 @@ class StrHelpersTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
     }
 
-    public function testThat_str_starts_with_WorksAsExpected() {
-        
-        if( PHP_MAJOR_VERSION < 8 ) {
-            
-            self::assertSame(true, str_starts_with('abbcd', ''));
-            self::assertSame(true, str_starts_with('abbcd', 'abb'));
-            self::assertSame(true, str_starts_with('abbcd', 'ab'));
-            self::assertSame(true, str_starts_with('abbcd', 'a'));
-            self::assertSame(false, str_starts_with('abc', 'abb'));
-        }
-    }
-
-    public function testThat_str_ends_with_WorksAsExpected() {
-        
-        if( PHP_MAJOR_VERSION < 8 ) {
-            
-            self::assertSame(true, str_ends_with('abbcd', ''));
-            self::assertSame(true, str_ends_with('abbcd', 'bcd'));
-            self::assertSame(true, str_ends_with('abbcd', 'cd'));
-            self::assertSame(true, str_ends_with('abbcd', 'd'));
-            self::assertSame(false, str_ends_with('abc', 'abb'));
-        }
-    }
-
-    public function testThat_str_contains_WorksAsExpected() {
-        
-        if( PHP_MAJOR_VERSION < 8 ) {
-            
-            self::assertSame(true, str_contains('abbcd', ''));
-            self::assertSame(true, str_contains('abbcd', 'abb'));
-            self::assertSame(true, str_contains('abbcd', 'bbc'));
-            self::assertSame(true, str_contains('abbcd', 'bcd'));
-            self::assertSame(false, str_contains('abcss', 'abb'));
-        }
-    }
-
     public function testThat_mb_str_starts_with_WorksAsExpected() {
-        
-        if( PHP_MAJOR_VERSION < 8 ) {
             
-            self::assertSame(true, mb_str_starts_with('Âbbcd', ''));
-            self::assertSame(true, mb_str_starts_with('Âbbcd', 'Âbb'));
-            self::assertSame(true, mb_str_starts_with('Âbbcd', 'Âb'));
-            self::assertSame(true, mb_str_starts_with('Âbbcd', 'Â'));
-            self::assertSame(false, mb_str_starts_with('Âbc', 'Âbb'));
-        }
+        self::assertSame(true, mb_str_starts_with('Âbbcd', ''));
+        self::assertSame(true, mb_str_starts_with('Âbbcd', 'Âbb'));
+        self::assertSame(true, mb_str_starts_with('Âbbcd', 'Âb'));
+        self::assertSame(true, mb_str_starts_with('Âbbcd', 'Â'));
+        self::assertSame(false, mb_str_starts_with('Âbc', 'Âbb'));
     }
 
     public function testThat_mb_str_ends_with_WorksAsExpected() {
         
-        if( PHP_MAJOR_VERSION < 8 ) {
-            
-            self::assertSame(true, mb_str_ends_with('abbcđ', ''));
-            self::assertSame(true, mb_str_ends_with('abbcđ', 'bcđ'));
-            self::assertSame(true, mb_str_ends_with('abbcđ', 'cđ'));
-            self::assertSame(true, mb_str_ends_with('abbcđ', 'đ'));
-            self::assertSame(false, mb_str_ends_with('abc', 'abđ'));
-        }
+        self::assertSame(true, mb_str_ends_with('abbcđ', ''));
+        self::assertSame(true, mb_str_ends_with('abbcđ', 'bcđ'));
+        self::assertSame(true, mb_str_ends_with('abbcđ', 'cđ'));
+        self::assertSame(true, mb_str_ends_with('abbcđ', 'đ'));
+        self::assertSame(false, mb_str_ends_with('abc', 'abđ'));
     }
 
     public function testThat_mb_str_contains_WorksAsExpected() {
         
-        if( PHP_MAJOR_VERSION < 8 ) {
-            
-            self::assertSame(true, mb_str_contains('Âbbcd', ''));
-            self::assertSame(true, mb_str_contains('Âbbcd', 'Âbb'));
-            self::assertSame(true, mb_str_contains('Âbbcd', 'bbc'));
-            self::assertSame(true, mb_str_contains('Âbbcd', 'bcd'));
-            self::assertSame(false, mb_str_contains('Âbcss', 'Âbb'));
-        }
+        self::assertSame(true, mb_str_contains('Âbbcd', ''));
+        self::assertSame(true, mb_str_contains('Âbbcd', 'Âbb'));
+        self::assertSame(true, mb_str_contains('Âbbcd', 'bbc'));
+        self::assertSame(true, mb_str_contains('Âbbcd', 'bcd'));
+        self::assertSame(false, mb_str_contains('Âbcss', 'Âbb'));
     }
     
     public function testThatDashesToCamelWorksAsExpected() {

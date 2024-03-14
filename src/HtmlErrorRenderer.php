@@ -13,14 +13,11 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
     
     use BaseErrorRendererTrait;
     
-    protected string $path_to_error_template_file = '';
-    
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function __construct(string $full_path_to_error_template_file) {
-        
-        $this->path_to_error_template_file = $full_path_to_error_template_file;
+    public function __construct(protected string $path_to_error_template_file='')
+    {
     }
     
     public function __invoke(\Throwable $exception, bool $displayErrorDetails): string {
@@ -59,7 +56,7 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
     
     private function renderExceptionFragment(\Throwable $exception): string {
         
-        $html = sprintf('<div><strong>Type:</strong> %s</div>', get_class($exception));
+        $html = sprintf('<div><strong>Type:</strong> %s</div>', $exception::class);
         $code = $exception->getCode();
         $html .= sprintf('<div><strong>Code:</strong> %s</div>', $code);
         $html .= sprintf('<div><strong>Message:</strong> %s</div>', htmlentities($exception->getMessage()));

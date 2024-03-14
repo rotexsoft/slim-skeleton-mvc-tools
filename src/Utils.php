@@ -19,7 +19,7 @@ class Utils {
 
         do {
             $message .= "Exception / Error Code: {$previous_throwable->getCode()}"
-                . $eol . "Exception / Error Class: " . \get_class($previous_throwable)
+                . $eol . "Exception / Error Class: " . $previous_throwable::class
                 . $eol . "File: {$previous_throwable->getFile()}"
                 . $eol . "Line: {$previous_throwable->getLine()}"
                 . $eol . "Message: {$previous_throwable->getMessage()}" . $eol

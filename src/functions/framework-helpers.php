@@ -156,7 +156,7 @@ function sMVC_DumpVar(...$vals): void {
  *              super global associated with each key).
  * 
  */
-function sMVC_GetSuperGlobal(string $global_name='', string $key='', $default_val='') {
+function sMVC_GetSuperGlobal(string $global_name='', string $key='', mixed $default_val='') {
 
     static $super_globals;
 
@@ -221,7 +221,7 @@ function sMVC_GetSuperGlobal(string $global_name='', string $key='', $default_va
     //normalize the global name
     $global_name = strtolower($global_name);
 
-    if( strpos($global_name, '$_') === 0 ) {
+    if( str_starts_with($global_name, '$_') ) {
 
         $global_name = substr($global_name, 2);
     }

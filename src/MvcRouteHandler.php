@@ -11,22 +11,12 @@ namespace SlimMvcTools;
  */
 class MvcRouteHandler {
     
-    protected \Slim\App $app;
-    protected bool $auto_prepend_action_to_method_name = false;
-    protected string $default_controller_class;
-    protected string $default_controller_action;
-
     public function __construct(
-        \Slim\App $app,
-        string $default_controller_class,
-        string $default_controller_action,
-        bool $auto_prepend_action_to_method_name
-    ) {
-        $this->app = $app;
-        $this->auto_prepend_action_to_method_name = $auto_prepend_action_to_method_name;
-        $this->default_controller_class = $default_controller_class;
-        $this->default_controller_action = $default_controller_action;
-    }
+        protected \Slim\App $app, 
+        protected string $default_controller_class, 
+        protected string $default_controller_action, 
+        protected bool $auto_prepend_action_to_method_name = false
+    ) { }
     
     public function __invoke(
         \Psr\Http\Message\ServerRequestInterface $req,
@@ -43,7 +33,7 @@ class MvcRouteHandler {
 
         // strip trailing forward slash
         /** @psalm-suppress MixedArgument */
-        $params_str = isset($args['parameters'])? rtrim($args['parameters'], '/') : '';
+        $params_str = isset($args['parameters'])? rtrim((string) $args['parameters'], '/') : '';
 
         // convert to array of parameters
         $params = ($params_str === '') && mb_strlen($params_str, 'UTF-8') <= 0 ? [] : explode('/', $params_str);
@@ -137,7 +127,7 @@ class MvcRouteHandler {
         
         if( !method_exists($controller_obj, $action_method) ) {
 
-            $controller_class_name = get_class($controller_obj);
+            $controller_class_name = $controller_obj::class;
 
             // 404 Not Found: Action method does not exist in the controller object.
             $err_message = "`".__FILE__."` on line ".__LINE__

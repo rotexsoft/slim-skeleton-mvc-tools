@@ -11,25 +11,20 @@ interface CliExitCodes {
 
 class CreateControllerReturnValue {
     
-    /**
-     * Must be any one of 
-     *  CliExitCodes::SUCCESS_EXIT, 
-     *  CliExitCodes::EXCEPTION_EXIT or
-     *  CliExitCodes::FAILURE_EXIT
-     */
-    private int $returnCode;
-    
-    /**
-     * Description of the operation just performed by createController
-     */
-    private string $returnMessage;
-    
     public function __construct(
-        int $returnCode,
-        string $returnMessage
-    ) {
-        $this->returnCode = $returnCode;
-        $this->returnMessage = $returnMessage;
+        /**
+         * Must be any one of
+         *  CliExitCodes::SUCCESS_EXIT,
+         *  CliExitCodes::EXCEPTION_EXIT or
+         *  CliExitCodes::FAILURE_EXIT
+         */
+        private readonly int $returnCode,
+        /**
+         * Description of the operation just performed by createController
+         */
+        private readonly string $returnMessage
+    )
+    {
     }
     
     /** 
