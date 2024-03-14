@@ -8,7 +8,7 @@
 ![Packagist Downloads](https://img.shields.io/packagist/dt/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
 ![GitHub top language](https://img.shields.io/github/languages/top/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
 ![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
-![GitHub commits since latest release (by date) for a branch](https://img.shields.io/github/commits-since/rotexsoft/slim-skeleton-mvc-tools/4.0.0/master) &nbsp;
+![GitHub commits since latest release (by date) for a branch](https://img.shields.io/github/commits-since/rotexsoft/slim-skeleton-mvc-tools/latest) &nbsp;
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/rotexsoft/slim-skeleton-mvc-tools/master) &nbsp;
 ![GitHub Release Date](https://img.shields.io/github/release-date/rotexsoft/slim-skeleton-mvc-tools) &nbsp;
 <a href="https://libraries.io/github/rotexsoft/slim-skeleton-mvc-tools">
