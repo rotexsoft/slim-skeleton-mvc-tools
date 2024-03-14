@@ -937,10 +937,8 @@ class BaseController
      *
      * False is returned if the user is logged in and there is no need to redirect to
      * the login page.
-     *
-     * @return bool|\Psr\Http\Message\ResponseInterface
      */
-    public function getResponseObjForLoginRedirectionIfNotLoggedIn() {
+    public function getResponseObjForLoginRedirectionIfNotLoggedIn(): bool|\Psr\Http\Message\ResponseInterface {
 
         if( !$this->isLoggedIn() ) {
 

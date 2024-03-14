@@ -127,7 +127,7 @@ namespace SlimMvcTools\Functions\Str {
     function camelToUnder(string $str): string
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
-        return str_replace(' ', '_', ucwords($str));
+        return str_replace(' ', '_', ucwords((string) $str));
     }
 
     /**
@@ -142,7 +142,7 @@ namespace SlimMvcTools\Functions\Str {
     function camelToDashes(string $str): string
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
-        $str = str_replace(' ', '-', ucwords($str));
+        $str = str_replace(' ', '-', ucwords((string) $str));
         return strtolower($str);
     }
 
