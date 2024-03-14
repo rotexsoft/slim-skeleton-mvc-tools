@@ -30,7 +30,7 @@ This package contains a Base controller and other classes and functions used by 
 
 ### Requirements
 
-* PHP 5.5+ (version 1.X) or PHP 5.6+ (version 2.X) or PHP 7.2+ (version 3.X) or PHP 7.4+ (version 4.X)
+* PHP 5.5+ (version 1.x) or PHP 5.6+ (version 2.x) or PHP 7.2+ (version 3.x) or PHP 7.4+ (version 4.x) or PHP 8.1+ (version 5.x)
 * Compatibility with HHVM not guaranteed
 
 ### Installation
