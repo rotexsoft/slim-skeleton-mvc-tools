@@ -11,27 +11,27 @@ Layout: View:             <h1>App Routes</h1>
                                             <tr>
                             <td>SlimMvcTools\Controllers\BaseController</td>
                             <td>actionIndex</td>
-                            <td>base-controller/index</td>
+                            <td>base-controller/action-index</td>
                         </tr>
                                             <tr>
                             <td>SlimMvcTools\Controllers\BaseController</td>
                             <td>actionLogin</td>
-                            <td>base-controller/login</td>
+                            <td>base-controller/action-login</td>
                         </tr>
                                             <tr>
                             <td>SlimMvcTools\Controllers\BaseController</td>
                             <td>actionLoginStatus</td>
-                            <td>base-controller/login-status</td>
+                            <td>base-controller/action-login-status</td>
                         </tr>
                                             <tr>
                             <td>SlimMvcTools\Controllers\BaseController</td>
                             <td>actionLogout</td>
-                            <td>base-controller/logout[/show_status_on_completion=false]</td>
+                            <td>base-controller/action-logout[/show_status_on_completion=false]</td>
                         </tr>
                                             <tr>
                             <td>SlimMvcTools\Controllers\BaseController</td>
                             <td>actionRoutes</td>
-                            <td>base-controller/routes[/onlyPublicMethodsPrefixedWithAction=true][/stripActionPrefixFromMethodName=true]</td>
+                            <td>base-controller/action-routes[/onlyPublicMethodsPrefixedWithAction=true][/stripActionPrefixFromMethodName=true]</td>
                         </tr>
                                     </tbody>
             </table>

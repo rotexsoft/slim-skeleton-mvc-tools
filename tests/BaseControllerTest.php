@@ -594,6 +594,12 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             file_get_contents("{$path}action-routes-output.txt"), 
             $result
         );
+        
+        $result2 = $controller->actionRoutes(1, 0);
+        self::assertEquals(
+            file_get_contents("{$path}action-routes-output-2.txt"), 
+            $result2
+        );
     }
 
     /**

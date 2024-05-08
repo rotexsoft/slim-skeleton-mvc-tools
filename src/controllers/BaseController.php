@@ -527,9 +527,11 @@ class BaseController
      *
      * @param bool $onlyPublicMethodsPrefixedWithAction true to include only public methods prefixed with `action`
      *                                                  or false to include all public methods
+     * @param bool $stripActionPrefixFromMethodName true to strip the `action-` prefix from methods displayed or false to leave the `action-` prefix
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function actionRoutes($onlyPublicMethodsPrefixedWithAction=true): ResponseInterface|string {
+    public function actionRoutes($onlyPublicMethodsPrefixedWithAction=true, $stripActionPrefixFromMethodName=true): ResponseInterface|string {
 
         $resp = $this->getResponseObjForLoginRedirectionIfNotLoggedIn();
 
@@ -544,7 +546,10 @@ class BaseController
         /** @psalm-suppress RedundantCastGivenDocblockType */
         $view_str = $this->renderView(
             'controller-classes-by-action-methods-report.php',
-            ['onlyPublicMethodsPrefixedWithAction'=> ((bool)$onlyPublicMethodsPrefixedWithAction)]
+            [
+                'onlyPublicMethodsPrefixedWithAction'=> ((bool)$onlyPublicMethodsPrefixedWithAction),
+                'stripActionPrefixFromMethodName'=> ((bool)$stripActionPrefixFromMethodName),
+            ]
         );
 
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
