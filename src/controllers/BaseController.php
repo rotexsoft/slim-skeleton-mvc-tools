@@ -245,7 +245,10 @@ class BaseController
         $this->storeCurrentUrlForLoginRedirection();
         $this->updateSelectedLanguage();
     }
-    
+
+    /**
+     * @psalm-suppress InvalidScalarArgument
+     */
     public function updateSelectedLanguage() : void {
 
         $query_params = $this->request->getQueryParams();
@@ -275,7 +278,13 @@ class BaseController
              */
             $_SESSION[self::SESSN_PARAM_CURRENT_LOCALE_LANG] = 
                 $query_params[self::GET_QUERY_PARAM_SELECTED_LANG];
-        } // else { // default lang is already preconfigured in dependencies file }
+        } elseif (
+            session_status() === PHP_SESSION_ACTIVE         
+            && array_key_exists(self::SESSN_PARAM_CURRENT_LOCALE_LANG, $_SESSION)
+        ) {
+            $this->vespula_locale->setCode($_SESSION[self::SESSN_PARAM_CURRENT_LOCALE_LANG]);
+        }
+        // else { // default lang is already preconfigured in dependencies file }
     }
 
     /**
