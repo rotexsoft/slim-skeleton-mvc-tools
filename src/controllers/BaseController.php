@@ -231,7 +231,7 @@ class BaseController
 
             $uri_path_parts = explode('/', $uri_path);
 
-            if( count($uri_path_parts) >= 1 && ($this->controller_name_from_uri === '') ) {
+            if( ($this->controller_name_from_uri === '') ) {
 
                 $this->controller_name_from_uri = $uri_path_parts[0];
             }
@@ -592,13 +592,13 @@ class BaseController
             $auth = $this->vespula_auth; //get the auth object
 
             /** @psalm-suppress MixedAssignment */
-            $username = sMVC_GetSuperGlobal('post', 'username');
+            $username = sMVC_GetSuperGlobal('post', 'username', '');
 
             /** @psalm-suppress MixedAssignment */
-            $password = sMVC_GetSuperGlobal('post', 'password');
+            $password = sMVC_GetSuperGlobal('post', 'password', '');
             $error_msg = '';
 
-            if( empty($username) ) {
+            if( $username === '' ) {
                 /** 
                  * @psalm-suppress MixedOperand
                  */
@@ -606,7 +606,7 @@ class BaseController
                                    ->gettext('base_controller_action_login_empty_username_msg');
             }
 
-            if( empty($password) ) {
+            if( $password === '' ) {
 
                 $error_msg .= (($error_msg === ''))? '' : '<br>';
                 /** 
