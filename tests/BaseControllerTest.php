@@ -1567,17 +1567,17 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             'Unknown' => 'Unknown session status.',
         ];
         
+        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
+
+            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
+        }
+        
         foreach ($test_params as $auth_status => $status_message_in_rendered_view) {
             
             $auth->getSession()->setStatus($auth_status);
             $action_result = $controller->actionLoginStatus();
             self::assertStringContainsString($status_message_in_rendered_view, $action_result);
             self::assertStringContainsString('<br>'.nl2br(sMVC_DumpAuthinfo($auth)), $action_result);
-        }
-        
-        if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
-
-            define('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES', true );
         }
         
         ////////////////////////////////////////////////////////////////////////
