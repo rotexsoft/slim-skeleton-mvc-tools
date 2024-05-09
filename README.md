@@ -35,3 +35,13 @@ This package contains a Base controller and other classes and functions used by 
 
 ### Installation
 `composer require rotexsoft/slim-skeleton-mvc-tools`
+
+### Branching
+
+These are the branches in this repository:
+
+- **master:** contains code for the latest major version of this package
+- **5.x:** contains code for the **5.x** versions of this package (currently being synced with master until a newer version 6.x starts being developed on master)
+- **4.x:** contains code for the **4.x** versions of this package. No new features, only bug fixes accepted.
+- **slim-3-edition:** contains code for the **3.x** versions of this package. No new features, only bug fixes accepted.
+- **1.X:** contains code for the **1.x** versions of this package. Abandoned.
