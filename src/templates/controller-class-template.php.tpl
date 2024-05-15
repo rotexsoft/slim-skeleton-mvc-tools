@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace __NAMESPACE_2_REPLACE__;
 
 use \Psr\Container\ContainerInterface;
