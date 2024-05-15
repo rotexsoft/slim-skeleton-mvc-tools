@@ -802,11 +802,11 @@ class BaseController
             /** 
              * @psalm-suppress MixedArgument
              * @psalm-suppress MixedMethodCall
-             * @psalm-suppress PossiblyInvalidOperand 
+             * @psalm-suppress PossiblyInvalidOperand
              */
             $this->logger
                  ->error( 
-                    \str_replace('<br>', PHP_EOL, (string) $_msg)
+                    \str_replace('<br>', PHP_EOL, $_msg)
                     . Utils::getThrowableAsStr($vaExc)
                  );
 
@@ -820,11 +820,11 @@ class BaseController
             /** 
              * @psalm-suppress MixedArgument
              * @psalm-suppress MixedMethodCall
-             * @psalm-suppress PossiblyInvalidOperand 
+             * @psalm-suppress PossiblyInvalidOperand
              */
             $this->logger
                  ->error(
-                    \str_replace('<br>', PHP_EOL, (string) $_msg)
+                    \str_replace('<br>', PHP_EOL, $_msg)
                     . Utils::getThrowableAsStr($basExc)
                  );
         }
