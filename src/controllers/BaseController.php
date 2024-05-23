@@ -270,7 +270,7 @@ class BaseController
              */
             $this->vespula_locale->setCode($query_params[self::GET_QUERY_PARAM_SELECTED_LANG]);
 
-            if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+            if (session_status() !== \PHP_SESSION_ACTIVE) { session_start($this->getAppSetting('session_start_options') ?? []); }
 
             // also store in session
             /**
@@ -279,7 +279,7 @@ class BaseController
             $_SESSION[self::SESSN_PARAM_CURRENT_LOCALE_LANG] = 
                 $query_params[self::GET_QUERY_PARAM_SELECTED_LANG];
         } elseif (
-            session_status() === PHP_SESSION_ACTIVE         
+            session_status() === \PHP_SESSION_ACTIVE         
             && array_key_exists(self::SESSN_PARAM_CURRENT_LOCALE_LANG, $_SESSION)
         ) {
             $this->vespula_locale->setCode($_SESSION[self::SESSN_PARAM_CURRENT_LOCALE_LANG]);
@@ -739,7 +739,7 @@ class BaseController
                 }
 
                 //since we are successfully logged in, resume session if any
-                if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+                if (session_status() !== \PHP_SESSION_ACTIVE) { session_start($this->getAppSetting('session_start_options') ?? []); }
 
             } else {
                 /**
@@ -848,7 +848,7 @@ class BaseController
 
         /** @psalm-suppress MixedArrayOffset */
         if(
-            session_status() === PHP_SESSION_ACTIVE
+            session_status() === \PHP_SESSION_ACTIVE
             && isset($_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT])
         ) {
             //there is an active session with a redirect url stored in it
@@ -1017,9 +1017,9 @@ class BaseController
                     . ( ($fragment !== '') ? '#' . $fragment : '' );
 
         //start a new session if none exists
-        if(session_status() !== PHP_SESSION_ACTIVE) {
+        if(session_status() !== \PHP_SESSION_ACTIVE) {
             
-            session_start();
+            session_start($this->getAppSetting('session_start_options') ?? []);
         }
 
         //store current url in session
