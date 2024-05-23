@@ -270,7 +270,14 @@ class BaseController
              */
             $this->vespula_locale->setCode($query_params[self::GET_QUERY_PARAM_SELECTED_LANG]);
 
-            if (session_status() !== \PHP_SESSION_ACTIVE) { session_start($this->getAppSetting('session_start_options') ?? []); }
+            if (session_status() !== \PHP_SESSION_ACTIVE) {
+                
+                $session_start_settings = 
+                    $this->getAppSetting('session_start_options') !== null
+                        ? (array)$this->getAppSetting('session_start_options')
+                        : [];
+                session_start($session_start_settings);
+            }
 
             // also store in session
             /**
@@ -739,7 +746,14 @@ class BaseController
                 }
 
                 //since we are successfully logged in, resume session if any
-                if (session_status() !== \PHP_SESSION_ACTIVE) { session_start($this->getAppSetting('session_start_options') ?? []); }
+                if (session_status() !== \PHP_SESSION_ACTIVE) { 
+                    
+                    $session_start_settings = 
+                        $this->getAppSetting('session_start_options') !== null
+                            ? (array)$this->getAppSetting('session_start_options')
+                            : [];
+                    session_start($session_start_settings);
+                }
 
             } else {
                 /**
@@ -1019,7 +1033,11 @@ class BaseController
         //start a new session if none exists
         if(session_status() !== \PHP_SESSION_ACTIVE) {
             
-            session_start($this->getAppSetting('session_start_options') ?? []);
+            $session_start_settings = 
+                $this->getAppSetting('session_start_options') !== null
+                    ? (array)$this->getAppSetting('session_start_options')
+                    : [];
+            session_start($session_start_settings);
         }
 
         //store current url in session
