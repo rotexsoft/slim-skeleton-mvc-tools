@@ -123,18 +123,18 @@ function sMVC_DumpVar(...$vals): void {
 /**
  * This function stores a snapshot of the following super globals $_SERVER, $_GET,
  * $_POST, $_FILES, $_COOKIE, $_SESSION & $_ENV and then returns the stored values
- * on subsequent calls. (In the case of $_SESSION, a reference to it is kept so 
- * that modifying sMVC_GetSuperGlobal('session') will also modify $_SESSION). 
+ * on subsequent calls. (In the case of $_SESSION, a reference to it is kept so
+ * that modifying sMVC_GetSuperGlobal('session') will also modify $_SESSION).
  * If a session has not been started sMVC_GetSuperGlobal('session') will always
  * return null, likewise sMVC_GetSuperGlobal('session', 'some_key') will always
  * return $default_val.
  * 
- * IT IS STRONGLY RECOMMENDED THAY YOU USE LIBRARIES LIKE aura/session 
+ * IT IS STRONGLY RECOMMENDED THAY YOU USE LIBRARIES LIKE aura/session
  * (https://github.com/auraphp/Aura.Session) TO WORK WITH $_SESSION.
  * USING sMVC_GetSuperGlobal('session') IS HIGHLY DISCOURAGED.
  * 
- * @param string $global_name the name (case-insensitive) of a any of the super 
- *                            globals mentioned above (excluding the $_). For 
+ * @param string $global_name the name (case-insensitive) of a any of the super
+ *                            globals mentioned above (excluding the $_). For
  *                            example 'Post', 'pOst', etc.
  *                            sMVC_GetSuperGlobal('get') === sMVC_GetSuperGlobal('gEt'), etc.
  * 
@@ -144,15 +144,15 @@ function sMVC_DumpVar(...$vals): void {
  * @param mixed $default_val the value to return if $key is not an actual key in
  *                            the specified super global.
  * 
- * @return mixed Returns an array containing all values in the specified super 
+ * @return mixed Returns an array containing all values in the specified super
  *               global if $key and $default_val were not supplied. A value associated
  *               with a specific key in the specified super global is returned or the
- *               $default_val if the specific key is not found in the specified super 
+ *               $default_val if the specific key is not found in the specified super
  *               global (this happens when $global_name and $key are supplied;
  *               $default_val may be supplied too). If no parameters were supplied
- *               an array with the following keys 
- *              (`server`, `get`, `post`, `files`, `cookie`, `env` and `session`) 
- *              is returned (the corresponding values will be the value of the 
+ *               an array with the following keys
+ *              (`server`, `get`, `post`, `files`, `cookie`, `env` and `session`)
+ *              is returned (the corresponding values will be the value of the
  *              super global associated with each key).
  * 
  */

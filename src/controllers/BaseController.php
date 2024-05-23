@@ -271,7 +271,7 @@ class BaseController
             $this->vespula_locale->setCode($query_params[self::GET_QUERY_PARAM_SELECTED_LANG]);
 
             if (session_status() !== \PHP_SESSION_ACTIVE) {
-                
+
                 $session_start_settings = 
                     $this->getAppSetting('session_start_options') !== null
                         ? (array)$this->getAppSetting('session_start_options')

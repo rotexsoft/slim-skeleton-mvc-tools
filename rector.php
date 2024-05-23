@@ -34,7 +34,8 @@ return static function (RectorConfig $rectorConfigurator): void {
 //        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
 //        \Rector\Php71\Rector\FuncCall\CountOnNullRector::class,
 //        //\Rector\TypeDeclaration\Rector\FunctionLike\ParamTypeDeclarationRector::class,
-//        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class
+//        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
+        \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
     ];
     
     $rectorConfigurator->skip($skipables);
