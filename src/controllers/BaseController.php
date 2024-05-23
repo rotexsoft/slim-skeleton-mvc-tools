@@ -246,6 +246,15 @@ class BaseController
         $this->updateSelectedLanguage();
     }
 
+    protected function startSession(): void {
+        
+        $session_start_settings = 
+            $this->getAppSetting('session_start_options') !== null
+                ? (array)$this->getAppSetting('session_start_options')
+                : [];
+        session_start($session_start_settings);
+    }
+    
     /**
      * @psalm-suppress InvalidScalarArgument
      */
@@ -272,11 +281,7 @@ class BaseController
 
             if (session_status() !== \PHP_SESSION_ACTIVE) {
 
-                $session_start_settings = 
-                    $this->getAppSetting('session_start_options') !== null
-                        ? (array)$this->getAppSetting('session_start_options')
-                        : [];
-                session_start($session_start_settings);
+                $this->startSession();
             }
 
             // also store in session
@@ -748,11 +753,7 @@ class BaseController
                 //since we are successfully logged in, resume session if any
                 if (session_status() !== \PHP_SESSION_ACTIVE) { 
                     
-                    $session_start_settings = 
-                        $this->getAppSetting('session_start_options') !== null
-                            ? (array)$this->getAppSetting('session_start_options')
-                            : [];
-                    session_start($session_start_settings);
+                    $this->startSession();
                 }
 
             } else {
@@ -1033,11 +1034,7 @@ class BaseController
         //start a new session if none exists
         if(session_status() !== \PHP_SESSION_ACTIVE) {
             
-            $session_start_settings = 
-                $this->getAppSetting('session_start_options') !== null
-                    ? (array)$this->getAppSetting('session_start_options')
-                    : [];
-            session_start($session_start_settings);
+            $this->startSession();
         }
 
         //store current url in session
