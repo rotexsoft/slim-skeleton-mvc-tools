@@ -10,6 +10,7 @@ if( !\SlimMvcTools\Functions\CliHelpers\isPhpRunningInCliMode() ) {
 } else {
 
     try {
+        echo "Current working directory: " . getcwd() . PHP_EOL;
         $result = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
         
         \SlimMvcTools\Functions\CliHelpers\printType(
