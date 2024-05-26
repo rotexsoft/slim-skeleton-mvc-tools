@@ -10,6 +10,9 @@ if( !\SlimMvcTools\Functions\CliHelpers\isPhpRunningInCliMode() ) {
 } else {
 
     try {
+        $current_directory = getcwd(); 
+        echo "Current working directory: " . getcwd() . PHP_EOL;
+        
         // we are going to mimic $argc and $argv
         $psuedo_argv = [];
         
@@ -102,6 +105,11 @@ if( !\SlimMvcTools\Functions\CliHelpers\isPhpRunningInCliMode() ) {
             $result->getReturnMessage(),
             true
         );
+        
+        if($result->getReturnCode() === \SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT) {
+            
+            passthru("cd {$current_directory} && composer dump-autoload -o");
+        }
         
         exit($result->getReturnCode());
 

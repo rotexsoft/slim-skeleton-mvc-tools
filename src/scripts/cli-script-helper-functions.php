@@ -501,7 +501,6 @@ function createController($argc, array $argv): CreateControllerReturnValue {
             }
 
             $success_messages .= PHP_EOL . "All done!!";
-            $success_messages .= PHP_EOL . "Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `$studly_controller_name` in `{$dest_controller_class_file}`.";
 
             return new CreateControllerReturnValue(
                 CliExitCodes::SUCCESS_EXIT, 
