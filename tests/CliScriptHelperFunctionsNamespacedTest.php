@@ -488,7 +488,6 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
             $expected_message3 = PHP_EOL . "Creating index view for `BlogComments::actionIndex()` in `{$dest_view_file}` ....";
             $expected_message4 = PHP_EOL . "Successfully created `{$dest_view_file}` ....".PHP_EOL;
             $expected_message5 = PHP_EOL . "All done!!";
-            $expected_message6 = PHP_EOL . "Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `BlogComments` in `{$dest_controller_class_file}`.";
             
             self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, $return_val->getReturnCode());
             
@@ -503,7 +502,6 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
             self::assertStringContainsString($expected_message3, $return_val->getReturnMessage());
             self::assertStringContainsString($expected_message4, $return_val->getReturnMessage());
             self::assertStringContainsString($expected_message5, $return_val->getReturnMessage());
-            self::assertStringContainsString($expected_message6, $return_val->getReturnMessage());
             
             // clean-up
             $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'controllers');
@@ -550,7 +548,6 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
             $expected_message3 = PHP_EOL . "Creating index view for `BlogComments::actionIndex()` in `{$dest_view_file}` ....";
             $expected_message4 = PHP_EOL . "Successfully created `{$dest_view_file}` ....".PHP_EOL;
             $expected_message5 = PHP_EOL . "All done!!";
-            $expected_message6 = PHP_EOL . "Remember to run `composer dumpautoload` so that composer can pick up the newly created controller class `BlogComments` in `{$dest_controller_class_file}`.";
             
             self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, $return_val->getReturnCode());
             
@@ -567,7 +564,6 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
             self::assertStringContainsString($expected_message3, $return_val->getReturnMessage());
             self::assertStringContainsString($expected_message4, $return_val->getReturnMessage());
             self::assertStringContainsString($expected_message5, $return_val->getReturnMessage());
-            self::assertStringContainsString($expected_message6, $return_val->getReturnMessage());
             
             // clean-up
             $this->rmdirRecursive($src_path . DIRECTORY_SEPARATOR . 'controllers');
