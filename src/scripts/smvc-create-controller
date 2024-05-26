@@ -10,12 +10,19 @@ if( !\SlimMvcTools\Functions\CliHelpers\isPhpRunningInCliMode() ) {
 } else {
 
     try {
+        $current_directory = getcwd(); 
         echo "Current working directory: " . getcwd() . PHP_EOL;
         $result = \SlimMvcTools\Functions\CliHelpers\createController($argc, $argv);
         
         \SlimMvcTools\Functions\CliHelpers\printType(
             $result->getReturnCode(), $result->getReturnMessage(), true
         );
+        
+        if($result->getReturnCode() === \SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT) {
+            
+            passthru("cd {$current_directory} && composer dump-autoload -o");
+        }
+        
         exit($result->getReturnCode());
 
     } catch(\Exception $e) {
