@@ -439,7 +439,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
             if( file_exists($dest_controller_class_file) ) {
 
                 return new CreateControllerReturnValue(
-                    CliExitCodes::FAILURE_EXIT,
+                    CliExitCodes::SUCCESS_EXIT,
                     "Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!"
                 );
             }
@@ -447,7 +447,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
             if( file_exists($dest_view_file) ) {
 
                 return new CreateControllerReturnValue(
-                    CliExitCodes::FAILURE_EXIT,
+                    CliExitCodes::SUCCESS_EXIT,
                     "View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!"
                 );
             }

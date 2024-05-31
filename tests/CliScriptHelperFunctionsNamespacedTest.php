@@ -258,7 +258,7 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
             
             $expected_message = "Controller class `ChildController` already exists in `{$dest_controller_class_file}`. Goodbye!!";
             
-            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, $return_val->getReturnCode());
             self::assertEquals($expected_message, $return_val->getReturnMessage());
         }
     }
@@ -291,7 +291,7 @@ class CliScriptHelperFunctionsNamespacedTest extends \PHPUnit\Framework\TestCase
             
             $expected_message = "View file `$dest_view_file` already exists for Controller class `ControllerWithNoControllerClass`. Goodbye!!";
             
-            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::FAILURE_EXIT, $return_val->getReturnCode());
+            self::assertEquals(\SlimMvcTools\Functions\CliHelpers\CliExitCodes::SUCCESS_EXIT, $return_val->getReturnCode());
             self::assertEquals($expected_message, $return_val->getReturnMessage());
         }
     }
