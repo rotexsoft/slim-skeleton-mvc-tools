@@ -252,6 +252,12 @@ class BaseController
             $this->getAppSetting('session_start_options') !== null
                 ? (array)$this->getAppSetting('session_start_options')
                 : [];
+        
+        if(isset($session_start_settings['name'])) {
+            
+            session_name($session_start_settings['name']);
+        }
+
         session_start($session_start_settings);
     }
     
