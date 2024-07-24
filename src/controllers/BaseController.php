@@ -255,7 +255,7 @@ class BaseController
         
         if(isset($session_start_settings['name'])) {
             
-            session_name($session_start_settings['name']);
+            session_name((string)$session_start_settings['name']);
         }
 
         session_start($session_start_settings);
