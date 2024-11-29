@@ -218,12 +218,12 @@ function normalizeFolderPathForOs(string $path): string {
  * @param string $destination_file_path the filename of the target
  * @param array $replaces the replaces to be applied to this target
  *
- * @return int|boolean the number of bytes that were written to the file located at $dest,
+ * @return int|false the number of bytes that were written to the file located at $dest,
  *                     or FALSE on failure.
  */
 function processTemplateFile(
     string $template_file_path, string $destination_file_path, array $replaces
-) {
+): int|false {
     $retval = file_get_contents($template_file_path);
     
     if($retval !== false) {

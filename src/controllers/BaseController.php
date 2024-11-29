@@ -168,10 +168,10 @@ class BaseController
     //////////////////////////////////
     // Session Parameter keys
     //////////////////////////////////
-    public const SESSN_PARAM_LOGIN_REDIRECT = 'login_redirect_path';
+    public const SESSN_PARAM_LOGIN_REDIRECT = self::class . '_login_redirect_path';
     
     // This item in the session represents the current language selected by the user
-    public const SESSN_PARAM_CURRENT_LOCALE_LANG = 'current_locale_language';
+    public const SESSN_PARAM_CURRENT_LOCALE_LANG = self::class . '_current_locale_language';
     
     /**
      * @psalm-suppress PossiblyUnusedMethod
