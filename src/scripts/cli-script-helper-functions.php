@@ -223,7 +223,7 @@ function normalizeFolderPathForOs(string $path): string {
  */
 function processTemplateFile(
     string $template_file_path, string $destination_file_path, array $replaces
-) {
+): int|false {
     $retval = file_get_contents($template_file_path);
     
     if($retval !== false) {
