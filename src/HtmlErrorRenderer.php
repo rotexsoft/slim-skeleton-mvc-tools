@@ -50,7 +50,7 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         return str_replace(
             ['{{{TITLE}}}', '{{{ERROR_HEADING}}}', '{{{ERROR_DETAILS}}}'], 
             [$title, $title, $html], 
-            $file_contents
+            ($file_contents === false) ? '' : $file_contents
         );
     }
     

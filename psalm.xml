@@ -7,6 +7,7 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
     findUnusedBaselineEntry="true"
     findUnusedCode="true"
+    allowStringToStandInForClass="true"
 >
     <projectFiles>
         <directory name="src" />
@@ -15,4 +16,9 @@
             <directory name="src/templates" />
         </ignoreFiles>
     </projectFiles>
+    
+    <issueHandlers>
+        <ClassMustBeFinal errorLevel="suppress" /> <!-- supress ClassMustBeFinal everywhere in your code -->
+        <MissingOverrideAttribute errorLevel="suppress" /> <!-- supress MissingOverrideAttribute everywhere in your code -->
+    </issueHandlers>
 </psalm>
