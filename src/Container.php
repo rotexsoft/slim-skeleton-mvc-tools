@@ -11,7 +11,6 @@ use \Psr\Container\ContainerInterface;
  *
  * @author rotimi
  * @psalm-suppress UnusedClass
- * @psalm-suppress ClassMustBeFinal
  */
 class Container extends PimpleContainer implements ContainerInterface {
 
