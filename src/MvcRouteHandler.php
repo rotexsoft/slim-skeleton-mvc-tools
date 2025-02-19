@@ -27,6 +27,7 @@ class MvcRouteHandler {
         
         if(!($container instanceof \Psr\Container\ContainerInterface)) {
             
+            /** @psalm-suppress InvalidOperand */
             $msg = "`".__FILE__."` on line ".__LINE__.": Null container retrieved from Slim App object.";
             throw new \Slim\Exception\HttpInternalServerErrorException($req, $msg);
         }
@@ -113,6 +114,7 @@ class MvcRouteHandler {
             // Make sure the controller name is a valid string usable as a class name
             // in php as defined in http://php.net/manual/en/language.oop5.basic.php
             // trigger 404 not found
+            /** @psalm-suppress InvalidOperand */
             $err_message = "`".__FILE__."` on line ".__LINE__.": Bad action name `{$action_method}`.";
 
             throw new \Slim\Exception\HttpBadRequestException($req, $err_message);
@@ -130,6 +132,7 @@ class MvcRouteHandler {
             $controller_class_name = $controller_obj::class;
 
             // 404 Not Found: Action method does not exist in the controller object.
+            /** @psalm-suppress InvalidOperand */
             $err_message = "`".__FILE__."` on line ".__LINE__
                 .": The action method `{$action_method}` does not exist in class `{$controller_class_name}`.";
 

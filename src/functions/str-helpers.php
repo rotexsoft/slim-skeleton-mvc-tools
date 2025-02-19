@@ -110,9 +110,12 @@ namespace SlimMvcTools\Functions\Str {
      */
     function toDashes(string $str): string
     {
+        $original = $str;
         $str = preg_replace('/[^a-z0-9 _-]/i', '', $str);
-        $str = camelToDashes($str);
-        return preg_replace('/[ _-]+/', '-', $str);
+        $str = camelToDashes(is_string($str) ? $str : $original);
+        $result = preg_replace('/[ _-]+/', '-', $str);
+
+        return is_string($result) ? $result : $str;
     }
 
     /**

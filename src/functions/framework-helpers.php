@@ -29,6 +29,7 @@ function sMVC_CreateController(
     ) {
         //A valid php class name starts with a letter or underscore, followed by 
         //any number of letters, numbers, or underscores.
+        /** @psalm-suppress InvalidOperand */
         $extra_log_message = "`" . __FILE__ . "` on line " . __LINE__ . ": Bad controller name `{$controller_class_name}`";
         throw new \Slim\Exception\HttpBadRequestException($request, $extra_log_message);
     } 
@@ -58,6 +59,7 @@ function sMVC_CreateController(
         if( !class_exists($controller_class_name) ) {
 
             //404 Not Found: Controller class not found.
+            /** @psalm-suppress InvalidOperand */
             $extra_log_message = "`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.";
             throw new \Slim\Exception\HttpNotFoundException($request, $extra_log_message);
         }
@@ -66,6 +68,7 @@ function sMVC_CreateController(
     if(!is_a($controller_class_name, \SlimMvcTools\Controllers\BaseController::class, true)) {
 
         //400 Bad Request: Controller class is not a subclass of \SlimMvcTools\Controllers\BaseController.
+        /** @psalm-suppress InvalidOperand */
         $extra_log_message = 
                 "`".__FILE__."` on line ".__LINE__
                 . sprintf(': `%s` could not be mapped to a valid controller.', $request->getUri()->__toString());
