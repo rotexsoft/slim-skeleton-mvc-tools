@@ -14,7 +14,7 @@ class ChildController extends \SlimMvcTools\Controllers\BaseController {
     
     protected string $login_success_redirect_controller = 'child-controller';
     
-    protected string $login_success_redirect_action = 'login-status2';
+    protected string $login_success_redirect_action = 'login-status';
     
     public bool $is_logged_in = false;
 

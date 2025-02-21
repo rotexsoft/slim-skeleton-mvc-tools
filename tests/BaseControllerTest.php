@@ -48,24 +48,9 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             self::assertSame($controller, $controller->storeCurrentUrlForLoginRedirection());
             self::assertArrayNotHasKey(BaseController::SESSN_PARAM_LOGIN_REDIRECT, $_SESSION);
         }
-        
-        //////////////////////////////////////////
-        $controller2 = new BaseController(
-            $psr11Container, 
-            '', '', 
-            $req->withHeader('X-Requested-With', 'XMLHttpRequest'), 
-            $resp
-        );
-        self::assertSame($controller2, $controller2->storeCurrentUrlForLoginRedirection());
-        self::assertArrayNotHasKey(BaseController::SESSN_PARAM_LOGIN_REDIRECT, $_SESSION);
 
         //////////////////////////////////////////
-        $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
         $controller3 = new BaseController($psr11Container, 'da-controller', 'da-action', $req, $resp);
-        
-        self::assertSame($controller3, $controller3->storeCurrentUrlForLoginRedirection());
-        self::assertArrayNotHasKey(BaseController::SESSN_PARAM_LOGIN_REDIRECT, $_SESSION);
-        unset($_SERVER['HTTP_X_REQUESTED_WITH']);
 
         // Now that we don't have a login route or ajax request
         // the method should store the current url in session
@@ -207,12 +192,12 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new BaseController(
             $psr11Container, 'base-controller', '', $req, $resp
         );
-        self::assertEquals('login-status', $controller->getLoginSuccessRedirectAction());   
+        self::assertEquals('index', $controller->getLoginSuccessRedirectAction());   
         
         $controller2 = new \SMVCTools\Tests\TestObjects\ChildController(
             $psr11Container, 'child-controller', 'da-action', $req, $resp
         );
-        self::assertEquals('login-status2', $controller2->getLoginSuccessRedirectAction());
+        self::assertEquals('login-status', $controller2->getLoginSuccessRedirectAction());
     }
 
     public function testThat_getLoginSuccessRedirectController_WorksAsExpected() {
@@ -950,14 +935,15 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         // Scenario: Valid Username & Password lead to a successful login and
         // user will be redirected.
         // 
-        // Response object containing a redirect uri (which is the uri stored in
-        // session when the controller was created) is returned instead of a  
-        // Login form
+        // Response object containing a redirect uri (which is a uri containing
+        // $controller->getLoginSuccessRedirectController() as controller and 
+        // $controller->getLoginSuccessRedirectAction() as action) is returned 
+        // instead of a Login form
         ////////////////////////////////////////////////////////////////////////
         $_POST['username'] = 'admin';
         $_POST['password'] = 'admin';
         $actionLoginResult = $controller->actionLogin();
-        $expectedRedirectPath = "/";
+        $expectedRedirectPath = $controller->makeLink("{$controller->getLoginSuccessRedirectController()}/{$controller->getLoginSuccessRedirectAction()}");
 
         // Response Object with a redirect uri should not be returned in this scenario
         self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionLoginResult);
@@ -1042,8 +1028,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         ////////////////////////////////////////////////////////////////////////
         
         $success_redirect_path = '/random-path';
-        $expected_redirect_path = 
-            $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT];
+        $expected_redirect_path = '/random-path';
         $credentials = [ 'username'=> 'admin', 'password'=> 'admin', ];
         
         //reset the logger first so that only log messages related to the next 
@@ -1055,8 +1040,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
 
         ////////////////////////////////////////////////////////////////////////
-        // $success_redirect_path should have the value stored in
-        // $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT]
+        // $success_redirect_path should not have changed
         ////////////////////////////////////////////////////////////////////////
         self::assertEquals(
             $expected_redirect_path, 
@@ -1096,6 +1080,36 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         
+        $success_redirect_pathX = '/random-path';
+        // Line below will trigger the current uri to be stored in session
+        $controller->getResponseObjForLoginRedirectionIfNotLoggedIn(); 
+        $expected_redirect_pathX = $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT];
+        $credentialsX = [ 'username'=> 'admin', 'password'=> 'admin', ];
+        
+        //reset the logger first so that only log messages related to the next 
+        //call of doLogin are present in the log object.
+        $controller->getContainerItem(ContainerKeys::LOGGER)->reset();
+        
+        $resultX = $controller->doLoginPublic(
+            $controller->getVespulaAuthObject(), $credentialsX, $success_redirect_pathX
+        );
+
+        ////////////////////////////////////////////////////////////////////////
+        // $success_redirect_path should have changed to the value stored
+        // in $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT]
+        ////////////////////////////////////////////////////////////////////////
+        self::assertEquals(
+            $expected_redirect_pathX, 
+            $success_redirect_pathX
+        );
+        self::assertNotEquals(
+            '/random-path', 
+            $success_redirect_pathX
+        );
+        
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
         ////////////////////////////////////////////////////////////////////////
         // Try logging in again, this time $success_redirect_path should not
         // be changed because $_SESSION[\SMVCTools\Tests\TestObjects\ControllerWithPublicDoLogin::SESSN_PARAM_LOGIN_REDIRECT]
@@ -1104,11 +1118,11 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $success_redirect_path2 = '/random-path';
         $original_success_redirect_path = $success_redirect_path2;
         $result2 = $controller->doLoginPublic(
-            $controller->getVespulaAuthObject(), $credentials, $success_redirect_path
+            $controller->getVespulaAuthObject(), $credentials, $success_redirect_path2
         );
         
         ////////////////////////////////////////////////////////////////////////
-        // $success_redirect_path should not have been changed by doLogin 
+        // $success_redirect_path2 should not have been changed by doLogin 
         ////////////////////////////////////////////////////////////////////////
         self::assertEquals(
             $original_success_redirect_path, 
@@ -1538,7 +1552,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller5 = new BaseController(
             $psr11Container, 'da-shizzle-for-rizzle-controller', '', $req, $resp
         );
-        
+        $controller5->storeCurrentUrlForLoginRedirection();
         $actionResult5 = $controller5->actionLogout(false);
         self::assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $actionResult5);
         self::assertEquals(302, $actionResult5->getStatusCode());

@@ -88,7 +88,7 @@ class BaseController
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
      * if $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT] is not set.
      */
-    protected string $login_success_redirect_action = 'login-status';
+    protected string $login_success_redirect_action = 'index';
     
     /**
      * @psalm-suppress PossiblyUnusedMethod
@@ -241,8 +241,7 @@ class BaseController
                 $this->action_name_from_uri = $uri_path_parts[1];
             }
         }
-
-        $this->storeCurrentUrlForLoginRedirection();
+        
         $this->updateSelectedLanguage();
     }
 
@@ -1022,8 +1021,6 @@ class BaseController
                     'logout', 'action-logout', 'actionlogout', 'action_logout'
                 ]
             )
-            || strtolower($this->request->getHeaderLine('X-Requested-With')) === strtolower('XMLHttpRequest') //ajax request
-            || ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower((string) $_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ) //ajax request
         ) { return $this; }
 
         // Use the uri to grab the query string & the fragment part 
