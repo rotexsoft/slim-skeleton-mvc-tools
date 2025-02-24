@@ -18,4 +18,3 @@ enum SlimHttpExceptionClassNames: string {
     case HttpTooManyRequestsException       = \Slim\Exception\HttpTooManyRequestsException::class;
     case HttpUnauthorizedException          = \Slim\Exception\HttpUnauthorizedException::class;
 }
-
