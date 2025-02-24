@@ -70,19 +70,40 @@ class MvcRouteHandler {
         $pre_action_response = $controller_obj->preAction();
         $controller_obj->setResponse( $pre_action_response );
 
-        // execute the controller's action
-        /** @psalm-suppress MixedAssignment */
-        $actn_res = 
-            ($params === []) 
-                ? $controller_obj->$action_method() // handle the following routes 
-                                                    // '/' , 
-                                                    // '/{controller}[/]'
-                                                    // '/{controller}/{action}' 
-                                                    // or '/{controller}/{action}/'
-                
-                : $controller_obj->$action_method(...$params); // handle this route
-                                                               // '/{controller}/{action}[/{parameters:.+}]'
+        try {
+            // execute the controller's action
+            /** @psalm-suppress MixedAssignment */
+            $actn_res = 
+                ($params === []) 
+                    ? $controller_obj->$action_method() // handle the following routes 
+                                                        // '/' , 
+                                                        // '/{controller}[/]'
+                                                        // '/{controller}/{action}' 
+                                                        // or '/{controller}/{action}/'
 
+                    : $controller_obj->$action_method(...$params); // handle this route
+                                                                   // '/{controller}/{action}[/{parameters:.+}]'
+        } catch (\ArgumentCountError $e) {
+            
+            //400 Bad Request: Not enough arguments supplied in the uri to invoke the method above.
+            /** @psalm-suppress InvalidOperand */
+            $log_message = 
+                    "`".__FILE__."` on line ".__LINE__
+                    . sprintf(': Not enough arguments when calling `%s`(...) on an instance of `%s` for the uri `%s`.', $action_method, $controller_obj::class, $req->getUri()->__toString());
+
+            throw new \Slim\Exception\HttpBadRequestException($req, $log_message, $e);
+            
+        } catch (\Throwable $e) {
+            
+            //500 Internal server error: An Exception or Error was thrown when trying to execute action method on the controller.
+            /** @psalm-suppress InvalidOperand */
+            $log_message = 
+                    "`".__FILE__."` on line ".__LINE__
+                    . sprintf(': Error occured when calling `%s`(...) on an instance of `%s` for the uri `%s`.', $action_method, $controller_obj::class, $req->getUri()->__toString());
+
+            throw new \Slim\Exception\HttpInternalServerErrorException($req, $log_message, $e);
+        }
+        
         // If we got this far, that means that the action method was successfully
         // executed on the controller object.
         if( is_string($actn_res) ) {
