@@ -84,7 +84,6 @@ function sMVC_CreateController(
                 "`".__FILE__."` on line ".__LINE__
                 . sprintf(': `%s` could not be mapped to a valid controller.', $request->getUri()->__toString());
         
-        //throw new \Slim\Exception\HttpBadRequestException($request, $extra_log_message);
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $container,
             SlimHttpExceptionClassNames::HttpBadRequestException,

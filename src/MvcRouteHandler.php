@@ -83,6 +83,20 @@ class MvcRouteHandler {
 
                     : $controller_obj->$action_method(...$params); // handle this route
                                                                    // '/{controller}/{action}[/{parameters:.+}]'
+        
+            // If we got this far, that means that the action method was successfully
+            // executed on the controller object.
+            if( is_string($actn_res) ) {
+
+                $resp = $pre_action_response;
+                // write the string into the response object as the response body
+                $resp->getBody()->write($actn_res);
+
+            } elseif ( $actn_res instanceof \Psr\Http\Message\ResponseInterface ) {
+
+                $resp = $actn_res; // the action returned a Response object
+            }
+            
         } catch (\ArgumentCountError $e) {
             
             //400 Bad Request: Not enough arguments supplied in the uri to invoke the method above.
@@ -102,33 +116,23 @@ class MvcRouteHandler {
             
         } catch (\Throwable $e) {
             
-            //500 Internal server error: An Exception or Error was thrown when trying to execute action method on the controller.
-            /** @psalm-suppress InvalidOperand */
-            $log_message = 
-                    "`".__FILE__."` on line ".__LINE__
-                    . sprintf(': Error occured when calling `%s`(...) on an instance of `%s` for the uri `%s`.', $action_method, $controller_obj::class, $req->getUri()->__toString());
-            
-            /** @psalm-suppress PossiblyNullArgument */
-            throw Utils::createSlimHttpExceptionWithLocalizedDescription(
-                $this->app->getContainer(),
-                SlimHttpExceptionClassNames::HttpInternalServerErrorException,
-                $req,
-                $log_message,
-                $e
-            );
-        }
-        
-        // If we got this far, that means that the action method was successfully
-        // executed on the controller object.
-        if( is_string($actn_res) ) {
+            if(! $e instanceof \Slim\Exception\HttpSpecializedException) {
+                
+                //500 Internal server error: An Exception or Error was thrown when trying to execute action method on the controller.
+                /** @psalm-suppress InvalidOperand */
+                $log_message = 
+                        "`".__FILE__."` on line ".__LINE__
+                        . sprintf(': Error occured when calling `%s`(...) on an instance of `%s` for the uri `%s`.' . PHP_EOL . 'Error: `%s`', $action_method, $controller_obj::class, $req->getUri()->__toString(), $e->getMessage());
 
-            $resp = $pre_action_response;
-            // write the string into the response object as the response body
-            $resp->getBody()->write($actn_res);
-
-        } elseif ( $actn_res instanceof \Psr\Http\Message\ResponseInterface ) {
-
-            $resp = $actn_res; // the action returned a Response object
+                /** @psalm-suppress PossiblyNullArgument */
+                throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+                    $this->app->getContainer(),
+                    SlimHttpExceptionClassNames::HttpInternalServerErrorException,
+                    $req,
+                    $log_message,
+                    $e
+                );
+            }
         }
 
         return $controller_obj->postAction($resp);
