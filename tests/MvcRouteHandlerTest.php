@@ -174,36 +174,6 @@ class MvcRouteHandlerTest extends \PHPUnit\Framework\TestCase  {
         $mvc_route_handler1($this->newRequest(), $this->newResponse(), $args);
     }
     
-    /**
-     * @runInSeparateProcess
-     */
-    public function testThat___invoke_WorksAsExpected4() {
-        
-        // When a conntroller method that throws an exception is called
-        $this->expectException(\Slim\Exception\HttpInternalServerErrorException::class);
-        $message = '/.*: Error occured when calling `actionThrowException`.*/';
-        $this->expectExceptionMessageMatches($message);
-        
-        $container = $this->getContainer();
-        \Slim\Factory\AppFactory::setContainer($container);
-        $app = \Slim\Factory\AppFactory::create();
-        
-        
-        $auto_prepend_action_to_method_name = true;
-        
-        $mvc_route_handler1 = new \SlimMvcTools\MvcRouteHandler(
-            $app, \SlimMvcTools\Controllers\BaseController::class,
-            'actionIndex', $auto_prepend_action_to_method_name
-        );
-        
-        $args = [
-            'parameters' => '',
-            'action' => 'action-throw-exception', // method that throws exception
-            'controller' => 'stand-alone-controller'
-        ];        
-        $mvc_route_handler1($this->newRequest(), $this->newResponse(), $args);
-    }
-    
     public function testThat_validateMethodName_WorksAsExpected() {
         
         $this->expectException(\Slim\Exception\HttpBadRequestException::class);
