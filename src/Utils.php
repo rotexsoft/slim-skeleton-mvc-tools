@@ -31,6 +31,15 @@ class Utils {
         return $message;
     }
     
+    /**
+     * 
+     * @param \Psr\Container\ContainerInterface $container a container from which the locale object will be retreived
+     * @param SlimHttpExceptionClassNames $exception_class the exception class to instantiate
+     * @param \Psr\Http\Message\RequestInterface $req a request object
+     * @param string $err_message an error message for the exception, it is different from the localized description for the exception
+     * @param \Throwable|null $previous_exception a previous exception if any
+     * @psalm-suppress MixedArgument
+     */
     public static function createSlimHttpExceptionWithLocalizedDescription(
         \Psr\Container\ContainerInterface $container,
         SlimHttpExceptionClassNames $exception_class,
@@ -46,6 +55,7 @@ class Utils {
                 $container->has(ContainerKeys::LOCALE_OBJ)
                 && $container->get(ContainerKeys::LOCALE_OBJ) instanceof \Vespula\Locale\Locale
             ) {
+                /** @psalm-suppress MixedMethodCall */
                 $exception->setDescription(
                     $container->get(ContainerKeys::LOCALE_OBJ)
                               ->gettext($exception_class->value.'_description')

@@ -90,7 +90,8 @@ class MvcRouteHandler {
             $log_message = 
                     "`".__FILE__."` on line ".__LINE__
                     . sprintf(': Not enough arguments when calling `%s`(...) on an instance of `%s` for the uri `%s`.', $action_method, $controller_obj::class, $req->getUri()->__toString());
-
+            
+            /** @psalm-suppress PossiblyNullArgument */
             throw Utils::createSlimHttpExceptionWithLocalizedDescription(
                 $this->app->getContainer(),
                 SlimHttpExceptionClassNames::HttpBadRequestException,
@@ -107,6 +108,7 @@ class MvcRouteHandler {
                     "`".__FILE__."` on line ".__LINE__
                     . sprintf(': Error occured when calling `%s`(...) on an instance of `%s` for the uri `%s`.', $action_method, $controller_obj::class, $req->getUri()->__toString());
             
+            /** @psalm-suppress PossiblyNullArgument */
             throw Utils::createSlimHttpExceptionWithLocalizedDescription(
                 $this->app->getContainer(),
                 SlimHttpExceptionClassNames::HttpInternalServerErrorException,
@@ -150,6 +152,7 @@ class MvcRouteHandler {
             /** @psalm-suppress InvalidOperand */
             $err_message = "`".__FILE__."` on line ".__LINE__.": Bad action name `{$action_method}`.";
 
+            /** @psalm-suppress PossiblyNullArgument */
             throw Utils::createSlimHttpExceptionWithLocalizedDescription(
                 $this->app->getContainer(),
                 SlimHttpExceptionClassNames::HttpBadRequestException,
@@ -174,6 +177,7 @@ class MvcRouteHandler {
             $err_message = "`".__FILE__."` on line ".__LINE__
                 .": The action method `{$action_method}` does not exist in class `{$controller_class_name}`.";
             
+            /** @psalm-suppress PossiblyNullArgument */
             throw Utils::createSlimHttpExceptionWithLocalizedDescription(
                 $this->app->getContainer(),
                 SlimHttpExceptionClassNames::HttpNotFoundException,
