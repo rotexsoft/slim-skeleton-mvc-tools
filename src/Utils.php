@@ -30,4 +30,28 @@ class Utils {
         
         return $message;
     }
+    
+    public static function createSlimHttpExceptionWithLocalizedDescription(
+        \Psr\Container\ContainerInterface $container,
+        SlimHttpExceptionClassNames $exception_class,
+        \Psr\Http\Message\RequestInterface $req,
+        string $err_message,
+        ?\Throwable $previous_exception = null
+    ): \Slim\Exception\HttpSpecializedException {
+
+            $exception_class_name = $exception_class->value;
+            $exception =  new $exception_class_name($req, $err_message, $previous_exception);
+            
+            if(
+                $container->has(ContainerKeys::LOCALE_OBJ)
+                && $container->get(ContainerKeys::LOCALE_OBJ) instanceof \Vespula\Locale\Locale
+            ) {
+                $exception->setDescription(
+                    $container->get(ContainerKeys::LOCALE_OBJ)
+                              ->gettext($exception_class->value.'_description')
+                );
+            }
+            
+            return $exception;
+    }
 }
