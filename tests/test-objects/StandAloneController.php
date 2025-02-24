@@ -28,6 +28,13 @@ class StandAloneController extends \SlimMvcTools\Controllers\BaseController {
         return $resp;
     }
     
+    public function actionIndex(): \Psr\Http\Message\ResponseInterface | string {
+        
+        $this->response->getBody()->write('Invoked '. __METHOD__);
+        
+        return $this->response;
+    }
+    
     public function actionHelloNoArgs() {
         
         $this->response->getBody()->write("Hello");
@@ -45,5 +52,12 @@ class StandAloneController extends \SlimMvcTools\Controllers\BaseController {
     public function actionHelloReturnStr($first_name, $last_name) {
         
         return "Hello {$first_name}, {$last_name}";
+    }
+    
+    public function actionThrowException() {
+        
+        throw new \Exception('Yo Yo Yo');
+        
+        return "Never gonna get here";
     }
 }

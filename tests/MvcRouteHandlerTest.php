@@ -44,6 +44,13 @@ class MvcRouteHandlerTest extends \PHPUnit\Framework\TestCase  {
             'controller' => 'stand-alone-controller'
         ];
         
+        $args2A = [
+            'parameters' => '',
+            // should lead to invocation of default action actionIndex
+            //'action' => 'action-hello-no-args',
+            'controller' => 'stand-alone-controller'
+        ];
+        
         $args3 = [
             'parameters' => 'John/Doe',
             'action' => 'action-hello-return-resp', // should not autoprepend because already prefixed with action
@@ -73,6 +80,10 @@ class MvcRouteHandlerTest extends \PHPUnit\Framework\TestCase  {
         $resp2 = $mvc_route_handler1($this->newRequest(), $this->newResponse(''), $args2);
         $resp2->getBody()->rewind();
         self::assertEquals($resp2->getBody().'', 'preAction: Hello John, Doe :postAction');
+        
+        $resp2A = $mvc_route_handler1($this->newRequest(), $this->newResponse(''), $args2A);
+        $resp2A->getBody()->rewind();
+        self::assertEquals($resp2A->getBody().'', 'preAction: Invoked ' . \SMVCTools\Tests\TestObjects\StandAloneController::class . '::actionIndex :postAction');
         
         $resp3 = $mvc_route_handler1($this->newRequest(), $this->newResponse(''), $args3);
         $resp3->getBody()->rewind();
@@ -131,6 +142,66 @@ class MvcRouteHandlerTest extends \PHPUnit\Framework\TestCase  {
         ];
         
         $mvc_route_handler1($this->newRequest(), $this->newResponse(), $args1);
+    }
+    
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat___invoke_WorksAsExpected3() {
+        
+        // too few arguments passed to controller method in the uri
+        $this->expectException(\Slim\Exception\HttpBadRequestException::class);
+        $message = '/.*: Not enough arguments when calling `actionHelloReturnStr`.*/';
+        $this->expectExceptionMessageMatches($message);
+        
+        $container = $this->getContainer();
+        \Slim\Factory\AppFactory::setContainer($container);
+        $app = \Slim\Factory\AppFactory::create();
+        
+        
+        $auto_prepend_action_to_method_name = true;
+        
+        $mvc_route_handler1 = new \SlimMvcTools\MvcRouteHandler(
+            $app, \SlimMvcTools\Controllers\BaseController::class,
+            'actionIndex', $auto_prepend_action_to_method_name
+        );
+        
+        $args = [
+            'parameters' => 'John', // only one parameter instead of two like John/Doe
+            'action' => 'action-hello-return-str',
+            'controller' => 'stand-alone-controller'
+        ];        
+        $mvc_route_handler1($this->newRequest(), $this->newResponse(), $args);
+    }
+    
+    /**
+     * @runInSeparateProcess
+     */
+    public function testThat___invoke_WorksAsExpected4() {
+        
+        // When a conntroller method that throws an exception is called
+        $this->expectException(\Slim\Exception\HttpInternalServerErrorException::class);
+        $message = '/.*: Error occured when calling `actionThrowException`.*/';
+        $this->expectExceptionMessageMatches($message);
+        
+        $container = $this->getContainer();
+        \Slim\Factory\AppFactory::setContainer($container);
+        $app = \Slim\Factory\AppFactory::create();
+        
+        
+        $auto_prepend_action_to_method_name = true;
+        
+        $mvc_route_handler1 = new \SlimMvcTools\MvcRouteHandler(
+            $app, \SlimMvcTools\Controllers\BaseController::class,
+            'actionIndex', $auto_prepend_action_to_method_name
+        );
+        
+        $args = [
+            'parameters' => '',
+            'action' => 'action-throw-exception', // method that throws exception
+            'controller' => 'stand-alone-controller'
+        ];        
+        $mvc_route_handler1($this->newRequest(), $this->newResponse(), $args);
     }
     
     public function testThat_validateMethodName_WorksAsExpected() {
