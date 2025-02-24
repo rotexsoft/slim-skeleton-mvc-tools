@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use \SlimMvcTools\ContainerKeys;
+use \SlimMvcTools\{ContainerKeys, Utils, SlimHttpExceptionClassNames};
 
 /**
  * Creates & returns a controller object that is an instance of 
@@ -31,7 +31,13 @@ function sMVC_CreateController(
         //any number of letters, numbers, or underscores.
         /** @psalm-suppress InvalidOperand */
         $extra_log_message = "`" . __FILE__ . "` on line " . __LINE__ . ": Bad controller name `{$controller_class_name}`";
-        throw new \Slim\Exception\HttpBadRequestException($request, $extra_log_message);
+        
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $container,
+            SlimHttpExceptionClassNames::HttpBadRequestException,
+            $request,
+            $extra_log_message
+        );
     } 
 
     if( !class_exists($controller_class_name) ) {
@@ -61,7 +67,12 @@ function sMVC_CreateController(
             //404 Not Found: Controller class not found.
             /** @psalm-suppress InvalidOperand */
             $extra_log_message = "`".__FILE__."` on line ".__LINE__.": Class `{$controller_class_name}` does not exist.";
-            throw new \Slim\Exception\HttpNotFoundException($request, $extra_log_message);
+            throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+                $container,
+                SlimHttpExceptionClassNames::HttpNotFoundException,
+                $request,
+                $extra_log_message
+            );
         }
     }
     
@@ -73,7 +84,13 @@ function sMVC_CreateController(
                 "`".__FILE__."` on line ".__LINE__
                 . sprintf(': `%s` could not be mapped to a valid controller.', $request->getUri()->__toString());
         
-        throw new \Slim\Exception\HttpBadRequestException($request, $extra_log_message);
+        //throw new \Slim\Exception\HttpBadRequestException($request, $extra_log_message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $container,
+            SlimHttpExceptionClassNames::HttpBadRequestException,
+            $request,
+            $extra_log_message
+        );
     }
 
     //Create the controller object

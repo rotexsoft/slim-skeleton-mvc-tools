@@ -91,7 +91,13 @@ class MvcRouteHandler {
                     "`".__FILE__."` on line ".__LINE__
                     . sprintf(': Not enough arguments when calling `%s`(...) on an instance of `%s` for the uri `%s`.', $action_method, $controller_obj::class, $req->getUri()->__toString());
 
-            throw new \Slim\Exception\HttpBadRequestException($req, $log_message, $e);
+            throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+                $this->app->getContainer(),
+                SlimHttpExceptionClassNames::HttpBadRequestException,
+                $req,
+                $log_message,
+                $e
+            );
             
         } catch (\Throwable $e) {
             
@@ -100,8 +106,14 @@ class MvcRouteHandler {
             $log_message = 
                     "`".__FILE__."` on line ".__LINE__
                     . sprintf(': Error occured when calling `%s`(...) on an instance of `%s` for the uri `%s`.', $action_method, $controller_obj::class, $req->getUri()->__toString());
-
-            throw new \Slim\Exception\HttpInternalServerErrorException($req, $log_message, $e);
+            
+            throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+                $this->app->getContainer(),
+                SlimHttpExceptionClassNames::HttpInternalServerErrorException,
+                $req,
+                $log_message,
+                $e
+            );
         }
         
         // If we got this far, that means that the action method was successfully
@@ -138,7 +150,12 @@ class MvcRouteHandler {
             /** @psalm-suppress InvalidOperand */
             $err_message = "`".__FILE__."` on line ".__LINE__.": Bad action name `{$action_method}`.";
 
-            throw new \Slim\Exception\HttpBadRequestException($req, $err_message);
+            throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+                $this->app->getContainer(),
+                SlimHttpExceptionClassNames::HttpBadRequestException,
+                $req,
+                $err_message
+            );
         }
     }
     
@@ -156,8 +173,13 @@ class MvcRouteHandler {
             /** @psalm-suppress InvalidOperand */
             $err_message = "`".__FILE__."` on line ".__LINE__
                 .": The action method `{$action_method}` does not exist in class `{$controller_class_name}`.";
-
-            throw new \Slim\Exception\HttpNotFoundException($req, $err_message);
+            
+            throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+                $this->app->getContainer(),
+                SlimHttpExceptionClassNames::HttpNotFoundException,
+                $req,
+                $err_message
+            );
         }
     }
 }

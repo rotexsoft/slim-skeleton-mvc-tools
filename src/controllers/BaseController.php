@@ -1063,8 +1063,13 @@ class BaseController
             $msg = "ERROR: The item with the key named `$item_key_in_container` does not exist in"
                  . " the container associated with `" . static::class . "` ."
                  . PHP_EOL;
-
-            throw new \Slim\Exception\HttpInternalServerErrorException($this->request, $msg);
+            
+            throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+                $this->getContainer(),
+                \SlimMvcTools\SlimHttpExceptionClassNames::HttpInternalServerErrorException,
+                $this->request,
+                $msg
+            );
         }
     }
 
@@ -1120,7 +1125,15 @@ class BaseController
         
         throw (new \Slim\Exception\HttpGoneException(($request ?? $this->request), $message))->setDescription($message);
     }
-    
+
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function forceHttp429(string $message, ?ServerRequestInterface $request=null): void {
+        
+        throw (new \Slim\Exception\HttpTooManyRequestsException(($request ?? $this->request), $message))->setDescription($message);
+    }
+
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
