@@ -102,20 +102,23 @@ class MvcRouteHandler {
             
         } catch (\Throwable $e) {
             
-            //500 Internal server error: An Exception or Error was thrown when trying to execute action method on the controller.
-            /** @psalm-suppress InvalidOperand */
-            $log_message = 
-                    "`".__FILE__."` on line ".__LINE__
-                    . sprintf(': Error occured when calling `%s`(...) on an instance of `%s` for the uri `%s`.', $action_method, $controller_obj::class, $req->getUri()->__toString());
-            
-            /** @psalm-suppress PossiblyNullArgument */
-            throw Utils::createSlimHttpExceptionWithLocalizedDescription(
-                $this->app->getContainer(),
-                SlimHttpExceptionClassNames::HttpInternalServerErrorException,
-                $req,
-                $log_message,
-                $e
-            );
+            if(! $e instanceof \Slim\Exception\HttpSpecializedException) {
+                
+                //500 Internal server error: An Exception or Error was thrown when trying to execute action method on the controller.
+                /** @psalm-suppress InvalidOperand */
+                $log_message = 
+                        "`".__FILE__."` on line ".__LINE__
+                        . sprintf(': Error occured when calling `%s`(...) on an instance of `%s` for the uri `%s`.' . PHP_EOL . 'Error: `%s%`', $action_method, $controller_obj::class, $req->getUri()->__toString(), $e->getMessage());
+
+                /** @psalm-suppress PossiblyNullArgument */
+                throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+                    $this->app->getContainer(),
+                    SlimHttpExceptionClassNames::HttpInternalServerErrorException,
+                    $req,
+                    $log_message,
+                    $e
+                );
+            }
         }
         
         // If we got this far, that means that the action method was successfully
