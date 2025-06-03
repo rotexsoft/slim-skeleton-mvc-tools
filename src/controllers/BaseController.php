@@ -160,6 +160,13 @@ class BaseController
      */
     protected string $layout_template_file_name = 'main-template.php';
     
+    /**
+     * The name of the view file containing the login form that will be
+     * rendered when actionLogin is called
+     * 
+     */
+    protected string $login_view_file_name = 'login.php';
+    
     //////////////////////////////////
     // Constants
     //////////////////////////////////
@@ -595,7 +602,7 @@ class BaseController
 
             //show login form
             //get the contents of the view first
-            $view_str = $this->renderView('login.php', $data_4_login_view);
+            $view_str = $this->renderView($this->login_view_file_name, $data_4_login_view);
 
             return $this->renderLayout( $this->layout_template_file_name, ['content' => $view_str]);
 
@@ -693,7 +700,7 @@ class BaseController
                 $data_4_login_view['password'] = $password;
 
                 //get the contents of the view first
-                $view_str = $this->renderView('login.php', $data_4_login_view);
+                $view_str = $this->renderView($this->login_view_file_name, $data_4_login_view);
 
                 return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
             }
