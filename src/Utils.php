@@ -49,6 +49,7 @@ class Utils {
     ): \Slim\Exception\HttpSpecializedException {
 
             $exception_class_name = $exception_class->value;
+            $err_message .= ($previous_exception !== null) ? PHP_EOL . static::getThrowableAsStr($previous_exception, PHP_EOL . PHP_EOL) : '';
             $exception =  new $exception_class_name($req, $err_message, $previous_exception);
             
             if(
