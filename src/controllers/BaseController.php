@@ -666,7 +666,7 @@ class BaseController
              * @psalm-suppress UndefinedConstant
              * @psalm-suppress UndefinedFunction
              */
-            if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
+            if( sMVC_GetCurrentAppEnvironment() !== \SlimMvcTools\AppEnvironments::PRODUCTION ) {
 
                 $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
             }
@@ -769,7 +769,7 @@ class BaseController
                  * @psalm-suppress UndefinedFunction
                  * @psalm-suppress UndefinedConstant
                  */
-                if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
+                if( sMVC_GetCurrentAppEnvironment() !== \SlimMvcTools\AppEnvironments::PRODUCTION ) {
                     /** @psalm-suppress MixedOperand */
                     $_msg .=  '<br>' . $auth->getAdapter()->getError();
                 }
@@ -943,7 +943,7 @@ class BaseController
          * @psalm-suppress UndefinedConstant
          * @psalm-suppress UndefinedFunction
          */
-        if( sMVC_GetCurrentAppEnvironment() !== SMVC_APP_ENV_PRODUCTION ) {
+        if( sMVC_GetCurrentAppEnvironment() !== \SlimMvcTools\AppEnvironments::PRODUCTION ) {
             /** @psalm-suppress MixedOperand */
             $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
         }

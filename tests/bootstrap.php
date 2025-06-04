@@ -9,26 +9,6 @@ if(!defined('SMVC_APP_ROOT_PATH')){
     define('SMVC_APP_ROOT_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'fake-smvc-app-root' );
 }
 
-if(!defined('SMVC_APP_ENV_DEV')){
-
-    define('SMVC_APP_ENV_DEV', 'dev');
-}
-
-if(!defined('SMVC_APP_ENV_STAGING')){
-
-    define('SMVC_APP_ENV_STAGING', 'staging' );
-}
-
-if(!defined('SMVC_APP_ENV_TESTING')){
-
-    define('SMVC_APP_ENV_TESTING', 'testing' );
-}
-
-if(!defined('SMVC_APP_ENV_PRODUCTION')){
-
-    define('SMVC_APP_ENV_PRODUCTION', 'production' );
-}
-
 if(!function_exists('sMVC_GetCurrentAppEnvironment')) {
 
     function sMVC_GetCurrentAppEnvironment(): string {

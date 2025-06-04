@@ -371,9 +371,10 @@ END;
  * This function detects which environment your web-app is running in
  * (i.e. one of Production, Development, Staging or Testing).
  *
- * NOTE: Make sure you edit ../config/env.php to return one of SMVC_APP_ENV_DEV,
- *       SMVC_APP_ENV_PRODUCTION, SMVC_APP_ENV_STAGING or SMVC_APP_ENV_TESTING
- *       relevant to the environment you are installing your web-app.
+ * NOTE: Make sure you edit ../config/env.php to return one of \SlimMvcTools\AppEnvironments::DEV,
+ *       \SlimMvcTools\AppEnvironments::PRODUCTION, \SlimMvcTools\AppEnvironments::STAGING 
+ *       or \SlimMvcTools\AppEnvironments::TESTING relevant to the environment you are
+ *       installing your web-app.
  * 
  * @param string $app_path should be set to the absolute path of where your mvc app is installed just pass SMVC_APP_ROOT_PATH
  * @psalm-suppress MixedInferredReturnType
