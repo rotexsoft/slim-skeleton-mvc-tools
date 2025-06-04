@@ -26,11 +26,15 @@ This package contains a Base controller and other classes and functions used by 
 
 ### Running Tests
 
-  ` ./vendor/bin/phpunit --coverage-text`
+  `./vendor/bin/phpunit --coverage-text`
+
+or 
+
+    `composer test`
 
 ### Requirements
 
-* PHP 5.5+ (version 1.x) or PHP 5.6+ (version 2.x) or PHP 7.2+ (version 3.x) or PHP 7.4+ (version 4.x) or PHP 8.1+ (version 5.x)
+* PHP 5.5+ (version 1.x) or PHP 5.6+ (version 2.x) or PHP 7.2+ (version 3.x) or PHP 7.4+ (version 4.x) or PHP 8.1+ (version 5.x) or PHP 8.2+ (version 6.x)
 * Compatibility with HHVM not guaranteed
 
 ### Installation
@@ -40,7 +44,7 @@ This package contains a Base controller and other classes and functions used by 
 
 These are the branches in this repository:
 
-- **master:** contains code for the latest major version of this package
+- **master:** contains code for the latest major version of this package (currently 6.x which will be released by the end of June 2025)
 - **5.x:** contains code for the **5.x** versions of this package
 - **4.x:** contains code for the **4.x** versions of this package. No new features, only bug fixes accepted.
 - **slim-3-edition:** contains code for the **3.x** versions of this package. No new features, only bug fixes accepted.
