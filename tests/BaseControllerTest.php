@@ -25,9 +25,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
     
     // This must be the first test in this file after the setUp() method so that
     // it gets executed first. It modifies $_SESSION, so it should be tested first.
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_storeCurrentUrlForLoginRedirection_WorksAsExpected2() {
         
         $req = $this->newRequest('http://google.com/');
@@ -472,9 +470,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('', $controller3->getActionNameFromUri());
     }
     
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_updateSelectedLanguage_WorksAsExpected() {
         
         $req = $this->newRequest('http://google.com/');
@@ -553,9 +549,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertStringContainsString('login', $result->getHeaderLine('Location'));
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_actionRoutes_WorksAsExpected2() {
         
         if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
@@ -587,9 +581,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_actionLogin_WithRequestGetMethod_WorksAsExpected() {
         
         if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
@@ -658,9 +650,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $controller->getVespulaAuthObject()->logout(); // logout
     }
     
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_actionLogin_WithRequestPostMethod_WorksAsExpected() {
         
         if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
@@ -744,9 +734,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertStringNotContainsString('<input type="submit" value="Logout">', $actionLoginResult); // logout button should not be present
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_actionLogin_WithRequestPostMethod_WorksAsExpected2() {
         
         if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
@@ -829,9 +817,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertStringNotContainsString('<input type="submit" value="Logout">', $actionLoginResult); // logout button should not be present
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_actionLogin_WithRequestPostMethod_WorksAsExpected3() {
         
         if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
@@ -914,9 +900,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertStringNotContainsString('<input type="submit" value="Logout">', $actionLoginResult); // logout button should not be present
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_actionLogin_WithRequestPostMethod_WorksAsExpected4() {
         
         if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
@@ -1006,9 +990,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_doLogin_WorksAsExpected() {
         
         if( !defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES') ) {
@@ -1354,9 +1336,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         return $contains;
     }
     
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_actionLogout_WorksAsExpected() {
         
         if(!defined('SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES')){
@@ -1563,9 +1543,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         ); // the uri that the returned response object contains has the redirect url stored in session
     }
     
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_actionLoginStatus_WorksAsExpected() {
         
         $req = $this->newRequest('http://google.com/');
@@ -1660,9 +1638,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
     }
     
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_isLoggedIn_WorksAsExpected() {
         
         $req = $this->newRequest('http://google.com/');
@@ -1683,9 +1659,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($controller->isLoggedIn());
     }
     
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_getResponseObjForLoginRedirectionIfNotLoggedIn_WorksAsExpected() {
         
         $req = $this->newRequest('http://google.com/');

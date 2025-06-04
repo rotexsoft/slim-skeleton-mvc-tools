@@ -119,10 +119,8 @@ class MvcRouteHandlerTest extends \PHPUnit\Framework\TestCase  {
         // auto prepend action off will lead to method not found on controller
         $mvc_route_handler2($this->newRequest(), $this->newResponse(''), $args1);
     }
-    
-    /**
-     * @runInSeparateProcess
-     */
+
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat___invoke_WorksAsExpected2() {
         
         $this->expectException(\Slim\Exception\HttpInternalServerErrorException::class);
@@ -144,9 +142,7 @@ class MvcRouteHandlerTest extends \PHPUnit\Framework\TestCase  {
         $mvc_route_handler1($this->newRequest(), $this->newResponse(), $args1);
     }
     
-    /**
-     * @runInSeparateProcess
-     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat___invoke_WorksAsExpected3() {
         
         // too few arguments passed to controller method in the uri

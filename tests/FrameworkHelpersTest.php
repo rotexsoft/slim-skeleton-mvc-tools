@@ -168,9 +168,7 @@ class FrameworkHelpersTest extends \PHPUnit\Framework\TestCase
         $_SERVER['SCRIPT_NAME'] = $original_script_name;
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testThat_sMVC_GetSuperGlobal_WorksAsExpected2() {
         
         session_abort();
