@@ -4,7 +4,7 @@ session_start();
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor/autoload.php';
 
-if(!defined('SMVC_APP_ROOT_PATH')){
+if(!defined('SMVC_APP_ROOT_PATH')) {
 
     define('SMVC_APP_ROOT_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'fake-smvc-app-root' );
 }
