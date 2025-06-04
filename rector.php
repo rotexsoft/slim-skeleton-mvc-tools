@@ -19,6 +19,7 @@ return static function (RectorConfig $rectorConfigurator): void {
     $rectorConfigurator->import(SetList::PHP_74);
     $rectorConfigurator->import(SetList::PHP_80);
     $rectorConfigurator->import(SetList::PHP_81);
+    $rectorConfigurator->import(SetList::PHP_82);
     $rectorConfigurator->import(SetList::DEAD_CODE);
     $rectorConfigurator->import(SetList::CODE_QUALITY);
     $rectorConfigurator->import(SetList::TYPE_DECLARATION);
@@ -35,7 +36,7 @@ return static function (RectorConfig $rectorConfigurator): void {
 //        \Rector\Php71\Rector\FuncCall\CountOnNullRector::class,
 //        //\Rector\TypeDeclaration\Rector\FunctionLike\ParamTypeDeclarationRector::class,
 //        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
-        \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
+//        \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
     ];
     
     $rectorConfigurator->skip($skipables);

@@ -16,7 +16,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.1.0",
+        "php": ">=8.2.0",
         "slim/slim": "^4.10",
         "rotexsoft/file-renderer": "^7.0.0",
         "vespula/log": "^3.0.0",
@@ -28,10 +28,10 @@
         "vespula/locale": "^2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.0.0",
+        "phpunit/phpunit": "^11.5.21",
         "php-coveralls/php-coveralls": "^2.5.2",
         "vimeo/psalm": "^6.0",
-        "rector/rector": "^1.0.0",
+        "rector/rector": "^2.0.17",
         "php-mock/php-mock": "^2.4"
     },
     "autoload": {
@@ -44,7 +44,7 @@
     },
     "bin": ["src/scripts/smvc-create-controller", "src/scripts/smvc-create-controller-wizard"],
     "scripts": {
-        "test": "vendor/bin/phpunit --coverage-text",
+        "test": "vendor/bin/phpunit --coverage-text --display-all-issues",
         "rector": "vendor/bin/rector process src --dry-run -vvv",
         "psalm": "vendor/bin/psalm",
         "psalm-clear-cache": "vendor/bin/psalm --clear-global-cache && vendor/bin/psalm --clear-cache",
