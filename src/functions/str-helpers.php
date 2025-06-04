@@ -3,11 +3,6 @@ declare(strict_types=1);
 
 namespace {
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Polyfills for PHP 8.0+ string functions. 
-    // Delete when PHP 8.1 becomes minimum version 
-    ////////////////////////////////////////////////////////////////////////////
-
     if (!function_exists('mb_str_starts_with')) {
         function mb_str_starts_with (string $haystack, string $needle): bool
         {

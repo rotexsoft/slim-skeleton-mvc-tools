@@ -41,7 +41,7 @@ class LogErrorRenderer extends \Slim\Error\Renderers\PlainTextErrorRenderer {
         $text = sprintf("Type: %s{$nl}", $exception::class);
         $code = $exception->getCode();
         $text .= sprintf("Code: %s{$nl}", $code);
-        $text .= sprintf("Message: %s{$nl}", htmlentities($exception->getMessage()));
+        $text .= sprintf("Message: %s{$nl}", $exception->getMessage());
         $text .= sprintf("File: %s{$nl}", $exception->getFile());
         $text .= sprintf("Line: %s{$nl}", $exception->getLine());
 

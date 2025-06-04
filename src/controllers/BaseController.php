@@ -408,10 +408,7 @@ class BaseController
         return $this->getAppSetting('app_base_path');
     }
     
-    /**
-     * @return mixed
-     */
-    public function getAppSetting(string $setting_key) {
+    public function getAppSetting(string $setting_key): mixed {
  
        /** 
          * @psalm-suppress MixedAssignment
@@ -448,8 +445,6 @@ class BaseController
      */
     public function renderLayout( string $file_name, array $data = ['content'=>'Content should be placed here!'] ): string {
 
-        $self = $this;
-        $data['sMVC_MakeLink'] = fn(string $path): string => $self->makeLink($path);
         $data['controller_object'] = $this;
         
         /**
@@ -533,8 +528,6 @@ class BaseController
             $this->view_renderer->prependPath($path_2_view_files . $this->controller_name_from_uri);
         }
 
-        $self = $this;
-        $data['sMVC_MakeLink'] = fn(string $path): string => $self->makeLink($path);
         $data['controller_object'] = $this;
         
         /** 
@@ -550,7 +543,7 @@ class BaseController
     public function actionIndex(): ResponseInterface|string {
 
         //get the contents of the view first
-        $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
+        $view_str = $this->renderView('index.php', []);
 
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
@@ -593,10 +586,7 @@ class BaseController
      */
     public function actionLogin(): ResponseInterface|string {
 
-        $data_4_login_view = [
-            'controller_object' => $this, 'error_message' => '', 
-            'username' => '', 'password' => ''
-        ];
+        $data_4_login_view = [ 'error_message' => '', 'username' => '', 'password' => '', ];
 
         if( strtoupper($this->request->getMethod()) === 'GET' ) {
 
@@ -619,10 +609,10 @@ class BaseController
             /** @psalm-suppress UndefinedConstant */
             $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
             $action = (
-                        $prepend_action 
-                        && !str_starts_with(mb_strtolower($this->login_success_redirect_action, 'UTF-8'), 'action')
-                      ) 
-                      ? 'action-' : '';
+                $prepend_action 
+                && !str_starts_with(mb_strtolower($this->login_success_redirect_action, 'UTF-8'), 'action')
+            ) 
+            ? 'action-' : '';
 
             $success_redirect_path =
                 $this->makeLink("{$controller}/{$action}{$this->login_success_redirect_action}");
@@ -959,7 +949,7 @@ class BaseController
         }
 
         //get the contents of the view first
-        $view_str = $this->renderView( 'login-status.php', ['message'=>$msg, 'is_logged_in'=>$this->isLoggedIn(), 'controller_object'=>$this] );
+        $view_str = $this->renderView( 'login-status.php', ['message'=>$msg, 'is_logged_in'=>$this->isLoggedIn()] );
 
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
