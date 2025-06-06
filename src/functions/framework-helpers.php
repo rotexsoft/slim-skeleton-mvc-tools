@@ -38,7 +38,7 @@ function sMVC_CreateController(
             $request,
             $extra_log_message
         );
-    } 
+    } // if( !preg_match( $regex_4_valid_class_name, preg_quote($controller_class_name, '/') ) )
 
     if( !class_exists($controller_class_name) ) {
         
@@ -57,9 +57,10 @@ function sMVC_CreateController(
                     /** @psalm-suppress MixedOperand */
                     $controller_class_name = $namespace_4_controllers.$controller_class_name;
                     break;
-                }
-            }
-        }
+                    
+                } // if( class_exists($namespace_4_controllers.$controller_class_name) )
+            } // foreach($namespaces_4_controllers as $namespace_4_controllers)
+        } // if( $container->has(ContainerKeys::NAMESPACES_4_CONTROLLERS) )
         
         //class still doesn't exist
         if( !class_exists($controller_class_name) ) {
@@ -73,10 +74,11 @@ function sMVC_CreateController(
                 $request,
                 $extra_log_message
             );
-        }
-    }
+            
+        } // if( !class_exists($controller_class_name) )
+    } // if( !class_exists($controller_class_name) )
     
-    if(!is_a($controller_class_name, \SlimMvcTools\Controllers\BaseController::class, true)) {
+    if( !is_a($controller_class_name, \SlimMvcTools\Controllers\BaseController::class, true) ) {
 
         //400 Bad Request: Controller class is not a subclass of \SlimMvcTools\Controllers\BaseController.
         /** @psalm-suppress InvalidOperand */
@@ -90,7 +92,8 @@ function sMVC_CreateController(
             $request,
             $extra_log_message
         );
-    }
+        
+    } // if( !is_a($controller_class_name, \SlimMvcTools\Controllers\BaseController::class, true) )
 
     //Create the controller object
     /** @psalm-suppress UnsafeInstantiation */
@@ -126,16 +129,15 @@ function sMVC_DumpVar(...$vals): void {
 
         return ($output === false) ? '' : $output;
     };
-    
+
+    $line_breaker = (PHP_SAPI === 'cli') ? PHP_EOL : '<br>';
+    $pre_open = (PHP_SAPI === 'cli') ? '' : '<pre>';
+    $pre_close = (PHP_SAPI === 'cli') ? '' : '</pre>';
+
     /** @psalm-suppress MixedAssignment */
     foreach($vals as $val) {
-        
-        $line_breaker = (PHP_SAPI === 'cli') ? PHP_EOL : '<br>';
-        $pre_open = (PHP_SAPI === 'cli') ? '' : '<pre>';
-        $pre_close = (PHP_SAPI === 'cli') ? '' : '</pre>';
-        
-        echo $pre_open . $var_to_string($val) . $pre_close 
-           . $line_breaker;
+
+        echo $pre_open . $var_to_string($val) . $pre_close . $line_breaker;
     }
 }
 
@@ -250,7 +252,7 @@ function sMVC_GetSuperGlobal(string $global_name='', string $key='', mixed $defa
         //return everything for the specified global
         /** @psalm-suppress MixedArgument */
         return array_key_exists($global_name, $super_globals)
-                                    ? $super_globals[$global_name] : [];
+               ? $super_globals[$global_name] : [];
     }
 
     if( !$is_session_started && $global_name === 'session' ) {
@@ -267,8 +269,7 @@ function sMVC_GetSuperGlobal(string $global_name='', string $key='', mixed $defa
      * @psalm-suppress PossiblyNullArrayAccess
      */
     return array_key_exists($key, $super_globals[$global_name])
-                                ? $super_globals[$global_name][$key] : $default_val;
-
+           ? $super_globals[$global_name][$key] : $default_val;
 }
 
 /**
@@ -335,7 +336,7 @@ function sMVC_DisplayAndLogFrameworkFileNotFoundError(
     <body>
         <h1>SlimPHP 4 Skeleton MVC App Error</h1>
         <p>
-            $error_message <br>
+            {$error_message} <br>
             Please check the most recent server log file in (<strong>./logs</strong>) for details.
             <br>Goodbye!!!
         </p>
@@ -346,14 +347,14 @@ END;
 
     $current_uri = $_SERVER['PATH_INFO'] ?? '';
     $current_uri .= isset($_SERVER['QUERY_STRING'])
-            ? '?' . $_SERVER['QUERY_STRING']
-            : '';
+                    ? '?' . $_SERVER['QUERY_STRING']
+                    : '';
 
     // Write full message to log via error_log(...)
     // http://php.net/manual/en/function.error-log.php
-    $log_message = "ERROR: [$current_uri] `$file_path` not found."
-        . " Please copy `$dist_file_path` to `$file_path` and"
-        . " configure `$file_path` for your application's current environment.";
+    $log_message = "ERROR: [{$current_uri}] `{$file_path}` not found."
+        . " Please copy `{$dist_file_path}` to `{$file_path}` and"
+        . " configure `{$file_path}` for your application's current environment.";
 
     $ds = DIRECTORY_SEPARATOR;
     $file = $app_root_path . "{$ds}logs{$ds}daily_log_" . date('Y_M_d') . '.txt';
@@ -411,7 +412,7 @@ function sMVC_DoGetCurrentAppEnvironment(string $app_path): string {
 
 function sMVC_PrependAction2ActionMethodName(string $action_method_name): string {
 
-    if( strtolower( substr($action_method_name, 0, 6) ) !== "action"){
+    if( strtolower( substr($action_method_name, 0, 6) ) !== "action") {
 
         $action_method_name = 'action'.  ucfirst($action_method_name);
     }
