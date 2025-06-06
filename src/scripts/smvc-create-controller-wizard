@@ -50,12 +50,10 @@ if( !\SlimMvcTools\Functions\CliHelpers\isPhpRunningInCliMode() ) {
                                   . ' this wizard (e.g. if you are running this wizard from `/home/myapp/`'
                                   . ' then entering `./src` will translate to `/home/myapp/src` as the absolute path):';
         $path_2_src_folder = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_path_2_src_folder, "cyan",  "black"));
-        //var_dump($path_2_src_folder);
         
         while( mb_strlen( ''.$path_2_src_folder, 'UTF-8') <= 0 ) {
             
             $path_2_src_folder = readFromLine(\SlimMvcTools\Functions\Str\color_4_console(PHP_EOL.$prompt_4_path_2_src_folder, "cyan",  "black"));
-            //var_dump($path_2_src_folder);
         }
         $psuedo_argv[] = '-p';
         $psuedo_argv[] = $path_2_src_folder;
