@@ -224,6 +224,7 @@ function normalizeFolderPathForOs(string $path): string {
 function processTemplateFile(
     string $template_file_path, string $destination_file_path, array $replaces
 ): int|false {
+    
     $retval = file_get_contents($template_file_path);
     
     if($retval !== false) {
@@ -269,6 +270,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
         $err_msg = '`' . __FUNCTION__ . '($argc, array $argv)` should only be called from within'
                    . ' php scripts that should be run via the command line!!!'.PHP_EOL;
+        
         throw new \RuntimeException($err_msg);
     }
 
@@ -284,6 +286,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
                    . ' `'. ucfirst(gettype($argc)). '` with the value below was supplied:'.PHP_EOL
                    . var_export($argc, true).PHP_EOL.PHP_EOL
                    . 'Good bye!!!';
+        
         throw new \InvalidArgumentException($err_msg);
     }
 
@@ -292,6 +295,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
         $err_msg = 'The expected value for the second argument to `' 
                    . __FUNCTION__ . '($argc, array $argv)` should be an array with at least one element. Empty Array was supplied.'
                    . 'This second argument is expected to be the $argv array passed by PHP to the script calling this function.';
+        
         throw new \InvalidArgumentException($err_msg);
     }
     //////////////////////////////////////////
@@ -340,7 +344,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
                 return new CreateControllerReturnValue(
                     CliExitCodes::FAILURE_EXIT,
-                    "Invalid controller class name `$controller_name` supplied. Goodbye!!"
+                    "Invalid controller class name `{$controller_name}` supplied. Goodbye!!"
                 );
             }
 
@@ -353,7 +357,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
                 return new CreateControllerReturnValue(
                     CliExitCodes::FAILURE_EXIT,
-                    "The src folder path `$src_folder_path` supplied is a non-existent directory. Goodbye!!"
+                    "The src folder path `{$src_folder_path}` supplied is a non-existent directory. Goodbye!!"
                 );
             }
 
@@ -369,7 +373,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
                     return new CreateControllerReturnValue(
                         CliExitCodes::FAILURE_EXIT,
-                        "Invalid controller class name `$controller_2_extend` for extension supplied. The class to extend must be `"
+                        "Invalid controller class name `{$controller_2_extend}` for extension supplied. The class to extend must be `"
                         . $default_controller_2_extend ."` or its sub-class. Goodbye!!"
                     );
                 }
@@ -392,7 +396,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
                     return new CreateControllerReturnValue(
                         CliExitCodes::FAILURE_EXIT,
-                        "Invalid namespace `$namepace_4_controller` supplied. Goodbye!!"
+                        "Invalid namespace `{$namepace_4_controller}` supplied. Goodbye!!"
                     );
                 }
 
@@ -418,7 +422,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
             ) {
                 return new CreateControllerReturnValue(
                     CliExitCodes::FAILURE_EXIT,
-                    "Failed to create `$dest_controller_class_file_folder`; the folder supposed to contain the controller named `$studly_controller_name`. Goodbye!!"
+                    "Failed to create `{$dest_controller_class_file_folder}`; the folder supposed to contain the controller named `{$studly_controller_name}`. Goodbye!!"
                 );
             }
 
@@ -432,7 +436,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
             ) {
                 return new CreateControllerReturnValue(
                     CliExitCodes::FAILURE_EXIT,
-                    "Failed to create `$dest_view_file_folder`; the folder supposed to contain views for the controller named `$studly_controller_name`. Goodbye!!"
+                    "Failed to create `{$dest_view_file_folder}`; the folder supposed to contain views for the controller named `{$studly_controller_name}`. Goodbye!!"
                 );
             }
 
@@ -440,7 +444,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
                 return new CreateControllerReturnValue(
                     CliExitCodes::SUCCESS_EXIT,
-                    "Controller class `$studly_controller_name` already exists in `$dest_controller_class_file`. Goodbye!!"
+                    "Controller class `{$studly_controller_name}` already exists in `{$dest_controller_class_file}`. Goodbye!!"
                 );
             }
 
@@ -448,11 +452,11 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
                 return new CreateControllerReturnValue(
                     CliExitCodes::SUCCESS_EXIT,
-                    "View file `$dest_view_file` already exists for Controller class `$studly_controller_name`. Goodbye!!"
+                    "View file `{$dest_view_file}` already exists for Controller class `{$studly_controller_name}`. Goodbye!!"
                 );
             }
 
-            $success_messages = "Creating Controller Class `$studly_controller_name` in `{$dest_controller_class_file}` ....";
+            $success_messages = "Creating Controller Class `{$studly_controller_name}` in `{$dest_controller_class_file}` ....";
 
             ////////////////////////////////////////////////////////////////////////////
             $replaces = [
@@ -466,7 +470,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
                 return new CreateControllerReturnValue(
                     CliExitCodes::FAILURE_EXIT,
-                    "Failed transforming template controller `$template_controller_file` to `$dest_controller_class_file`. Goodbye!!"
+                    "Failed transforming template controller `{$template_controller_file}` to `{$dest_controller_class_file}`. Goodbye!!"
                 );
 
             } else {
