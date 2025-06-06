@@ -270,7 +270,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
 
         $err_msg = '`' . __FUNCTION__ . '($argc, array $argv)` should only be called from within'
                    . ' php scripts that should be run via the command line!!!'.PHP_EOL;
-        
+
         throw new \RuntimeException($err_msg);
     }
 
@@ -286,7 +286,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
                    . ' `'. ucfirst(gettype($argc)). '` with the value below was supplied:'.PHP_EOL
                    . var_export($argc, true).PHP_EOL.PHP_EOL
                    . 'Good bye!!!';
-        
+
         throw new \InvalidArgumentException($err_msg);
     }
 
@@ -295,7 +295,7 @@ function createController($argc, array $argv): CreateControllerReturnValue {
         $err_msg = 'The expected value for the second argument to `' 
                    . __FUNCTION__ . '($argc, array $argv)` should be an array with at least one element. Empty Array was supplied.'
                    . 'This second argument is expected to be the $argv array passed by PHP to the script calling this function.';
-        
+
         throw new \InvalidArgumentException($err_msg);
     }
     //////////////////////////////////////////

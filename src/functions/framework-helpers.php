@@ -41,9 +41,9 @@ function sMVC_CreateController(
     } // if( !preg_match( $regex_4_valid_class_name, preg_quote($controller_class_name, '/') ) )
 
     if( !class_exists($controller_class_name) ) {
-        
+
         if( $container->has(ContainerKeys::NAMESPACES_4_CONTROLLERS) ) {
-            
+
             /** @psalm-suppress MixedAssignment */
             $namespaces_4_controllers = $container->get(ContainerKeys::NAMESPACES_4_CONTROLLERS);
 
@@ -57,11 +57,11 @@ function sMVC_CreateController(
                     /** @psalm-suppress MixedOperand */
                     $controller_class_name = $namespace_4_controllers.$controller_class_name;
                     break;
-                    
+
                 } // if( class_exists($namespace_4_controllers.$controller_class_name) )
             } // foreach($namespaces_4_controllers as $namespace_4_controllers)
         } // if( $container->has(ContainerKeys::NAMESPACES_4_CONTROLLERS) )
-        
+
         //class still doesn't exist
         if( !class_exists($controller_class_name) ) {
 
@@ -74,7 +74,7 @@ function sMVC_CreateController(
                 $request,
                 $extra_log_message
             );
-            
+
         } // if( !class_exists($controller_class_name) )
     } // if( !class_exists($controller_class_name) )
     

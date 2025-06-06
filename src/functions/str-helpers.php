@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace {
 
     if (!function_exists('mb_str_starts_with')) {
-        
+
         function mb_str_starts_with (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_strpos($haystack, $needle) === 0;
@@ -12,7 +12,7 @@ namespace {
     }
 
     if (!function_exists('mb_str_contains')) {
-        
+
         function mb_str_contains (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_strpos($haystack, $needle) !== false;
@@ -20,7 +20,7 @@ namespace {
     }
 
     if (!function_exists('mb_str_ends_with')) {
-        
+
         function mb_str_ends_with (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_substr($haystack, -mb_strlen($needle)) === $needle;
@@ -44,7 +44,7 @@ namespace SlimMvcTools\Functions\Str {
         $str = ucwords(str_replace('-', ' ', $str));
         $str = str_replace(' ', '', $str);
         $str[0] = strtolower($str[0]);
-        
+
         return $str;
     }
 
@@ -61,7 +61,7 @@ namespace SlimMvcTools\Functions\Str {
     {
         $str = dashesToCamel($str);
         $str[0] = strtoupper($str[0]);
-        
+
         return $str;
     }
 
@@ -79,7 +79,7 @@ namespace SlimMvcTools\Functions\Str {
         $str = ucwords(str_replace('_', ' ', $str));
         $str = str_replace(' ', '', $str);
         $str[0] = strtolower($str[0]);
-        
+
         return $str;
     }
 
@@ -96,7 +96,7 @@ namespace SlimMvcTools\Functions\Str {
     {
         $str = underToCamel($str);
         $str[0] = strtoupper($str[0]);
-        
+
         return $str;
     }
 
@@ -131,7 +131,7 @@ namespace SlimMvcTools\Functions\Str {
     function camelToUnder(string $str): string
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
-        
+
         return str_replace(' ', '_', ucwords((string) $str));
     }
 
@@ -148,7 +148,7 @@ namespace SlimMvcTools\Functions\Str {
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
         $str = str_replace(' ', '-', ucwords((string) $str));
-        
+
         return strtolower($str);
     }
 
@@ -173,7 +173,7 @@ namespace SlimMvcTools\Functions\Str {
         string $foreground_color = 'white', 
         string $background_color = 'black'
     ): string {
-        
+
         if( PHP_OS !== 'Linux') {
 
             //just return the string as is
