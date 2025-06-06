@@ -83,7 +83,6 @@ class BaseController
         return $this;
     }
     
-
     /**
      * Will be used in actionLogin() to construct the url to redirect to upon successful login,
      * if $_SESSION[self::SESSN_PARAM_LOGIN_REDIRECT] is not set.
@@ -163,21 +162,35 @@ class BaseController
     /**
      * The name of the view file containing the login form that will be
      * rendered when actionLogin is called
-     * 
      */
     protected string $login_view_file_name = 'login.php';
     
     //////////////////////////////////
     // Constants
     //////////////////////////////////
+    
+    /**
+     * Name of the query string parameter whose value specified the selected
+     * language that will be used by the locale object to translate strings
+     * in your application.
+     */
     public const GET_QUERY_PARAM_SELECTED_LANG = 'selected_lang';
     
     //////////////////////////////////
     // Session Parameter keys
     //////////////////////////////////
+    
+    /**
+     * Key name in $_SESSION whose corresponding value is a path to redirect to
+     * after a successful login in your application.
+     */
     public const SESSN_PARAM_LOGIN_REDIRECT = self::class . '_login_redirect_path';
     
-    // This item in the session represents the current language selected by the user
+    /**
+     * Key name in $_SESSION whose corresponding value is the currently selected
+     * language that will be used by the locale object to translate strings
+     * in your application.
+     */
     public const SESSN_PARAM_CURRENT_LOCALE_LANG = self::class . '_current_locale_language';
     
     /**
@@ -210,6 +223,7 @@ class BaseController
         
         /** @psalm-suppress MixedAssignment */
         $this->vespula_auth = $this->getContainerItem(ContainerKeys::VESPULA_AUTH);
+        $this->updateSelectedLanguage();
         
         /**
          * @psalm-suppress MixedAssignment
@@ -248,10 +262,13 @@ class BaseController
                 $this->action_name_from_uri = $uri_path_parts[1];
             }
         }
-        
-        $this->updateSelectedLanguage();
     }
 
+    /**
+     * A helper method to start a new session using session settings specified
+     * in your app's settings file. The settings key in the settings array for
+     * for session_start settings is expected to be 'session_start_options'
+     */
     protected function startSession(): void {
         
         $session_start_settings = 
@@ -268,6 +285,21 @@ class BaseController
     }
     
     /**
+     * This method tries to store the currently selected language code (like en_US)
+     * specified in a query string parameter whose name is the value contained in
+     * in \SlimMvcTools\Controllers\BaseController::GET_QUERY_PARAM_SELECTED_LANG
+     * in $_SESSION if the specified language code is one of the acceptable language
+     * codes defined for your application's dependencies file and updates the locale
+     * object to switch to that language.
+     * 
+     * If the query string parameter does not exist, it looks in $_SESSION to see
+     * if any language code was previously stored there, if yes, it updates the
+     * locale object to switch to that language.
+     * 
+     * If there wasn't any query string parameter or previously stored language
+     * code in $_SESSION, this method does nothing. The locale object will use
+     * the default language code defined in your application's dependencies file.
+     * 
      * @psalm-suppress InvalidScalarArgument
      */
     public function updateSelectedLanguage() : void {
@@ -302,6 +334,7 @@ class BaseController
              */
             $_SESSION[self::SESSN_PARAM_CURRENT_LOCALE_LANG] = 
                 $query_params[self::GET_QUERY_PARAM_SELECTED_LANG];
+
         } elseif (
             session_status() === \PHP_SESSION_ACTIVE         
             && array_key_exists(self::SESSN_PARAM_CURRENT_LOCALE_LANG, $_SESSION)
@@ -398,7 +431,12 @@ class BaseController
         return $this;
     }
     
-    /** @psalm-suppress MixedInferredReturnType */
+    /** 
+     * Grab the application setting value with the 'app_base_path' key from the
+     * application's settings array.
+     * 
+     * @psalm-suppress MixedInferredReturnType 
+     */
     public function getAppBasePath(): string {
         
         /** 
@@ -408,6 +446,15 @@ class BaseController
         return $this->getAppSetting('app_base_path');
     }
     
+    /**
+     * Grab the application setting value with the specified key $setting_key
+     * from the application's settings array and return the value if $setting_key
+     * actually exists as a key in the application's settings array or return null
+     * if not.
+     * 
+     * @param string $setting_key a key in the application's settings array whose
+     *                            value is to be returned by this method
+     */
     public function getAppSetting(string $setting_key): mixed {
  
        /** 
@@ -421,6 +468,24 @@ class BaseController
         return $settings[$setting_key] ?? null; 
     }
     
+    /**
+     * Generates a relative url usable as the value for href attributes of HTML 
+     * links (<a></a> or <link />) or as the value for src attributes of HTML
+     * script, img tags and the likes. It prepends your application's base path
+     * returned by $this->getAppBasePath() to the relative path it returns.
+     * 
+     * A $controller_object variable is always available in all view and layout
+     * files rendered by the renderView & renderLayout methods of this class.
+     * The $controller_object hold a reference to the controller class instance
+     * from which the render* method was called. You can use 
+     * $controller_object->makeLink($path) in your views & layouts to generate
+     * relative urls for the appropriate HTML elements requiring such urls.
+     * 
+     * @param string $path a relative path (not containing your application's base path)
+     *                     you want to inject into the src or href attribute of an HTML
+     *                     element
+     * @return string
+     */
     public function makeLink(string $path): string {
             
         return rtrim($this->getAppBasePath(), '/')  . '/' . ltrim($path, '/'); 
@@ -582,6 +647,11 @@ class BaseController
     }
 
     /**
+     * This method displays a login form if a user accesses it via a HTTP GET 
+     * request or tries to log a user in if a user accesses it via a HTTP POST
+     * request. If the login fails, the login form is returned with error messages
+     * stating why the login failed.
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function actionLogin(): ResponseInterface|string {
@@ -697,7 +767,18 @@ class BaseController
         } // if( strtoupper($this->request->getMethod()) === 'GET' ) else {....}
     }
     
-    /** @psalm-suppress MixedInferredReturnType */
+    /**
+     * Tries to log a user into the application and returns a string containing
+     * information about the result of the login operation.
+     * 
+     * @param \Vespula\Auth\Auth $auth object used to authenticate a user
+     * 
+     * @param array $credentials an array containing the user's username & password we want to authenticate
+     * 
+     * @param string $success_redirect_path a url (absolute or relative) to redirect the application to if
+     *                                      the login is successful. It will be changed to the redirect
+     *                                      url stored in session (if it exists)
+     */
     protected function doLogin(\Vespula\Auth\Auth $auth, array $credentials, string &$success_redirect_path): string {
         
         $_msg = '';
@@ -850,6 +931,8 @@ class BaseController
     }
 
     /**
+     * Logs a user out of the application
+     * 
      * @param mixed $show_status_on_completion any value that evaluates to true or false.
      *                                         When the value is true, the user will be
      *                                         redirected to actionLoginStatus(). When it
@@ -920,7 +1003,9 @@ class BaseController
         return $this->response->withStatus(302)->withHeader('Location', $redirect_path);
     }
     
-    /** 
+    /**
+     * Displays the login status of the application
+     * 
      * @psalm-suppress PossiblyUnusedMethod 
      * @psalm-suppress UnusedVariable
      */
@@ -954,6 +1039,11 @@ class BaseController
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
 
+    /**
+     * Checks if a user is logged in
+     * 
+     * @return bool true if user is logged in, false otherwise
+     */
     public function isLoggedIn(): bool {
         
         return ($this->vespula_auth->isValid());
@@ -997,16 +1087,36 @@ class BaseController
         return false;
     }
 
+    /**
+     * This action gets called before the actual action* method that matches
+     * the request uri is executed. Use this method to perform some tasks that
+     * should be done before your action method is executed. See
+     * MvcRouteHandler->__invoke(...) to see how this method is called
+     * 
+     * @return ResponseInterface
+     */
     public function preAction(): ResponseInterface {
 
         return $this->response;
     }
 
+    /**
+     * This action gets called after the actual action* method that matches
+     * the request uri is executed. Use this method to perform some tasks that
+     * should be done after your action method is executed. See
+     * MvcRouteHandler->__invoke(...) to see how this method is called.
+     * 
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @return ResponseInterface
+     */
     public function postAction(\Psr\Http\Message\ResponseInterface $response): ResponseInterface {
 
         return $response;
     }
 
+    /**
+     * Stores the current uri (the relative part of the uri) in session
+     */
     public function storeCurrentUrlForLoginRedirection(): static {
 
         /** @psalm-suppress RedundantCast */
@@ -1045,6 +1155,8 @@ class BaseController
     }
 
     /**
+     * Gets an item with the specified key from the application's container
+     * 
      * @return mixed
      *
      * @throws \Slim\Exception\HttpInternalServerErrorException
@@ -1076,6 +1188,8 @@ class BaseController
     }
     
     /**
+     * Call this method to trigger the HTTP 400 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp400(string $message, ?ServerRequestInterface $request=null): void {
@@ -1084,6 +1198,8 @@ class BaseController
     }
     
     /**
+     * Call this method to trigger the HTTP 401 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp401(string $message, ?ServerRequestInterface $request=null): void {
@@ -1092,6 +1208,8 @@ class BaseController
     }
     
     /**
+     * Call this method to trigger the HTTP 403 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp403(string $message, ?ServerRequestInterface $request=null): void {
@@ -1100,6 +1218,8 @@ class BaseController
     }
     
     /**
+     * Call this method to trigger the HTTP 404 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp404(string $message, ?ServerRequestInterface $request=null): void {
@@ -1108,6 +1228,8 @@ class BaseController
     }
     
     /**
+     * Call this method to trigger the HTTP 405 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp405(string $message, ?ServerRequestInterface $request=null): void {
@@ -1116,6 +1238,8 @@ class BaseController
     }
     
     /**
+     * Call this method to trigger the HTTP 410 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp410(string $message, ?ServerRequestInterface $request=null): void {
@@ -1124,6 +1248,8 @@ class BaseController
     }
 
     /**
+     * Call this method to trigger the HTTP 429 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp429(string $message, ?ServerRequestInterface $request=null): void {
@@ -1132,6 +1258,8 @@ class BaseController
     }
 
     /**
+     * Call this method to trigger the HTTP 500 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp500(string $message, ?ServerRequestInterface $request=null): void {
@@ -1140,6 +1268,8 @@ class BaseController
     }
     
     /**
+     * Call this method to trigger the HTTP 501 handler
+     * 
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function forceHttp501(string $message, ?ServerRequestInterface $request=null): void {
