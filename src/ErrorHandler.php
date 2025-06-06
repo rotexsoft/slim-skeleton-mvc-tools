@@ -25,9 +25,10 @@ class ErrorHandler extends \Slim\Handlers\ErrorHandler {
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setContainer(\Psr\Container\ContainerInterface $container): self {
+    public function setContainer(\Psr\Container\ContainerInterface $container): static {
 
         $this->container = $container;
+        
         return $this;
     }
 }
