@@ -469,22 +469,21 @@ class BaseController
     }
     
     /**
-     * Generates a relative url usable as the value for href attributes of HTML 
+     * Generates a relative url usable as the value for href attributes of HTML
      * links (<a></a> or <link />) or as the value for src attributes of HTML
      * script, img tags and the likes. It prepends your application's base path
      * returned by $this->getAppBasePath() to the relative path it returns.
-     * 
+     *
      * A $controller_object variable is always available in all view and layout
      * files rendered by the renderView & renderLayout methods of this class.
      * The $controller_object hold a reference to the controller class instance
-     * from which the render* method was called. You can use 
+     * from which the render* method was called. You can use
      * $controller_object->makeLink($path) in your views & layouts to generate
      * relative urls for the appropriate HTML elements requiring such urls.
-     * 
+     *
      * @param string $path a relative path (not containing your application's base path)
      *                     you want to inject into the src or href attribute of an HTML
      *                     element
-     * @return string
      */
     public function makeLink(string $path): string {
             
@@ -1092,8 +1091,6 @@ class BaseController
      * the request uri is executed. Use this method to perform some tasks that
      * should be done before your action method is executed. See
      * MvcRouteHandler->__invoke(...) to see how this method is called
-     * 
-     * @return ResponseInterface
      */
     public function preAction(): ResponseInterface {
 
@@ -1105,9 +1102,11 @@ class BaseController
      * the request uri is executed. Use this method to perform some tasks that
      * should be done after your action method is executed. See
      * MvcRouteHandler->__invoke(...) to see how this method is called.
-     * 
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @return ResponseInterface
+     *
+     * @param \Psr\Http\Message\ResponseInterface $response response returned
+     *                                                      from the action method
+     *                                                      that was executed to handle
+     *                                                      the matched route in your application
      */
     public function postAction(\Psr\Http\Message\ResponseInterface $response): ResponseInterface {
 
