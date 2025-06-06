@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace {
 
     if (!function_exists('mb_str_starts_with')) {
+        
         function mb_str_starts_with (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_strpos($haystack, $needle) === 0;
@@ -11,6 +12,7 @@ namespace {
     }
 
     if (!function_exists('mb_str_contains')) {
+        
         function mb_str_contains (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_strpos($haystack, $needle) !== false;
@@ -18,6 +20,7 @@ namespace {
     }
 
     if (!function_exists('mb_str_ends_with')) {
+        
         function mb_str_ends_with (string $haystack, string $needle): bool
         {
             return $needle === '' || mb_substr($haystack, -mb_strlen($needle)) === $needle;
@@ -41,6 +44,7 @@ namespace SlimMvcTools\Functions\Str {
         $str = ucwords(str_replace('-', ' ', $str));
         $str = str_replace(' ', '', $str);
         $str[0] = strtolower($str[0]);
+        
         return $str;
     }
 
@@ -57,6 +61,7 @@ namespace SlimMvcTools\Functions\Str {
     {
         $str = dashesToCamel($str);
         $str[0] = strtoupper($str[0]);
+        
         return $str;
     }
 
@@ -74,6 +79,7 @@ namespace SlimMvcTools\Functions\Str {
         $str = ucwords(str_replace('_', ' ', $str));
         $str = str_replace(' ', '', $str);
         $str[0] = strtolower($str[0]);
+        
         return $str;
     }
 
@@ -90,12 +96,12 @@ namespace SlimMvcTools\Functions\Str {
     {
         $str = underToCamel($str);
         $str[0] = strtoupper($str[0]);
+        
         return $str;
     }
 
     /**
-     * Returns any string, converted to using dashes with only lowercase 
-     * alphanumerics.
+     * Returns any string, converted to using dashes with only lowercase alphanumerics.
      * 
      * @param string $str The string to convert.
      * 
@@ -125,6 +131,7 @@ namespace SlimMvcTools\Functions\Str {
     function camelToUnder(string $str): string
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
+        
         return str_replace(' ', '_', ucwords((string) $str));
     }
 
@@ -141,26 +148,32 @@ namespace SlimMvcTools\Functions\Str {
     {
         $str = preg_replace('/([a-z])([A-Z])/', '$1 $2', $str);
         $str = str_replace(' ', '-', ucwords((string) $str));
+        
         return strtolower($str);
     }
 
     /**
+     * 
      * @param string $string string to be colored
+     * 
      * @param string $foreground_color any of
      *                                          'black', 'dark_gray', 'blue',
      *                                          'light_blue', 'green', 'light_green',
      *                                          'cyan', 'light_cyan', 'red', 'light_red',
      *                                          'purple', 'light_purple', 'brown', 'yellow',
      *                                          'light_gray' and 'white'
+     * 
      * @param string $background_color any of
      *                                         'black', 'red', 'green', 'yellow', 'blue',
      *                                         'magenta', 'cyan' and 'light_gray'
+     * 
      */
     function color_4_console(
         string $string, 
         string $foreground_color = 'white', 
         string $background_color = 'black'
     ): string {
+        
         if( PHP_OS !== 'Linux') {
 
             //just return the string as is
