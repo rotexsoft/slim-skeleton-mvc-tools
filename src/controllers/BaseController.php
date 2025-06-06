@@ -53,7 +53,7 @@ class BaseController
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setVespulaLocale(\Vespula\Locale\Locale $nu_locale): self {
+    public function setVespulaLocale(\Vespula\Locale\Locale $nu_locale): static {
         
         $this->vespula_locale = $nu_locale;
         
@@ -76,7 +76,7 @@ class BaseController
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setLogger(\Psr\Log\LoggerInterface $nu_logger): self {
+    public function setLogger(\Psr\Log\LoggerInterface $nu_logger): static {
         
         $this->logger = $nu_logger;
         
@@ -322,7 +322,7 @@ class BaseController
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setVespulaAuthObject(\Vespula\Auth\Auth $vespula_auth): self {
+    public function setVespulaAuthObject(\Vespula\Auth\Auth $vespula_auth): static {
 
         $this->vespula_auth = $vespula_auth;
         
@@ -340,7 +340,7 @@ class BaseController
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setLayoutRenderer(\Rotexsoft\FileRenderer\Renderer $renderer): self {
+    public function setLayoutRenderer(\Rotexsoft\FileRenderer\Renderer $renderer): static {
 
         $this->layout_renderer = $renderer;
         
@@ -358,7 +358,7 @@ class BaseController
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setViewRenderer(\Rotexsoft\FileRenderer\Renderer $renderer): self {
+    public function setViewRenderer(\Rotexsoft\FileRenderer\Renderer $renderer): static {
 
         $this->view_renderer = $renderer;
         
@@ -376,7 +376,7 @@ class BaseController
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setRequest(\Psr\Http\Message\ServerRequestInterface $request): self {
+    public function setRequest(\Psr\Http\Message\ServerRequestInterface $request): static {
 
         $this->request = $request;
         
@@ -391,7 +391,7 @@ class BaseController
         return $this->response;
     }
     
-    public function setResponse(\Psr\Http\Message\ResponseInterface $response): self {
+    public function setResponse(\Psr\Http\Message\ResponseInterface $response): static {
 
         $this->response = $response;
         
@@ -1007,7 +1007,7 @@ class BaseController
         return $response;
     }
 
-    public function storeCurrentUrlForLoginRedirection(): self {
+    public function storeCurrentUrlForLoginRedirection(): static {
 
         /** @psalm-suppress RedundantCast */
         if(
