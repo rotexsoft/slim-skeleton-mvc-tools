@@ -10,7 +10,7 @@ trait BaseErrorRendererTrait {
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setDefaultErrorTitle(string $text): self {
+    public function setDefaultErrorTitle(string $text): static {
         
         $this->defaultErrorTitle = $text;
 
@@ -20,7 +20,7 @@ trait BaseErrorRendererTrait {
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setDefaultErrorDescription(string $text): self {
+    public function setDefaultErrorDescription(string $text): static {
         
         $this->defaultErrorDescription = $text;
 
