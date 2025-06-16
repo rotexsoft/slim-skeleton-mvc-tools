@@ -1736,6 +1736,42 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($resp2, $controller->postAction($resp2));
     }
     
+    public function testThatAppendingToResponseBodyFromPreActionPostActionAndTheActionWorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        $controller = new NonDefaultPreAndPostActionController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        ////////////////////////////////////////////////////
+        // We are mimicking how MvcRouteHandler->__invoke 
+        // executes preAction, the action and postAction
+        ////////////////////////////////////////////////////
+        $responseFromPreAction = $controller->preAction();
+        $responseStringFromPreAction = (string) $responseFromPreAction->getBody();
+        self::assertEquals(
+            "Running NonDefaultPreAndPostActionController::preAction||", 
+            $responseStringFromPreAction
+        );
+        
+        $controller->setResponse($responseFromPreAction);
+        $responseFromActionIndex = $controller->actionIndex();
+        $responseStringFromActionIndex = (string) $responseFromActionIndex->getBody();
+        self::assertEquals(
+            "Running NonDefaultPreAndPostActionController::preAction||Running NonDefaultPreAndPostActionController::actionIndex",
+            $responseStringFromActionIndex
+        );
+        
+        $responseFromPostAction = $controller->postAction($responseFromActionIndex);
+        $responseStringFromPostAction = (string) $responseFromPostAction->getBody();
+        self::assertEquals(
+            "Running NonDefaultPreAndPostActionController::preAction||Running NonDefaultPreAndPostActionController::actionIndex||Running NonDefaultPreAndPostActionController::postAction",
+            $responseStringFromPostAction
+        );
+    }
+    
     public function testThat_getContainerItem_WorksAsExpected() {
         
         $req = $this->newRequest('http://google.com/');

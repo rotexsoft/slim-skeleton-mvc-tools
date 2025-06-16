@@ -1,2 +1,2 @@
 <?php
-return 'testing';
+return \SlimMvcTools\AppEnvironments::TESTING;
