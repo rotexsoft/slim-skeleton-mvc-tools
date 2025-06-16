@@ -64,6 +64,6 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         $html .= sprintf('<div><strong>Line:</strong> %s</div>', $exception->getLine());
         $html .= '<h2>Trace</h2>';
 
-        return $html . sprintf('<pre>%s</pre>', htmlentities($exception->getTraceAsString()));
+        return $html . sprintf('<pre>%s</pre>', nl2br(htmlentities($exception->getTraceAsString())) );
     }
 }
