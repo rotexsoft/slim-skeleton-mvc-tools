@@ -37,7 +37,7 @@ class MvcRouteHandler {
         $params_str = isset($args['parameters'])? rtrim((string) $args['parameters'], '/') : '';
 
         // convert to array of parameters
-        $params = ($params_str === '') && mb_strlen($params_str, 'UTF-8') <= 0 ? [] : explode('/', $params_str);
+        $params = ($params_str === '') ? [] : explode('/', $params_str);
         //////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /** @psalm-suppress MixedArgument */
