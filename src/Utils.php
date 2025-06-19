@@ -48,21 +48,21 @@ class Utils {
         ?\Throwable $previous_exception = null
     ): \Slim\Exception\HttpSpecializedException {
 
-            $exception_class_name = $exception_class->value;
-            $err_message .= ($previous_exception instanceof \Throwable) ? PHP_EOL . static::getThrowableAsStr($previous_exception, PHP_EOL . PHP_EOL) : '';
-            $exception =  new $exception_class_name($req, $err_message, $previous_exception);
-            
-            if(
-                $container->has(ContainerKeys::LOCALE_OBJ)
-                && $container->get(ContainerKeys::LOCALE_OBJ) instanceof \Vespula\Locale\Locale
-            ) {
-                /** @psalm-suppress MixedMethodCall */
-                $exception->setDescription(
-                    $container->get(ContainerKeys::LOCALE_OBJ)
-                              ->gettext($exception_class->value.'_description')
-                );
-            }
-            
-            return $exception;
+        $exception_class_name = $exception_class->value;
+        $err_message .= ($previous_exception instanceof \Throwable) ? PHP_EOL . static::getThrowableAsStr($previous_exception, PHP_EOL . PHP_EOL) : '';
+        $exception =  new $exception_class_name($req, $err_message, $previous_exception);
+
+        if(
+            $container->has(ContainerKeys::LOCALE_OBJ)
+            && $container->get(ContainerKeys::LOCALE_OBJ) instanceof \Vespula\Locale\Locale
+        ) {
+            /** @psalm-suppress MixedMethodCall */
+            $exception->setDescription(
+                $container->get(ContainerKeys::LOCALE_OBJ)
+                          ->gettext($exception_class->value.'_description')
+            );
+        }
+
+        return $exception;
     }
 }
