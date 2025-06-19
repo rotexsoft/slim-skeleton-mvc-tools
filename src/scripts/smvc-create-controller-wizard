@@ -11,7 +11,7 @@ if( !\SlimMvcTools\Functions\CliHelpers\isPhpRunningInCliMode() ) {
 
     try {
         $current_directory = getcwd(); 
-        echo "Current working directory: " . getcwd() . PHP_EOL;
+        echo "Current working directory: " . $current_directory . PHP_EOL;
         
         // we are going to mimic $argc and $argv
         $psuedo_argv = [];
