@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- 
+Please DO NOT delete this file, you can make a copy of it and set that copy as your error template file in app-settings.php.
+If your app bootstrapping fails, this file will be used as final fallback error template file
+-->
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -11,8 +15,10 @@
         </style>
     </head>
     <body>
-        <h1>{{{ERROR_HEADING}}}</h1>
-        <div>{{{ERROR_DETAILS}}}</div>
+        <h1>{{{ERROR_HEADING}}}</h1>     <!-- title injected by \SlimMvcTools\HtmlErrorRenderer->renderHtmlBody(string $title = '', string $html = '') -->
+        <br>
+        <div>{{{ERROR_DETAILS}}}</div>   <!-- error message body injected by \SlimMvcTools\HtmlErrorRenderer->renderHtmlBody(string $title = '', string $html = '') -->
+        <br>
         <a href="#" onclick="window.history.go(-1)">Go Back Yooooooooooo</a>
     </body>
 </html>
