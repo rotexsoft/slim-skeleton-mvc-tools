@@ -5,6 +5,7 @@ namespace SlimMvcTools\Controllers;
 
 use \Psr\Http\Message\ServerRequestInterface,
     \Psr\Http\Message\ResponseInterface,
+    \SlimMvcTools\AppSettingsKeys,
     \SlimMvcTools\ContainerKeys,
     \SlimMvcTools\Utils;
 
@@ -267,13 +268,14 @@ class BaseController
     /**
      * A helper method to start a new session using session settings specified
      * in your app's settings file. The settings key in the settings array for
-     * for session_start settings is expected to be 'session_start_options'
+     * for session_start settings is expected to be 
+     * \SlimMvcTools\AppSettingsKeys::SESSION_START_OPTIONS
      */
     protected function startSession(): void {
         
         $session_start_settings = 
-            $this->getAppSetting('session_start_options') !== null
-                ? (array)$this->getAppSetting('session_start_options')
+            $this->getAppSetting(AppSettingsKeys::SESSION_START_OPTIONS) !== null
+                ? (array)$this->getAppSetting(AppSettingsKeys::SESSION_START_OPTIONS)
                 : [];
         
         if(isset($session_start_settings['name'])) {
@@ -432,7 +434,7 @@ class BaseController
     }
     
     /** 
-     * Grab the application setting value with the 'app_base_path' key from the
+     * Grab the application setting value with the \SlimMvcTools\AppSettingsKeys::APP_BASE_PATH key from the
      * application's settings array.
      * 
      * @psalm-suppress MixedInferredReturnType 
@@ -443,7 +445,7 @@ class BaseController
          * @psalm-suppress MixedArrayAccess
          * @psalm-suppress MixedReturnStatement
          */
-        return $this->getAppSetting('app_base_path');
+        return $this->getAppSetting(AppSettingsKeys::APP_BASE_PATH);
     }
     
     /**

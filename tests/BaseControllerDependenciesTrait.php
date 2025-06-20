@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use \SlimMvcTools\Container,
     \SlimMvcTools\ContainerKeys,
+    \SlimMvcTools\AppSettingsKeys,
     \SlimMvcTools\Controllers\BaseController;
 
 /**
@@ -77,22 +78,27 @@ SQL;
             $psr11Container = new Container();
             
             $settings = [
-                'displayErrorDetails' => false,
-                'logErrors' => false,
-                'logErrorDetails' => false,
-                'addContentLengthHeader' => true,
+                AppSettingsKeys::DISPLAY_ERROR_DETAILS => false,
+                AppSettingsKeys::LOG_ERRORS => false,
+                AppSettingsKeys::LOG_ERROR_DETAILS => false,
+                AppSettingsKeys::ADD_CONTENT_LENGTH_HEADER => true,
 
-                'app_base_path' => '/da-path',
-                'error_template_file'=> 'error-template.php',
-                'use_mvc_routes' => true,
-                'mvc_routes_http_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-                'auto_prepend_action_to_action_method_names' => false,
-                'default_controller_class_name' => \SlimMvcTools\Controllers\BaseController::class,
-                'default_action_name' => 'actionIndex',
+                AppSettingsKeys::APP_BASE_PATH => '/da-path',
+                AppSettingsKeys::ERROR_TEMPLATE_FILE_NAME => 'error-template.html',
+                AppSettingsKeys::USE_MVC_ROUTES => true,
+                AppSettingsKeys::MVC_ROUTES_HTTP_METHODS => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+                AppSettingsKeys::AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES => false,
+                AppSettingsKeys::DEFAULT_CONTROLLER_CLASS_NAME => \SlimMvcTools\Controllers\BaseController::class,
+                AppSettingsKeys::DEFAULT_ACTION_NAME => 'actionIndex',
 
-                'error_handler_class' => \SlimMvcTools\ErrorHandler::class,
-                'html_renderer_class' => \SlimMvcTools\HtmlErrorRenderer::class,
-                'log_renderer_class'  => \SlimMvcTools\LogErrorRenderer::class,
+                AppSettingsKeys::ERROR_HANDLER_CLASS => \SlimMvcTools\ErrorHandler::class,
+
+                AppSettingsKeys::HTML_RENDERER_CLASS => \SlimMvcTools\HtmlErrorRenderer::class,
+                AppSettingsKeys::JSON_RENDERER_CLASS => \SlimMvcTools\JsonErrorRenderer::class,
+                AppSettingsKeys::LOG_RENDERER_CLASS  => \SlimMvcTools\LogErrorRenderer::class,
+                AppSettingsKeys::XML_RENDERER_CLASS  => \SlimMvcTools\XmlErrorRenderer::class,
+                
+                AppSettingsKeys::SESSION_START_OPTIONS => [],
             ];
             
             foreach ($override_settings as $key => $value) {

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use \SlimMvcTools\Controllers\BaseController,
+    \SlimMvcTools\AppSettingsKeys,
     \SlimMvcTools\ContainerKeys;
 
 /**
@@ -353,7 +354,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
         
         self::assertEquals(
-            $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'], 
+            $psr11Container->get(ContainerKeys::APP_SETTINGS)[AppSettingsKeys::APP_BASE_PATH], 
             $controller->getAppBasePath()
         );
     }
@@ -369,8 +370,8 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         );
         
         self::assertEquals(
-            $psr11Container->get(ContainerKeys::APP_SETTINGS)['app_base_path'], 
-            $controller->getAppSetting('app_base_path')
+            $psr11Container->get(ContainerKeys::APP_SETTINGS)[AppSettingsKeys::APP_BASE_PATH], 
+            $controller->getAppSetting(AppSettingsKeys::APP_BASE_PATH)
         );
         self::assertNull( $controller->getAppSetting('non_existent_setting_key') );
     }
