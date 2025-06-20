@@ -111,10 +111,7 @@ class HtmlErrorRendererTest extends \PHPUnit\Framework\TestCase {
         $container = $this->getContainer();
         
         // Test that when valid file is passed, the file is used to render
-        $error_template_file = SMVC_APP_ROOT_PATH . DIRECTORY_SEPARATOR . 'src' 
-                                . DIRECTORY_SEPARATOR . 'layout-templates' 
-                                . DIRECTORY_SEPARATOR 
-                                . $container->get(ContainerKeys::APP_SETTINGS)[AppSettingsKeys::ERROR_TEMPLATE_FILE_PATH];
+        $error_template_file = $container->get(ContainerKeys::APP_SETTINGS)[AppSettingsKeys::ERROR_TEMPLATE_FILE_PATH];
         $html_renderer_with_template_file = new \SlimMvcTools\HtmlErrorRenderer(
             $error_template_file
         );
