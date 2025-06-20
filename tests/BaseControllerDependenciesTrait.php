@@ -84,7 +84,7 @@ SQL;
                 AppSettingsKeys::ADD_CONTENT_LENGTH_HEADER => true,
 
                 AppSettingsKeys::APP_BASE_PATH => '/da-path',
-                AppSettingsKeys::ERROR_TEMPLATE_FILE_NAME => 'error-template.html',
+                AppSettingsKeys::ERROR_TEMPLATE_FILE_PATH => 'error-template.html',
                 AppSettingsKeys::USE_MVC_ROUTES => true,
                 AppSettingsKeys::MVC_ROUTES_HTTP_METHODS => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
                 AppSettingsKeys::AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES => false,

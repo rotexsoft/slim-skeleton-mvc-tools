@@ -16,7 +16,7 @@ class AppSettingsKeys {
     public const LOG_ERROR_DETAILS = 'logErrorDetails';
     public const ADD_CONTENT_LENGTH_HEADER = 'addContentLengthHeader';
     public const APP_BASE_PATH = 'app_base_path';
-    public const ERROR_TEMPLATE_FILE_NAME = 'error_template_file';
+    public const ERROR_TEMPLATE_FILE_PATH = 'error_template_file';
     public const USE_MVC_ROUTES = 'use_mvc_routes';
     public const MVC_ROUTES_HTTP_METHODS = 'mvc_routes_http_methods';
     public const AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES = 'auto_prepend_action_to_action_method_names';
