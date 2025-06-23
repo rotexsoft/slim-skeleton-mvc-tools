@@ -739,7 +739,7 @@ class BaseController
              */
             if( sMVC_GetCurrentAppEnvironment() !== \SlimMvcTools\AppEnvironments::PRODUCTION ) {
 
-                $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
+                $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth), false);
             }
 
             if( $auth->isValid() ) {
@@ -1031,7 +1031,7 @@ class BaseController
          */
         if( sMVC_GetCurrentAppEnvironment() !== \SlimMvcTools\AppEnvironments::PRODUCTION ) {
             /** @psalm-suppress MixedOperand */
-            $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth));
+            $msg .= '<br>'.nl2br(sMVC_DumpAuthinfo($auth), false);
         }
 
         //get the contents of the view first

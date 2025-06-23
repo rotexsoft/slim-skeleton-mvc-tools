@@ -695,27 +695,27 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "The 'username' field is empty.<br>The 'password' field is empty.<br>Login Status: ANON<br />", 
+            "The 'username' field is empty.<br>The 'password' field is empty.<br>Login Status: ANON<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Logged in Person's Username: <br />", 
+            "Logged in Person's Username: <br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Logged in User's Data: <br />", 
+            "Logged in User's Data: <br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Array<br />", 
+            "Array<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "(<br />", 
+            "(<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            ")<br />", 
+            ")<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
@@ -778,27 +778,27 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "The 'password' field is empty.<br>Login Status: ANON<br />", 
+            "The 'password' field is empty.<br>Login Status: ANON<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Logged in Person's Username: <br />", 
+            "Logged in Person's Username: <br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Logged in User's Data: <br />", 
+            "Logged in User's Data: <br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Array<br />", 
+            "Array<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "(<br />", 
+            "(<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            ")<br />", 
+            ")<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
@@ -861,27 +861,27 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "The 'username' field is empty.<br>Login Status: ANON<br />", 
+            "The 'username' field is empty.<br>Login Status: ANON<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Logged in Person's Username: <br />", 
+            "Logged in Person's Username: <br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Logged in User's Data: <br />", 
+            "Logged in User's Data: <br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "Array<br />", 
+            "Array<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            "(<br />", 
+            "(<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
-            ")<br />", 
+            ")<br>", 
             $actionLoginResult
         );
         self::assertStringContainsString(
@@ -1575,7 +1575,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             $auth->getSession()->setStatus($auth_status);
             $action_result = $controller->actionLoginStatus();
             self::assertStringContainsString($status_message_in_rendered_view, $action_result);
-            self::assertStringContainsString('<br>'.nl2br(sMVC_DumpAuthinfo($auth)), $action_result);
+            self::assertStringContainsString('<br>'.nl2br(sMVC_DumpAuthinfo($auth), false), $action_result);
         }
         
         ////////////////////////////////////////////////////////////////////////

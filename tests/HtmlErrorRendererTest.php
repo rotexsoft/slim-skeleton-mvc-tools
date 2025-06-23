@@ -70,7 +70,7 @@ class HtmlErrorRendererTest extends \PHPUnit\Framework\TestCase {
             $result
         );
         self::assertStringContainsString(
-            sprintf('<pre>%s</pre>', nl2br(htmlentities($http_exception->getTraceAsString())) ), 
+            sprintf('<pre>%s</pre>', nl2br(htmlentities($http_exception->getTraceAsString()), false) ), 
             $result
         );
         //self::assertStringContainsString($needle, $result);
