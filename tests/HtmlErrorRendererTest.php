@@ -89,6 +89,16 @@ class HtmlErrorRendererTest extends \PHPUnit\Framework\TestCase {
             $result2
         );
         
+        $result2b = $html_renderer_no_template_file($non_http_exception, false);
+        self::assertStringContainsString(
+            'DefaultErrorTitle', 
+            $result2b
+        );
+        self::assertStringContainsString(
+            'DefaultErrorDescription', 
+            $result2b
+        );
+        
         $result3 = $html_renderer_no_template_file($http_exception, !$display_error_details);
         self::assertStringNotContainsString(
             'DefaultErrorTitle', 
@@ -120,5 +130,40 @@ class HtmlErrorRendererTest extends \PHPUnit\Framework\TestCase {
             '<a href="#" onclick="window.history.go(-1)">Go Back Yooooooooooo</a>', 
             $result4
         );
+    }
+    
+    public function testThatGetContainerAndSetContainerWorkAsExpected() {
+        
+        $html_renderer_no_template_file = new \SlimMvcTools\HtmlErrorRenderer('');
+        
+        self::assertNull($html_renderer_no_template_file->getContainer());
+        
+        $contaner1 = $this->getContainer();
+        $contaner2 = $this->getContainer([AppSettingsKeys::DISPLAY_ERROR_DETAILS => false]);
+        
+        $html_renderer_no_template_file->setContainer($contaner1);
+        self::assertSame($contaner1, $html_renderer_no_template_file->getContainer());
+        self::assertNotSame($contaner2, $html_renderer_no_template_file->getContainer());
+        
+        $html_renderer_no_template_file->setContainer($contaner2);
+        self::assertSame($contaner2, $html_renderer_no_template_file->getContainer());
+        self::assertNotSame($contaner1, $html_renderer_no_template_file->getContainer());
+    }
+    
+    public function testThatGetLocalizedTextWorkAsExpected() {
+        
+        $html_renderer_no_template_file = new \SlimMvcTools\HtmlErrorRenderer('');
+        
+        // No container set on renderer scenario
+        self::assertEquals('', $html_renderer_no_template_file->getLocalizedText('NON_EXISTENT_TEXT_IN_LOCALE_FILE')); // should return default fall back text which is ''
+        self::assertEquals('fallback text', $html_renderer_no_template_file->getLocalizedText('NON_EXISTENT_TEXT_IN_LOCALE_FILE', 'fallback text')); // should return specified fall back text
+        
+        $html_renderer_no_template_file->setContainer($this->getContainer());
+        
+        // Container set on renderer scenario
+        self::assertEquals('', $html_renderer_no_template_file->getLocalizedText('NON_EXISTENT_TEXT_IN_LOCALE_FILE')); // should return default fall back text which is ''
+        self::assertEquals('fallback text', $html_renderer_no_template_file->getLocalizedText('NON_EXISTENT_TEXT_IN_LOCALE_FILE', 'fallback text')); // should return specified fall back text
+        self::assertEquals('Home', $html_renderer_no_template_file->getLocalizedText('main_template_text_home')); // should return text from locale file
+        self::assertEquals('English', $html_renderer_no_template_file->getLocalizedText('base_controller_text_english', 'fallback text')); // should return text from locale file
     }
 }
