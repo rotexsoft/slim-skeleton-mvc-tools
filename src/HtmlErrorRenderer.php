@@ -22,8 +22,10 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
                 
         if ($displayErrorDetails) {
             
+            $detailsText = $this->getLocalizedText('html_error_renderer_text_details', 'Details');
+            
             $html = "<p>{$this->defaultErrorDescription}:</p>";
-            $html .= '<h2>Details</h2>';
+            $html .= "<h2>{$detailsText}</h2>";
             $html .= $this->renderExceptionFragment($exception);
             
         } else {
@@ -54,13 +56,20 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
     
     private function renderExceptionFragment(\Throwable $exception): string {
         
-        $html = sprintf('<div><strong>Type:</strong> %s</div>', $exception::class);
+        $typeText = $this->getLocalizedText('html_error_renderer_text_type', 'Type');
+        $codeText = $this->getLocalizedText('html_error_renderer_text_code', 'Code');
+        $mssgText = $this->getLocalizedText('html_error_renderer_text_mssg', 'Message');
+        $fileText = $this->getLocalizedText('html_error_renderer_text_file', 'File');
+        $lineText = $this->getLocalizedText('html_error_renderer_text_line', 'Line');
+        $traceText = $this->getLocalizedText('html_error_renderer_text_trace', 'Trace');
+        
+        $html = sprintf("<div><strong>{$typeText}:</strong> %s</div>", $exception::class);
         $code = $exception->getCode();
-        $html .= sprintf('<div><strong>Code:</strong> %s</div>', $code);
-        $html .= sprintf('<div><strong>Message:</strong> %s</div>', nl2br(htmlentities($exception->getMessage()), false));
-        $html .= sprintf('<div><strong>File:</strong> %s</div>', $exception->getFile());
-        $html .= sprintf('<div><strong>Line:</strong> %s</div>', $exception->getLine());
-        $html .= '<h2>Trace</h2>';
+        $html .= sprintf("<div><strong>{$codeText}:</strong> %s</div>", $code);
+        $html .= sprintf("<div><strong>{$mssgText}:</strong> %s</div>", nl2br(htmlentities($exception->getMessage()), false));
+        $html .= sprintf("<div><strong>{$fileText}:</strong> %s</div>", $exception->getFile());
+        $html .= sprintf("<div><strong>{$lineText}:</strong> %s</div>", $exception->getLine());
+        $html .= "<h2>{$traceText}</h2>";
 
         return $html . sprintf('<pre>%s</pre>', nl2br(htmlentities($exception->getTraceAsString()), false) );
     }

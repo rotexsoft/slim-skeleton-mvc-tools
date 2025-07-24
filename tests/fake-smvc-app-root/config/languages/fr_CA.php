@@ -53,4 +53,12 @@ return [
     \Slim\Exception\HttpNotImplementedException::class . '_description' => "Le serveur ne prend pas en charge les fonctionnalités requises pour répondre à la demande.",
     \Slim\Exception\HttpTooManyRequestsException::class . '_description' => "L'application client a dépassé sa limite de débit, ou le nombre de requêtes qu'elle peut envoyer au cours d'une période de temps donnée.",
     \Slim\Exception\HttpUnauthorizedException::class . '_description' => "La demande nécessite une authentification utilisateur valide.",
+    
+    'html_error_renderer_text_details' => 'Détails',
+    'html_error_renderer_text_type' => 'Type',
+    'html_error_renderer_text_code' => 'Code',
+    'html_error_renderer_text_mssg' => 'Message',
+    'html_error_renderer_text_file' => 'Fichier',
+    'html_error_renderer_text_line' => 'Ligne',
+    'html_error_renderer_text_trace' => 'Tracé',
 ];

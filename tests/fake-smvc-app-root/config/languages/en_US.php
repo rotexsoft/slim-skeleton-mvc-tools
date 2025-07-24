@@ -53,4 +53,12 @@ return [
     \Slim\Exception\HttpNotImplementedException::class . '_description' => "The server does not support the functionality required to fulfill the request.",
     \Slim\Exception\HttpTooManyRequestsException::class . '_description' => "The client application has surpassed its rate limit, or number of requests they can send in a given period of time.",
     \Slim\Exception\HttpUnauthorizedException::class . '_description' => "The request requires valid user authentication.",
+    
+    'html_error_renderer_text_details' => 'Details',
+    'html_error_renderer_text_type' => 'Type',
+    'html_error_renderer_text_code' => 'Code',
+    'html_error_renderer_text_mssg' => 'Message',
+    'html_error_renderer_text_file' => 'File',
+    'html_error_renderer_text_line' => 'Line',
+    'html_error_renderer_text_trace' => 'Trace',
 ];
