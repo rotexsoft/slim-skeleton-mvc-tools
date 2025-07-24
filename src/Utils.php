@@ -58,9 +58,12 @@ class Utils {
         ) {
             /** @psalm-suppress MixedMethodCall */
             $exception->setDescription(
-                $container->get(ContainerKeys::LOCALE_OBJ)
-                          ->gettext($exception_class->value.'_description')
-            );
+                        $container->get(ContainerKeys::LOCALE_OBJ)
+                                  ->gettext($exception_class->value.'_description')
+                    )->setTitle(
+                        $container->get(ContainerKeys::LOCALE_OBJ)
+                                  ->gettext($exception_class->value.'_title')
+                    );
         }
 
         return $exception;
