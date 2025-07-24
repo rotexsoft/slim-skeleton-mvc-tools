@@ -16,9 +16,7 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function __construct(protected string $path_to_error_template_file='')
-    {
-    }
+    public function __construct(protected string $path_to_error_template_file='') {}
     
     public function __invoke(\Throwable $exception, bool $displayErrorDetails): string {
                 
