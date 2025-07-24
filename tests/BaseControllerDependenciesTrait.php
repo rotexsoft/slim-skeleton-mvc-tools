@@ -120,6 +120,28 @@ SQL;
                 $path_2_locale_language_files = __DIR__ . DIRECTORY_SEPARATOR . 'fake-smvc-app-root' . $ds.'config'.$ds.'languages';        
                 $locale_obj->load($path_2_locale_language_files); //load local entries for base controller
     
+                if(session_status() !== \PHP_SESSION_ACTIVE) {
+
+                    // Try to start or resume existing session
+
+                    $sessionOptions = $c->get(ContainerKeys::APP_SETTINGS)[AppSettingsKeys::SESSION_START_OPTIONS];
+
+                    if(isset($sessionOptions['name'])) {
+
+                        ////////////////////////////////////////////////////////////////
+                        // Set the session name first
+                        // https://www.php.net/manual/en/function.session-start.php
+                        //      To use a named session, call session_name() before 
+                        //      calling session_start(). 
+                        // 
+                        // https://www.php.net/manual/en/function.session-name.php
+                        ////////////////////////////////////////////////////////////////
+                        session_name($sessionOptions['name']);
+                    }
+
+                    session_start($sessionOptions);
+                }
+                
                 // Try to update to previously selected language if stored in session
                 if (
                     session_status() === PHP_SESSION_ACTIVE
@@ -165,8 +187,7 @@ SQL;
 
                     return $view_renderer;
                 });
-
-        }
+        } // if(!$psr11Container || $override_settings !== [])
         
         return $psr11Container;
     } // protected function getContainer(array $override_settings=[]): \Psr\Container\ContainerInterface
