@@ -1195,7 +1195,12 @@ class BaseController
      */
     public function forceHttp400(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpBadRequestException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpBadRequestException,
+            ($request ?? $this->request),
+            $message
+        );
     }
     
     /**
@@ -1205,7 +1210,12 @@ class BaseController
      */
     public function forceHttp401(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpUnauthorizedException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpUnauthorizedException,
+            ($request ?? $this->request),
+            $message
+        );
     }
     
     /**
@@ -1215,7 +1225,12 @@ class BaseController
      */
     public function forceHttp403(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpForbiddenException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpForbiddenException,
+            ($request ?? $this->request),
+            $message
+        );
     }
     
     /**
@@ -1225,7 +1240,12 @@ class BaseController
      */
     public function forceHttp404(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpNotFoundException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpNotFoundException,
+            ($request ?? $this->request),
+            $message
+        );
     }
     
     /**
@@ -1235,7 +1255,12 @@ class BaseController
      */
     public function forceHttp405(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpMethodNotAllowedException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpMethodNotAllowedException,
+            ($request ?? $this->request),
+            $message
+        );
     }
     
     /**
@@ -1245,7 +1270,12 @@ class BaseController
      */
     public function forceHttp410(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpGoneException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpGoneException,
+            ($request ?? $this->request),
+            $message
+        );
     }
 
     /**
@@ -1255,7 +1285,12 @@ class BaseController
      */
     public function forceHttp429(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpTooManyRequestsException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpTooManyRequestsException,
+            ($request ?? $this->request),
+            $message
+        );
     }
 
     /**
@@ -1265,7 +1300,12 @@ class BaseController
      */
     public function forceHttp500(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpInternalServerErrorException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpInternalServerErrorException,
+            ($request ?? $this->request),
+            $message
+        );
     }
     
     /**
@@ -1275,6 +1315,11 @@ class BaseController
      */
     public function forceHttp501(string $message, ?ServerRequestInterface $request=null): void {
         
-        throw (new \Slim\Exception\HttpNotImplementedException(($request ?? $this->request), $message))->setDescription($message);
+        throw Utils::createSlimHttpExceptionWithLocalizedDescription(
+            $this->getContainer(),
+            \SlimMvcTools\SlimHttpExceptionClassNames::HttpNotImplementedException,
+            ($request ?? $this->request),
+            $message
+        );
     }
 }
