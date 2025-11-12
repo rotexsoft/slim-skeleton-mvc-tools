@@ -47,9 +47,19 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
         
         $file_contents = file_get_contents($this->path_to_error_template_file);
         
+        $appSettings = (array)$this->getContainerItem(ContainerKeys::APP_SETTINGS, []);
+        /** @psalm-suppress MixedOperand */
+        $appBasePath = \trim(''.($appSettings[AppSettingsKeys::APP_BASE_PATH] ?? ''));
+        
+        if(\str_ends_with($appBasePath, '/')) {
+            
+            // remove trailing forward slash
+            $appBasePath = \substr($appBasePath, 0, -1);
+        }
+        
         return str_replace(
-            ['{{{TITLE}}}', '{{{ERROR_HEADING}}}', '{{{ERROR_DETAILS}}}'], 
-            [$title, $title, $html], 
+            ['{{{TITLE}}}', '{{{ERROR_HEADING}}}', '{{{ERROR_DETAILS}}}', '{{{APP_BASE_PATH}}}'], 
+            [$title, $title, $html, $appBasePath], 
             ($file_contents === false) ? '' : $file_contents
         );
     }
