@@ -27,7 +27,7 @@ class InMemoryLogger extends \Psr\Log\AbstractLogger {
      *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, string|\Stringable $message, array $context=[]) {
+    public function log($level, string|\Stringable $message, array $context=[]):void {
         
         $this->log_entries[] = "[LEVEL: {$level}] [MESSAGE: {$message}]";
     }
