@@ -165,5 +165,79 @@ class LogErrorRendererTest extends \PHPUnit\Framework\TestCase  {
             sprintf("Trace: %s{$nl}", $exception_with_previous_exception->getPrevious()->getTraceAsString()), 
             $result4
         );
+        
+        // Set a container on the renderer with both AppSettingsKeys::LOG_ERRORS
+        // and AppSettingsKeys::LOG_ERROR_DETAILS set to true and 
+        // AppSettingsKeys::DISPLAY_ERROR_DETAILS set to false
+        $container = $this->getContainer([
+            \SlimMvcTools\AppSettingsKeys::LOG_ERRORS => true,
+            \SlimMvcTools\AppSettingsKeys::LOG_ERROR_DETAILS => true,
+            \SlimMvcTools\AppSettingsKeys::DISPLAY_ERROR_DETAILS => false,
+        ]);
+        
+        $display_error_details = false;
+        $log_error_renderer->setContainer($container);
+        $result5 = $log_error_renderer($exception_with_previous_exception, $display_error_details);
+        self::assertStringContainsString(
+            "APP Error{$nl}", 
+            $result5
+        );
+        self::assertStringNotContainsString(
+            'Request Uri:', 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("Type: %s{$nl}", get_class($exception_with_previous_exception)), 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("Code: %s{$nl}", $exception_with_previous_exception->getCode()), 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("Message: %s{$nl}", htmlentities($exception_with_previous_exception->getMessage())), 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("File: %s{$nl}", $exception_with_previous_exception->getFile()), 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("Line: %s{$nl}", $exception_with_previous_exception->getLine()), 
+            $result5
+        );
+        self::assertStringContainsStringIgnoringCase(
+            sprintf("Trace: %s{$nl}", $exception_with_previous_exception->getTraceAsString()), 
+            $result5
+        );
+        self::assertStringContainsString(
+            "Previous Error:", 
+            $result5
+        );
+        
+        self::assertStringContainsString(
+            sprintf("Type: %s{$nl}", get_class($exception_with_previous_exception->getPrevious())), 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("Code: %s{$nl}", $exception_with_previous_exception->getPrevious()->getCode()), 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("Message: %s{$nl}", htmlentities($exception_with_previous_exception->getPrevious()->getMessage())), 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("File: %s{$nl}", $exception_with_previous_exception->getPrevious()->getFile()), 
+            $result5
+        );
+        self::assertStringContainsString(
+            sprintf("Line: %s{$nl}", $exception_with_previous_exception->getPrevious()->getLine()), 
+            $result5
+        );
+        self::assertStringContainsStringIgnoringCase(
+            sprintf("Trace: %s{$nl}", $exception_with_previous_exception->getPrevious()->getTraceAsString()), 
+            $result5
+        );
     }
 }
