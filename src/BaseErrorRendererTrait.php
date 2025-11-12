@@ -30,22 +30,35 @@ trait BaseErrorRendererTrait {
         return $this;
     }
     
-    public function getLocalizedText(string $localeKey, string $fallbackText=''): string {
+    public function getContainerItem(string $containerKey, mixed $fallbackValue=null): mixed {
         
         if(
             $this->container instanceof \Psr\Container\ContainerInterface
-            && $this->container->has(ContainerKeys::LOCALE_OBJ)
-            && $this->container->get(ContainerKeys::LOCALE_OBJ) instanceof \Vespula\Locale\Locale
+            && $this->container->has($containerKey)
         ) {
+            return $this->container->get($containerKey);
+        }
+            
+        return $fallbackValue;
+    }
+    
+    public function getLocalizedText(string $localeKey, string $fallbackText=''): string {
+        
+        /**
+         * @psalm-suppress MixedAssignment
+         */
+        $localeObj = $this->getContainerItem(ContainerKeys::LOCALE_OBJ);
+        
+        if( $localeObj instanceof \Vespula\Locale\Locale ) {
+            
             /**
              * @psalm-suppress MixedAssignment
              * @psalm-suppress MixedMethodCall
              */
-            $localizedText = $this->container->get(ContainerKeys::LOCALE_OBJ)->gettext($localeKey);
+            $localizedText = $localeObj->gettext($localeKey);
             
             // ($localizedText === $localeKey) when $localeKey is not found in the locale object
             return ($localizedText === $localeKey) ? $fallbackText : $localizedText;
-            
         }
             
         return $fallbackText;

@@ -22,22 +22,13 @@ class LogErrorRenderer extends \Slim\Error\Renderers\PlainTextErrorRenderer {
         $nl = PHP_EOL;
         $logErrorDetails = false;
         $text = "{$this->getErrorTitle($exception)}{$nl}";
+
+        /** @psalm-suppress MixedAssignment */
+        $appSettings = (array)$this->getContainerItem(ContainerKeys::APP_SETTINGS, []);
         
-        /** @psalm-suppress PossiblyNullReference */
-        if(
-            ($this->getContainer() instanceof ContainerInterface)
-            && $this->getContainer()->has(ContainerKeys::APP_SETTINGS)
-        ) {
-            /** @psalm-suppress PossiblyNullReference */
-            /** @psalm-suppress MixedAssignment */
-            $appSettings = $this->getContainer()
-                                ->get(ContainerKeys::APP_SETTINGS);
-            if(
-                \is_array($appSettings) 
-                && \array_key_exists(AppSettingsKeys::LOG_ERROR_DETAILS, $appSettings)
-            ) {
-                $logErrorDetails = (bool)$appSettings[AppSettingsKeys::LOG_ERROR_DETAILS];
-            }
+        if( \array_key_exists(AppSettingsKeys::LOG_ERROR_DETAILS, $appSettings) ) {
+
+            $logErrorDetails = (bool)$appSettings[AppSettingsKeys::LOG_ERROR_DETAILS];
         }
         
         if($exception instanceof \Slim\Exception\HttpException) {

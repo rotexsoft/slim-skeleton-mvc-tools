@@ -150,6 +150,28 @@ class HtmlErrorRendererTest extends \PHPUnit\Framework\TestCase {
         self::assertNotSame($contaner1, $html_renderer_no_template_file->getContainer());
     }
     
+    public function testThatGetContainerItemWorkAsExpected() {
+        
+        $html_renderer_no_template_file = new \SlimMvcTools\HtmlErrorRenderer('');
+        
+        self::assertNull($html_renderer_no_template_file->getContainerItem(ContainerKeys::LOCALE_OBJ)); // no container
+        self::assertEquals($html_renderer_no_template_file->getContainerItem(ContainerKeys::LOCALE_OBJ, -777), -777); // no container with fallback value of -777
+        
+        $contaner1 = $this->getContainer();
+        
+        $html_renderer_no_template_file->setContainer($contaner1);
+        self::assertNotNull($html_renderer_no_template_file->getContainerItem(ContainerKeys::LOCALE_OBJ));
+        self::assertNotNull($html_renderer_no_template_file->getContainerItem(ContainerKeys::LOCALE_OBJ, -777));
+        self::assertInstanceOf(
+            \Vespula\Locale\Locale::class, 
+            $html_renderer_no_template_file->getContainerItem(ContainerKeys::LOCALE_OBJ)
+        );
+        self::assertInstanceOf(
+            \Vespula\Locale\Locale::class, 
+            $html_renderer_no_template_file->getContainerItem(ContainerKeys::LOCALE_OBJ, -777)
+        );
+    }
+    
     public function testThatGetLocalizedTextWorkAsExpected() {
         
         $html_renderer_no_template_file = new \SlimMvcTools\HtmlErrorRenderer('');
