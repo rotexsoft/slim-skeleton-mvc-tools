@@ -45,7 +45,7 @@
     "bin": ["src/scripts/smvc-create-controller", "src/scripts/smvc-create-controller-wizard"],
     "scripts": {
         "test": "vendor/bin/phpunit --coverage-text --display-all-issues",
-        "rector": "vendor/bin/rector process src --dry-run -vvv",
+        "rector": "vendor/bin/rector process src --dry-run",
         "psalm": "vendor/bin/psalm",
         "psalm-clear-cache": "vendor/bin/psalm --clear-global-cache && vendor/bin/psalm --clear-cache",
         "qa": "composer test && composer rector  && composer psalm-clear-cache && composer psalm"

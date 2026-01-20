@@ -26,6 +26,7 @@ return static function (RectorConfig $rectorConfigurator): void {
         
     $skipables = [
         \Rector\CodeQuality\Rector\If_\ShortenElseIfRector::class,
+        \Rector\DeadCode\Rector\ClassMethod\RemoveParentDelegatingConstructorRector::class,
 //        \Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector::class,
 //        \Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class,
 //        \Rector\Php81\Rector\ClassConst\FinalizePublicClassConstantRector::class,
