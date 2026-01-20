@@ -1830,6 +1830,7 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
             'forceHttp404'=> \Slim\Exception\HttpNotFoundException::class,
             'forceHttp405'=> \Slim\Exception\HttpMethodNotAllowedException::class,
             'forceHttp410'=> \Slim\Exception\HttpGoneException::class,
+            'forceHttp429'=> \Slim\Exception\HttpTooManyRequestsException::class,
             'forceHttp500'=> \Slim\Exception\HttpInternalServerErrorException::class,
             'forceHttp501'=> \Slim\Exception\HttpNotImplementedException::class,
         ];
@@ -1892,5 +1893,324 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $nu_locale = new \Vespula\Locale\Locale('fr_CA');
         $controller->setVespulaLocale($nu_locale);
         self::assertSame($nu_locale, $controller->getVespulaLocale());
+    }
+    
+    public function testThat_ResponseWithContentTypeHtml_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController($psr11Container, '', '', $req, $resp);
+        $htmlString = 'name, "Jane Doe"';
+        
+        // String Data & default http status code
+        $response = $controller->responseWithContentTypeHtml($htmlString);
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertTrue($response->hasHeader(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY));
+        self::assertStringContainsString(
+            BaseController::RESPONSE_CONTENT_TYPE_HTML,
+            $response->getHeaderLine(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY)
+        );
+        self::assertStringContainsString($htmlString, (string)$response->getBody());
+        
+        // String Data & non-default http status code
+        $response = $controller->responseWithContentTypeHtml($htmlString, 301);
+        self::assertEquals(301, $response->getStatusCode());
+        self::assertTrue($response->hasHeader(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY));
+        self::assertStringContainsString(
+            BaseController::RESPONSE_CONTENT_TYPE_HTML,
+            $response->getHeaderLine(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY)
+        );
+        self::assertStringContainsString($htmlString, (string)$response->getBody());
+    }
+    
+    public function testThat_ResponseWithContentTypeCsv_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController($psr11Container, '', '', $req, $resp);
+        $csvString = 'name, "Jane Doe"';
+        $fileName = 'da-dile.csv';
+        
+        // String Data & default http status code
+        $response = $controller->responseWithContentTypeCsv($csvString, $fileName);
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertTrue($response->hasHeader(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY));
+        self::assertStringContainsString(
+            BaseController::RESPONSE_CONTENT_TYPE_CSV,
+            $response->getHeaderLine(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY)
+        );
+        self::assertTrue($response->hasHeader('Content-Disposition'));
+        self::assertStringContainsString(
+            "attachment; filename=\"{$fileName}\"",
+            $response->getHeaderLine('Content-Disposition')
+        );
+        self::assertStringContainsString($csvString, (string)$response->getBody());
+        
+        // String Data & non-default http status code
+        $response = $controller->responseWithContentTypeCsv($csvString, $fileName, 301);
+        self::assertEquals(301, $response->getStatusCode());
+        self::assertTrue($response->hasHeader(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY));
+        self::assertStringContainsString(
+            BaseController::RESPONSE_CONTENT_TYPE_CSV,
+            $response->getHeaderLine(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY)
+        );
+        self::assertTrue($response->hasHeader('Content-Disposition'));
+        self::assertStringContainsString(
+            "attachment; filename=\"{$fileName}\"",
+            $response->getHeaderLine('Content-Disposition')
+        );
+        self::assertStringContainsString($csvString, (string)$response->getBody());
+    }
+    
+    public function testThat_ResponseWithContentTypeJson_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+
+        $arrayData = ['name' => 'John Doe'];
+        $jsonString = '{"name": "Jane Doe"}';
+        
+        // Array Data & default http status code
+        $response = $controller->responseWithContentTypeJson($arrayData);
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertTrue($response->hasHeader(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY));
+        self::assertStringContainsString(
+            BaseController::RESPONSE_CONTENT_TYPE_JSON,
+            $response->getHeaderLine(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY)
+        );
+        self::assertStringContainsString('name', (string)$response->getBody());
+        $response->getBody()->rewind();
+        self::assertStringContainsString('John Doe', (string)$response->getBody());
+        
+        // String Data & default http status code
+        $response = $controller->responseWithContentTypeJson($jsonString);
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertTrue($response->hasHeader(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY));
+        self::assertStringContainsString(
+            BaseController::RESPONSE_CONTENT_TYPE_JSON,
+            $response->getHeaderLine(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY)
+        );
+        self::assertStringContainsString($jsonString, (string)$response->getBody());
+        
+        // Array Data & non-default http status code
+        $response = $controller->responseWithContentTypeJson($arrayData, 400);
+        self::assertEquals(400, $response->getStatusCode());
+        self::assertTrue($response->hasHeader(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY));
+        self::assertStringContainsString(
+            BaseController::RESPONSE_CONTENT_TYPE_JSON,
+            $response->getHeaderLine(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY)
+        );
+        self::assertStringContainsString('name', (string)$response->getBody());
+        $response->getBody()->rewind();
+        self::assertStringContainsString('John Doe', (string)$response->getBody());
+        
+        // String Data & non-default http status code
+        $response = $controller->responseWithContentTypeJson($jsonString, 301);
+        self::assertEquals(301, $response->getStatusCode());
+        self::assertTrue($response->hasHeader(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY));
+        self::assertStringContainsString(
+            BaseController::RESPONSE_CONTENT_TYPE_JSON,
+            $response->getHeaderLine(BaseController::RESPONSE_CONTENT_TYPE_HEADER_KEY)
+        );
+        self::assertStringContainsString($jsonString, (string)$response->getBody());
+    }
+    
+    /**
+     * Tests:
+     *  - isAppInDevMode()
+     *  - isAppInProductionMode()
+     *  - isAppInStagingMode()
+     *  - isAppInTestingMode()
+     */
+    public function testThat_IsAppInEnvMode_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $methodsMap = [
+            'isAppInDevMode', 'isAppInProductionMode',
+            'isAppInStagingMode', 'isAppInTestingMode'
+        ];
+        
+        foreach($methodsMap as $controllerMethod) {
+            
+            $controller = new BaseController(
+                $psr11Container, '', '', $req, $resp
+            );
+            
+            if($controllerMethod === 'isAppInTestingMode') {
+                
+                self::assertTrue($controller->{$controllerMethod}());
+                
+            } else {
+                
+                self::assertFalse($controller->{$controllerMethod}());
+            }
+        }
+    }
+    
+    /**
+     * Tests:
+     *  - isDeleteRequest()
+     *  - isGetRequest()
+     *  - isOptionsRequest()
+     *  - isPatchRequest()
+     *  - isPostRequest()
+     *  - isPutRequest()
+     */
+    public function testThat_IsHttpMethodRequest_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $httpMethodsMap = [
+            'delete' => 'isDeleteRequest',
+            'get' => 'isGetRequest',
+            'options' => 'isOptionsRequest',
+            'patch' => 'isPatchRequest',
+            'post' => 'isPostRequest',
+            'put' => 'isPutRequest',
+        ];
+        
+        foreach($httpMethodsMap as $httpMethod => $controllerMethod) {
+            $controller = new BaseController(
+                $psr11Container, '', '', $req, $resp
+            );
+            ($httpMethod !== 'get') && self::assertFalse($controller->{$controllerMethod}());
+
+            $controller->setRequest($controller->getRequest()->withMethod($httpMethod));
+            self::assertTrue($controller->{$controllerMethod}());
+        }
+    }
+    
+    public function testThat_LogError_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        /** @var \SMVCTools\Tests\TestObjects\InMemoryLogger $logger */
+        $logger = $controller->getLogger();
+        $logger->reset();
+        $controller->logError('Log message 1');
+
+        $logEntries = implode(PHP_EOL, $logger->getLogEntries());
+        self::assertStringContainsString('Log message 1', $logEntries);
+        self::assertStringContainsString(\Psr\Log\LogLevel::ERROR, $logEntries);
+    }
+    
+    public function testThat_LogInfo_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        /** @var \SMVCTools\Tests\TestObjects\InMemoryLogger $logger */
+        $logger = $controller->getLogger();
+        $logger->reset();
+        $controller->logInfo('Log message 2');
+
+        $logEntries = implode(PHP_EOL, $logger->getLogEntries());
+        self::assertStringContainsString('Log message 2', $logEntries);
+        self::assertStringContainsString(\Psr\Log\LogLevel::INFO, $logEntries);
+        
+    }
+    
+    public function testThat_LogNotice_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        /** @var \SMVCTools\Tests\TestObjects\InMemoryLogger $logger */
+        $logger = $controller->getLogger();
+        $logger->reset();
+        $controller->logNotice('Log message 3');
+
+        $logEntries = implode(PHP_EOL, $logger->getLogEntries());
+        self::assertStringContainsString('Log message 3', $logEntries);
+        self::assertStringContainsString(\Psr\Log\LogLevel::NOTICE, $logEntries);
+        
+    }
+    
+    public function testThat_LogWarning_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        /** @var \SMVCTools\Tests\TestObjects\InMemoryLogger $logger */
+        $logger = $controller->getLogger();
+        $logger->reset();
+        $controller->logWarning('Log message 4');
+
+        $logEntries = implode(PHP_EOL, $logger->getLogEntries());
+        self::assertStringContainsString('Log message 4', $logEntries);
+        self::assertStringContainsString(\Psr\Log\LogLevel::WARNING, $logEntries);
+        
+    }
+    
+    public function testThat_Redirect_WorksAsExpected() {
+        
+        $req = $this->newRequest('http://google.com/');
+        $resp = $this->newResponse();
+        $psr11Container = $this->getContainer();
+        
+        $controller = new BaseController(
+            $psr11Container, '', '', $req, $resp
+        );
+        
+        // empty url with remaining args default
+        $repsonseForEmptyUrl = $controller->redirect('');
+        self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
+        self::assertEquals($controller->makeLink(''), $repsonseForEmptyUrl->getHeader('Location')[0]);
+        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
+        
+        // empty url & don't call makeLink with remaining args default
+        $repsonseForEmptyUrl = $controller->redirect('', false);
+        self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
+        self::assertEquals('', $repsonseForEmptyUrl->getHeader('Location')[0]);
+        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
+        
+        // empty url, don't call makeLink & 302 status code
+        $repsonseForEmptyUrl = $controller->redirect('', false, 302);
+        self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
+        self::assertEquals('', $repsonseForEmptyUrl->getHeader('Location')[0]);
+        self::assertEquals(302, $repsonseForEmptyUrl->getStatusCode());
+        
+        // non-empty url with remaining args default
+        $repsonseForEmptyUrl = $controller->redirect('/foo/bar');
+        self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
+        self::assertEquals($controller->makeLink('/foo/bar'), $repsonseForEmptyUrl->getHeader('Location')[0]);
+        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
+        
+        // non-empty url & don't call makeLink with remaining args default
+        $repsonseForEmptyUrl = $controller->redirect('/foo/bar', false);
+        self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
+        self::assertEquals('/foo/bar', $repsonseForEmptyUrl->getHeader('Location')[0]);
+        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
     }
 }
