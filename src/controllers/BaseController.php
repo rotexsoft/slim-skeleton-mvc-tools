@@ -18,6 +18,11 @@ use \Psr\Http\Message\ServerRequestInterface,
  */
 class BaseController
 {
+    public const RESPONSE_CONTENT_TYPE_HEADER_KEY = 'Content-Type';
+    public const RESPONSE_CONTENT_TYPE_JSON = 'application/json';
+    public const RESPONSE_CONTENT_TYPE_CSV = 'text/csv; charset=UTF-8';
+    public const RESPONSE_CONTENT_TYPE_HTML = 'text/html; charset=UTF-8';
+    
     /**
      * View object for rendering layout files.
      */
@@ -1321,5 +1326,233 @@ class BaseController
             ($request ?? $this->request),
             $message
         );
+    }
+    
+    /**
+     * @param string $html the html to be returned in response to the current Ajax request
+     * @param int $status an http status code https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+     * 
+     * @return ResponseInterface response object with html content in the body
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function responseWithContentTypeHtml(string $html, int $status = 200): ResponseInterface {
+        
+        $this->response->getBody()->write($html);
+        
+        /** @psalm-suppress MixedArgument */
+        return $this->response
+                    ->withStatus($status)
+                    ->withHeader(
+                        static::RESPONSE_CONTENT_TYPE_HEADER_KEY,
+                        static::RESPONSE_CONTENT_TYPE_HTML
+                    );
+    }
+
+    /**
+     * Return a CSV formatted string in a response object
+     * 
+     * @param string $content   A CSV formatted string
+     * 
+     * @param string $filename  The default file name the CSV response will be
+     *                          saved as by the client (typically a web browser)
+     *                          that receives the response
+     * 
+     * @param int $status       HTTP status code to be set on the response object
+     *                          to be returned
+     * 
+     * @return ResponseInterface response object with csv data in the body
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function responseWithContentTypeCsv(string $content, string $filename, int $status = 200): ResponseInterface {
+        
+        $this->response->getBody()->write($content);
+        
+        /** @psalm-suppress MixedArgument */
+        return $this->response->withHeader(
+                                static::RESPONSE_CONTENT_TYPE_HEADER_KEY,
+                                static::RESPONSE_CONTENT_TYPE_CSV
+                              )
+                              ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                              ->withStatus($status);
+    }
+
+    /**
+     * Converts an array or string into a response object with the array data in JSON format or the string AS IS inside the response object
+     * 
+     * @param array|string $data Data to be converted into JSON to be embedded in the response's body or a string containing valid JSON to be embedded in the response's body.
+     *                           (The caller of this method is responsible for ensuring that the string contains valid JSON)
+     * @param int $status HTTP status code to be set on the response object to be returned
+     * 
+     * @return ResponseInterface response object with JSON data in the body
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function responseWithContentTypeJson(array|string $data, int $status = 200): ResponseInterface {
+        
+        $jsonData = (\is_array($data)) ? \json_encode($data, JSON_PRETTY_PRINT) : $data;
+        $jsonConversionFailureErrorMsg = 'could not convert response data to json';
+        
+        $this->response
+             ->getBody()
+             ->write(
+                ($jsonData === false)
+                ? $jsonConversionFailureErrorMsg
+                : $jsonData
+             );
+        
+        if($jsonData === false) {
+            
+            $this->response = 
+                $this->response
+                     ->withStatus(500, $jsonConversionFailureErrorMsg);
+            
+            $this->logError(
+                $jsonConversionFailureErrorMsg 
+                . PHP_EOL . \var_export($data, true)
+            );
+        }
+        
+        /** @psalm-suppress MixedArgument */
+        return $this->response
+                    ->withHeader(
+                        static::RESPONSE_CONTENT_TYPE_HEADER_KEY,
+                        static::RESPONSE_CONTENT_TYPE_JSON
+                    )
+                    ->withStatus($status);
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress UndefinedFunction
+     */
+    public function isAppInDevMode(): bool {
+        
+        return sMVC_GetCurrentAppEnvironment() === \SlimMvcTools\AppEnvironments::DEV;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress UndefinedFunction
+     */
+    public function isAppInProductionMode(): bool {
+        
+        return sMVC_GetCurrentAppEnvironment() === \SlimMvcTools\AppEnvironments::PRODUCTION;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress UndefinedFunction
+     */
+    public function isAppInStagingMode(): bool {
+        
+        return sMVC_GetCurrentAppEnvironment() === \SlimMvcTools\AppEnvironments::STAGING;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress UndefinedFunction
+     */
+    public function isAppInTestingMode(): bool {
+        
+        return sMVC_GetCurrentAppEnvironment() === \SlimMvcTools\AppEnvironments::TESTING;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function isDeleteRequest(): bool {
+        
+        return \strtoupper($this->request->getMethod()) === 'DELETE';
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function isGetRequest(): bool {
+        
+        return \strtoupper($this->request->getMethod()) === 'GET';
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function isOptionsRequest(): bool {
+        
+        return \strtoupper($this->request->getMethod()) === 'OPTIONS';
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function isPatchRequest(): bool {
+        
+        return \strtoupper($this->request->getMethod()) === 'PATCH';
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function isPostRequest(): bool {
+        
+        return \strtoupper($this->request->getMethod()) === 'POST';
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function isPutRequest(): bool {
+        
+        return \strtoupper($this->request->getMethod()) === 'PUT';
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function logError(string $logMessage): static {
+        
+        $this->getLogger()->error($logMessage);
+        
+        return $this;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function logInfo(string $logMessage): static {
+        
+        $this->getLogger()->info($logMessage);
+        
+        return $this;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function logNotice(string $logMessage): static {
+        
+        $this->getLogger()->notice($logMessage);
+        
+        return $this;
+    }
+    
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function logWarning(string $logMessage): static {
+        
+        $this->getLogger()->warning($logMessage);
+        
+        return $this;
+    }
+
+    /**
+     * Redirect to a different url
+     * 
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function redirect(string $url, bool $callMakeLink=true, int $status = 301): ResponseInterface {
+
+        return $this->response
+                    ->withStatus($status)
+                    ->withHeader('Location', $callMakeLink ? $this->makeLink($url) : $url);
     }
 }
