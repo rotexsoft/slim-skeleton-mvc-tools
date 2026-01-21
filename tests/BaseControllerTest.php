@@ -2187,30 +2187,30 @@ class BaseControllerTest extends \PHPUnit\Framework\TestCase
         $repsonseForEmptyUrl = $controller->redirect('');
         self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
         self::assertEquals($controller->makeLink(''), $repsonseForEmptyUrl->getHeader('Location')[0]);
-        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
+        self::assertEquals(302, $repsonseForEmptyUrl->getStatusCode());
         
         // empty url & don't call makeLink with remaining args default
         $repsonseForEmptyUrl = $controller->redirect('', false);
         self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
         self::assertEquals('', $repsonseForEmptyUrl->getHeader('Location')[0]);
-        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
+        self::assertEquals(302, $repsonseForEmptyUrl->getStatusCode());
         
         // empty url, don't call makeLink & 302 status code
-        $repsonseForEmptyUrl = $controller->redirect('', false, 302);
+        $repsonseForEmptyUrl = $controller->redirect('', false, 301);
         self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
         self::assertEquals('', $repsonseForEmptyUrl->getHeader('Location')[0]);
-        self::assertEquals(302, $repsonseForEmptyUrl->getStatusCode());
+        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
         
         // non-empty url with remaining args default
         $repsonseForEmptyUrl = $controller->redirect('/foo/bar');
         self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
         self::assertEquals($controller->makeLink('/foo/bar'), $repsonseForEmptyUrl->getHeader('Location')[0]);
-        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
+        self::assertEquals(302, $repsonseForEmptyUrl->getStatusCode());
         
         // non-empty url & don't call makeLink with remaining args default
         $repsonseForEmptyUrl = $controller->redirect('/foo/bar', false);
         self::assertTrue($repsonseForEmptyUrl->hasHeader('Location'));
         self::assertEquals('/foo/bar', $repsonseForEmptyUrl->getHeader('Location')[0]);
-        self::assertEquals(301, $repsonseForEmptyUrl->getStatusCode());
+        self::assertEquals(302, $repsonseForEmptyUrl->getStatusCode());
     }
 }
