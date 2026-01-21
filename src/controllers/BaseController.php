@@ -1544,8 +1544,6 @@ class BaseController
 
     /**
      * Redirect to a different url
-     * 
-     * @psalm-suppress PossiblyUnusedMethod
      */
     public function redirect(string $url, bool $callMakeLink=true, int $status = 302): ResponseInterface {
 
