@@ -751,9 +751,7 @@ class BaseController
 
                 //re-direct
                 /** @psalm-suppress MixedArgument */
-                return $this->response
-                            ->withStatus(302)
-                            ->withHeader('Location', $success_redirect_path);
+                return $this->redirect($success_redirect_path, false, 302);
             } else {
 
                 //re-display login form with error messages
@@ -1006,7 +1004,7 @@ class BaseController
         
         //re-direct
         /** @psalm-suppress MixedArgument */
-        return $this->response->withStatus(302)->withHeader('Location', $redirect_path);
+        return $this->redirect($redirect_path, false, 302);
     }
     
     /**
@@ -1087,7 +1085,7 @@ class BaseController
             $action = (SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES) ? 'login' : 'action-login';
             $redr_path = $this->makeLink("/{$controller}/$action");
 
-            return $this->response->withStatus(302)->withHeader('Location', $redr_path);
+            return $this->redirect($redr_path, false, 302);
         }
 
         return false;
@@ -1549,7 +1547,7 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function redirect(string $url, bool $callMakeLink=true, int $status = 301): ResponseInterface {
+    public function redirect(string $url, bool $callMakeLink=true, int $status = 302): ResponseInterface {
 
         return $this->response
                     ->withStatus($status)
