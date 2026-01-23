@@ -107,8 +107,8 @@ class FrameworkHelpersTest extends \PHPUnit\Framework\TestCase
     
     public function testThat_sMVC_DumpVar_WorksAsExpected() {
         
-        $expected_needle = 'string(11) "Hello world"';
-        $expected_needle2 = 'int(777)';
+        $expected_needle = 'Hello world';
+        $expected_needle2 = '777';
         $func_wrapper = function(...$vals) { sMVC_DumpVar(...$vals); };
         
         $result = $this->execVoidFuncCaptureAndReturnOutput($func_wrapper, "Hello world");

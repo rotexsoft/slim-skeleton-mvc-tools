@@ -28,7 +28,7 @@
         "vespula/locale": "^2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.5.21",
+        "phpunit/phpunit": "^12.0 || ^11.0",
         "php-coveralls/php-coveralls": "^2.5.2",
         "vimeo/psalm": "^6.0",
         "rector/rector": "^2.0.17",
