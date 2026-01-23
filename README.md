@@ -44,7 +44,8 @@ or
 
 These are the branches in this repository:
 
-- **master:** contains code for the latest major version of this package (currently 6.x)
+- **master:** contains code for the latest major version of this package (currently 7.x)
+- **6.x:** contains code for the **6.x** versions of this package
 - **5.x:** contains code for the **5.x** versions of this package
 - **4.x:** contains code for the **4.x** versions of this package. No new features, only bug fixes accepted.
 - **slim-3-edition:** contains code for the **3.x** versions of this package. No new features, only bug fixes accepted.
