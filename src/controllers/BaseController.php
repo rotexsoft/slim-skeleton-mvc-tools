@@ -513,6 +513,7 @@ class BaseController
      *                    file (i.e. the file named $file_name).
      * 
      * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress InvalidReturnType
      */
     public function renderLayout( string $file_name, array $data = ['content'=>'Content should be placed here!'] ): string {
 
@@ -523,11 +524,20 @@ class BaseController
          */
         $this->layout_renderer = $this->getContainerItem(ContainerKeys::LAYOUT_RENDERER); // get new instance for each call to this method renderLayout
         
-        /** 
-         * @psalm-suppress MixedReturnStatement
-         * @psalm-suppress MixedMethodCall
-         */
-        return $this->layout_renderer->renderToString($file_name, $data);
+        try {
+            /** 
+             * @psalm-suppress MixedReturnStatement
+             * @psalm-suppress MixedMethodCall
+             */
+            return $this->layout_renderer->renderToString($file_name, $data);
+            
+        } catch (\Rotexsoft\FileRenderer\FileNotFoundException $ex) {
+            
+            $this->forceHttp404(
+                $this->vespula_locale->gettext('error_layout_not_found'),
+                null, $ex
+            );
+        }
     }
 
     /**
@@ -547,6 +557,7 @@ class BaseController
      *                    file (i.e. the file named $file_name).
      * 
      * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress InvalidReturnType
      */
     public function renderView( string $file_name, array $data = [] ): string {
 
@@ -601,11 +612,20 @@ class BaseController
 
         $data['controller_object'] = $this;
         
-        /** 
-         * @psalm-suppress MixedReturnStatement
-         * @psalm-suppress MixedMethodCall
-         */
-        return $this->view_renderer->renderToString($file_name, $data);
+        try {
+            /** 
+             * @psalm-suppress MixedReturnStatement
+             * @psalm-suppress MixedMethodCall
+             */
+            return $this->view_renderer->renderToString($file_name, $data);
+            
+        } catch (\Rotexsoft\FileRenderer\FileNotFoundException $ex) {
+            
+            $this->forceHttp404(
+                $this->vespula_locale->gettext('error_view_not_found'),
+                null, $ex
+            );
+        }
     }
 
     /**
@@ -1196,13 +1216,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp400(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp400(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpBadRequestException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
     
@@ -1211,13 +1231,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp401(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp401(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpUnauthorizedException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
     
@@ -1226,13 +1246,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp403(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp403(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpForbiddenException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
     
@@ -1241,13 +1261,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp404(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp404(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpNotFoundException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
     
@@ -1256,13 +1276,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp405(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp405(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpMethodNotAllowedException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
     
@@ -1271,13 +1291,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp410(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp410(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpGoneException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
 
@@ -1286,13 +1306,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp429(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp429(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpTooManyRequestsException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
 
@@ -1301,13 +1321,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp500(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp500(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpInternalServerErrorException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
     
@@ -1316,13 +1336,13 @@ class BaseController
      * 
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function forceHttp501(string $message, ?ServerRequestInterface $request=null): void {
+    public function forceHttp501(string $message, ?ServerRequestInterface $request=null, ?\Throwable $previous_exception = null): void {
         
         throw Utils::createSlimHttpExceptionWithLocalizedDescription(
             $this->getContainer(),
             \SlimMvcTools\SlimHttpExceptionClassNames::HttpNotImplementedException,
             ($request ?? $this->request),
-            $message
+            $message, $previous_exception
         );
     }
     
