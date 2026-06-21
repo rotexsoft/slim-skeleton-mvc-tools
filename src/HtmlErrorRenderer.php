@@ -45,8 +45,6 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
             return parent::renderHtmlBody($title, $html);
         }
         
-        $file_contents = '';
-        
         if(\str_ends_with(\mb_strtolower($this->path_to_error_template_file), 'php')) {
             
             $php_file_renderer = new \Rotexsoft\FileRenderer\Renderer();
