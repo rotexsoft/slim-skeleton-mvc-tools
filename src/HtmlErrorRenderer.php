@@ -45,7 +45,17 @@ class HtmlErrorRenderer extends \Slim\Error\Renderers\HtmlErrorRenderer {
             return parent::renderHtmlBody($title, $html);
         }
         
-        $file_contents = file_get_contents($this->path_to_error_template_file);
+        $file_contents = '';
+        
+        if(\str_ends_with(\mb_strtolower($this->path_to_error_template_file), 'php')) {
+            
+            $php_file_renderer = new \Rotexsoft\FileRenderer\Renderer();
+            $file_contents = $php_file_renderer->renderToString($this->path_to_error_template_file);
+            
+        } else {
+            
+            $file_contents = file_get_contents($this->path_to_error_template_file);
+        }
         
         $appSettings = (array)$this->getContainerItem(ContainerKeys::APP_SETTINGS, []);
         /** @psalm-suppress MixedOperand */
