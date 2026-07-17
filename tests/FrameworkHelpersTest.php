@@ -186,7 +186,7 @@ class FrameworkHelpersTest extends \PHPUnit\Framework\TestCase
     
     public function testThat_sMVC_UriToStringWithoutSchemeAndAuthority_WorksAsExpected() {
         
-        $url = 'http://192.139.7.136:8888/controller/action-method/1043?format=xlsx#section-one';
+        $url = 'http://tnyholm.com:8888/controller/action-method/1043?format=xlsx#section-one';
         $result = sMVC_UriToStringWithoutSchemeAndAuthority(
             $this->newRequest($url)
                  ->getUri()
