@@ -310,7 +310,7 @@ function sMVC_AddQueryStrParamToUri(
  * 'http://192.139.7.136:8888/controller/action-method/1043?format=xlsx#section-one',
  * this method will return '/controller/action-method/1043?format=xlsx#section-one'
  */
-function sMVC_UriToStringWithoutSchemeAndAuthority(\Psr\Http\Message\UriInterface $uri): string {
+function sMVC_UriToStringWithoutSchemeAndAuthorityAndPort(\Psr\Http\Message\UriInterface $uri): string {
 
         $path = $uri->getPath();
         $query = $uri->getQuery();
