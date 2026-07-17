@@ -304,6 +304,25 @@ function sMVC_AddQueryStrParamToUri(
 }
 
 /**
+ * Returns a string representation of a uri object without the host and authority parts.
+ * 
+ * For example given a uri object representing 
+ * 'http://192.139.7.136:8888/controller/action-method/1043?format=xlsx#section-one',
+ * this method will return '/controller/action-method/1043?format=xlsx#section-one'
+ */
+function sMVC_UriToStringWithoutSchemeAndAuthority(\Psr\Http\Message\UriInterface $uri): string {
+
+        $path = $uri->getPath();
+        $query = $uri->getQuery();
+        $fragment = $uri->getFragment();
+        $path = '/' . ltrim($path, '/');
+
+        return $path
+            . (($query !== '' && $query !== '0')  ? '?' . $query : '')
+            . (($fragment !== '' && $fragment !== '0') ? '#' . $fragment : '');
+}
+
+/**
  * @param string $error_message A brief description of the message
  * @param string $file_path path to the missing file
  * @param string $dist_file_path path to the dist file that can be used to create the missing file

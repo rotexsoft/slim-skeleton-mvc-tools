@@ -184,6 +184,16 @@ class FrameworkHelpersTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('http://tnyholm.se/blah?var=1', $result);
     }
     
+    public function testThat_sMVC_UriToStringWithoutSchemeAndAuthority_WorksAsExpected() {
+        
+        $url = 'http://192.139.7.136:8888/controller/action-method/1043?format=xlsx#section-one';
+        $result = sMVC_UriToStringWithoutSchemeAndAuthority(
+            $this->newRequest($url)
+                 ->getUri()
+        );
+        self::assertEquals('/controller/action-method/1043?format=xlsx#section-one', $result);
+    }
+    
     public function testThat_sMVC_addQueryStrParamToUri_WorksAsExpected() {
         
         $result = sMVC_AddQueryStrParamToUri(
